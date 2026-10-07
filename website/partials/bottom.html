@@ -1,0 +1,137 @@
+		</main>
+
+		<aside class="sidebar" aria-label="sidebar">
+			<section class="widget stats" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/eye.png" alt="">live stats <i class="live-dot" data-tip="live: updates by itself"></i></h4>
+				<div class="w-body">
+					<div class="dim small">you are visitor number</div>
+					<div class="odometer" data-stat="visits" data-digits="7" aria-label="visitor counter">0001337</div>
+					<div class="you dim small" id="you-were"></div>
+					<dl class="statlist">
+						<dt><i class="led"></i>online now</dt><dd data-stat="online">1</dd>
+						<dt>visits today</dt><dd data-stat="today">0</dd>
+						<dt>page views</dt><dd data-stat="views">0</dd>
+						<dt>downloads</dt><dd data-stat="downloads">0</dd>
+						<dt>guestbook</dt><dd data-stat="guestbook">1</dd>
+					</dl>
+					<div class="spark" id="spark" aria-label="visits over the last two weeks" data-tip="visits, last 14 days"></div>
+					<dl class="statlist tally">
+						<dt data-tip="modules people switched on and off in the menu demo">menu toggles</dt><dd data-stat="toggles">0</dd>
+						<dt data-tip="skin layer changes played in the skin animation lab, by everyone">skin blinks</dt><dd data-stat="blinks">0</dd>
+					</dl>
+				</div>
+			</section>
+
+			<section class="widget promo" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/player.png" alt="">skin animation <b class="burst small">NEW!</b></h4>
+				<a class="w-body promo-body" href="/skin-animation">
+					<span class="mini-stage" data-skin3d="mini" aria-hidden="true"></span>
+					<span class="promo-copy"><b>your skin, animated.</b> hat, jacket, sleeves, trousers and cape blink in patterns. <u>everyone on the server sees it.</u></span>
+					<span class="button glossy small">try it &raquo;</span>
+				</a>
+			</section>
+
+			<section class="widget poll" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/check.png" alt="">poll</h4>
+				<form class="w-body" id="poll">
+					<p class="q">best way to annoy people?</p>
+					<div class="poll-options"><span class="dim small">loading the ballot...</span></div>
+					<button class="button glossy small" type="submit" disabled>vote!</button>
+					<p class="dim small poll-total"></p>
+				</form>
+			</section>
+
+			<section class="widget" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/chat.png" alt="">guestbook</h4>
+				<div class="w-body center">
+					<a href="/guestbook"><img src="img/mail.gif" width="32" height="24" alt=""></a>
+					<div><a href="/guestbook">sign my guestbook!</a></div>
+					<div class="latest-entry dim small" id="latest-entry"></div>
+				</div>
+			</section>
+
+			<section class="widget webring" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/world.png" alt="">webring</h4>
+				<div class="w-body center">
+					<div class="ring" aria-hidden="true"><span>T</span><span>R</span><span>O</span><span>L</span><span>L</span></div>
+					<div class="dim small">the troll webring</div>
+					<a href="/" data-ring="-1" data-tip="there is only one site in this ring">&laquo; prev</a> &middot;
+					<a href="/" data-ring="0" data-tip="it's always this one">random</a> &middot;
+					<a href="/" data-ring="1" data-tip="still this one">next &raquo;</a>
+				</div>
+			</section>
+
+			<div class="construction" data-reveal>
+				<img src="img/construction.gif" width="150" height="40" alt="under construction">
+				<div class="dim small">this site is forever under construction</div>
+			</div>
+		</aside>
+	</div>
+
+	<footer class="statusbar">
+		<span class="status" id="status">Done</span>
+		<span class="meter" aria-hidden="true" data-tip="how far down the page you are"><i id="scroll-meter"></i></span>
+		<span class="sb-online"><i class="led"></i><span data-stat="online">1</span> online</span>
+		<span class="zone"><img class="icon" src="img/icons/world.png" alt=""> Internet</span>
+	</footer>
+</div>
+
+<footer class="site-foot">
+	<div class="badges">
+		<a href="/"><img src="img/badges/troll.png" alt="Troll Client"></a>
+		<a href="https://fabricmc.net/" rel="noopener"><img src="img/badges/fabric.png" alt="Fabric powered"></a>
+		<img src="img/badges/mc.png" alt="Minecraft 26.2">
+		<img src="img/badges/java.png" alt="Java 25">
+		<img src="img/badges/bw.png" alt="black and white">
+		<img src="img/badges/notepad.png" alt="made with notepad">
+		<img src="img/badges/800.png" alt="best at 800x600">
+		<img src="img/badges/nofl.png" alt="no flash">
+	</div>
+	<p class="dim small">&copy; 2026 Troll Client &middot; not affiliated with Mojang or Microsoft &middot; Minecraft is a trademark of Mojang AB<br>
+	served by a Cloudflare Worker &middot; use it where this kind of thing is welcome</p>
+</footer>
+
+<button class="to-top" id="to-top" type="button" aria-label="Back to top"><svg viewBox="0 0 12 16" shape-rendering="crispEdges"><path fill="currentColor" d="M5 0h2v1h1v2h1v6h1v1h1v3h-1v-1H9v1H3v-1H2v1H1v-3h1V9h1V3h1V1h1zm0 4v2h2V4z"/><path class="flame" fill="currentColor" d="M4 14h1v1h2v-1h1v1H7v1H5v-1H4z"/></svg></button>
+
+<div class="taskbar" id="taskbar">
+	<button class="start" id="start" type="button" aria-haspopup="true" aria-expanded="false"><img src="img/logo-small.png" alt=""><span>start</span></button>
+	<span class="quick">
+		<a href="/" aria-label="home" data-tip="home"><img src="img/icons/star.png" alt=""></a>
+		<a href="/skin-animation" aria-label="skin animation" data-tip="skin animation"><img src="img/icons/player.png" alt=""></a>
+		<a href="/download" aria-label="download" data-tip="download"><img src="img/icons/cube.png" alt=""></a>
+	</span>
+	<button class="task on" id="task" type="button"><img src="img/logo-small.png" alt=""><span>Troll Client - Troll Navigator</span></button>
+	<span class="grow"></span>
+	<span class="tray" id="tray">
+		<button class="tray-btn" type="button" id="tray-sound" aria-label="Sound" data-tip="sound: off"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M2 6h3l4-4h1v12H9l-4-4H2z"/><path class="waves" fill="currentColor" d="M12 5h1v1h1v4h-1v1h-1V9h1V7h-1z"/></svg></button>
+		<span class="tray-online" data-tip="people on the site right now"><i class="led"></i><span data-stat="online">1</span></span>
+		<span class="clock" id="clock">00:00</span>
+	</span>
+</div>
+
+<div class="startmenu" id="startmenu" hidden>
+	<div class="sm-head"><span class="sm-avatar" data-head="troll"></span><b>troll user</b></div>
+	<div class="sm-cols">
+		<ul class="sm-left">
+			<li><a href="/"><img src="img/icons/star.png" alt="">home</a></li>
+			<li><a href="/skin-animation" class="hot"><img src="img/icons/player.png" alt=""><span>skin animation<small>your skin, animated</small></span></a></li>
+			<li><a href="/modules"><img src="img/icons/gear.png" alt="">modules</a></li>
+			<li><a href="/gallery"><img src="img/icons/radar.png" alt="">gallery</a></li>
+			<li><a href="/download"><img src="img/icons/cube.png" alt="">download</a></li>
+			<li><a href="/guestbook"><img src="img/icons/chat.png" alt="">guestbook</a></li>
+		</ul>
+		<ul class="sm-right">
+			<li><button type="button" data-sm="theme"><img src="img/icons/palette.png" alt="">next theme</button></li>
+			<li><button type="button" data-sm="crt"><img src="img/icons/eye.png" alt="">CRT on/off</button></li>
+			<li><button type="button" data-sm="sound"><img src="img/icons/keyboard.png" alt="">sound on/off</button></li>
+			<li><button type="button" data-sm="trail"><img src="img/icons/star.png" alt="">cursor trail</button></li>
+			<li><button type="button" data-sm="twerk"><img src="img/icons/troll.png" alt="">twerk.exe</button></li>
+		</ul>
+	</div>
+	<div class="sm-foot">
+		<button type="button" data-sm="logoff"><img src="img/icons/close.png" alt="">log off</button>
+		<button type="button" data-sm="shutdown"><img src="img/icons/power.png" alt="">turn off computer</button>
+	</div>
+</div>
+
+<div class="balloons" id="balloons" aria-live="polite"></div>

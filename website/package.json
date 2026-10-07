@@ -1,0 +1,13 @@
+{
+	"name": "troll-client-homepage",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev --port 8642",
+		"deploy": "wrangler deploy",
+		"tail": "wrangler tail"
+	},
+	"devDependencies": {
+		"wrangler": "^4.148.0"
+	}
+}

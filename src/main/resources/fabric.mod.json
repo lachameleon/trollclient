@@ -1,0 +1,21 @@
+{
+	"schemaVersion": 1,
+	"id": "trollclient",
+	"version": "${version}",
+	"name": "Troll Client",
+	"description": "A black & white utility client for being mildly annoying.",
+	"authors": ["Troll Client"],
+	"license": "MIT",
+	"icon": "assets/trollclient/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": ["com.trollclient.TrollClient"]
+	},
+	"mixins": ["trollclient.mixins.json"],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

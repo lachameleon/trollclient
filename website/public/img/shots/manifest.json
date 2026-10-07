@@ -1,0 +1,58 @@
+[
+ {
+  "file": "title.jpg",
+  "caption": "the title screen: warp stars, a 3D pixel logo and a sine scroller"
+ },
+ {
+  "file": "menu.jpg",
+  "caption": "the menu, with the category name sliding out of the sidebar"
+ },
+ {
+  "file": "settings.jpg",
+  "caption": "settings: switches that say on/off, sliders, typewriter tooltips"
+ },
+ {
+  "file": "themes.jpg",
+  "caption": "themes: this one's Ink"
+ },
+ {
+  "file": "search.jpg",
+  "caption": "type to search: matches light up"
+ },
+ {
+  "file": "twerk.jpg",
+  "caption": "Twerk + ItemFlex, with the troll skin and cape (Noir shader)"
+ },
+ {
+  "file": "orbit.jpg",
+  "caption": "Orbit circling a stand-in player, target HUD and radar (CRT shader)"
+ },
+ {
+  "file": "stalker.jpg",
+  "caption": "Stalker in angel mode (Noir shader)"
+ },
+ {
+  "file": "trapper.jpg",
+  "caption": "Trapper boxing someone in (Ink shader)"
+ },
+ {
+  "file": "pelter.jpg",
+  "caption": "Pelter + Confetti (Dither shader)"
+ },
+ {
+  "file": "nowayhome.jpg",
+  "caption": "NoWayHome walling a player in (Halftone shader)"
+ },
+ {
+  "file": "mimic.jpg",
+  "caption": "Mimic copying every move"
+ },
+ {
+  "file": "racket.jpg",
+  "caption": "Racket: every door, gate and lever at once (CRT shader)"
+ },
+ {
+  "file": "outro.jpg",
+  "caption": "fin"
+ }
+]

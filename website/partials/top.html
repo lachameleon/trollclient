@@ -1,0 +1,67 @@
+<div class="desktop" aria-hidden="true">
+	<canvas id="wallpaper"></canvas>
+</div>
+<div class="desk-icons" role="group" aria-label="desktop icons">
+	<button class="desk-icon" data-open="/download" style="--x:0;--y:0"><span class="ico"><img src="img/icons/cube.png" alt=""></span><span class="lbl">troll-client-1.0.0.jar</span></button>
+	<button class="desk-icon" data-open="/skin-animation" style="--x:0;--y:1"><span class="ico"><img src="img/icons/player.png" alt=""><b class="mini-burst">NEW</b></span><span class="lbl">skin_animation.exe</span></button>
+	<button class="desk-icon" data-act="twerk" style="--x:0;--y:2"><span class="ico"><img src="img/icons/troll.png" alt=""></span><span class="lbl">twerk.exe</span></button>
+	<button class="desk-icon" data-act="bin" style="--x:0;--y:3"><span class="ico"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M5 1h6v1h4v2H1V2h4zM2 5h12v10H2zm2 2v6h1V7zm3 0v6h2V7zm4 0v6h1V7z"/></svg></span><span class="lbl">Recycle Bin</span></button>
+	<button class="desk-icon" data-open="/guestbook" style="--x:0;--y:4"><span class="ico"><img src="img/icons/chat.png" alt=""></span><span class="lbl">guestbook.txt</span></button>
+</div>
+
+<div class="browser" id="browser">
+	<header class="chrome">
+		<div class="titlebar" id="titlebar">
+			<img class="app-icon" src="img/logo-small.png" alt="">
+			<span class="title"><span class="t-page">Troll Client - {{title}}</span><span class="t-app"> - Troll Navigator 2.0</span></span>
+			<span class="winbtns">
+				<button class="winbtn" data-win="min" aria-label="Minimize" title="Minimize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 7h8v2H1z"/></svg></button>
+				<button class="winbtn" data-win="max" aria-label="Maximize" title="Maximize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 1h8v8H1zm1 2v5h6V3z"/></svg></button>
+				<button class="winbtn close" data-win="close" aria-label="Close" title="Close"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 1h2v1h1v1h2V2h1V1h2v2H8v1H7v2h1v1h1v2H7V8H6V7H4v1H3v1H1V7h1V6h1V4H2V3H1z"/></svg></button>
+			</span>
+		</div>
+		<nav class="tabs" aria-label="Pages">
+			<a class="tab" data-tab="home" href="/"><img src="img/icons/star.png" alt=""><span class="lbl">home</span></a>
+			<a class="tab hot" data-tab="skin" href="/skin-animation"><img src="img/icons/player.png" alt=""><span class="lbl">skin animation</span><b class="burst" aria-label="new">NEW!</b></a>
+			<a class="tab" data-tab="modules" href="/modules"><img src="img/icons/gear.png" alt=""><span class="lbl">modules</span></a>
+			<a class="tab" data-tab="gallery" href="/gallery"><img src="img/icons/radar.png" alt=""><span class="lbl">gallery</span></a>
+			<a class="tab" data-tab="download" href="/download"><img src="img/icons/cube.png" alt=""><span class="lbl">download</span></a>
+			<a class="tab" data-tab="guestbook" href="/guestbook"><img src="img/icons/chat.png" alt=""><span class="lbl">guestbook</span></a>
+			<button class="tab-new" type="button" aria-label="Open a random page" data-tip="new tab: somewhere random">+</button>
+		</nav>
+		<div class="toolbar">
+			<button class="navbtn back" type="button" data-nav="back" aria-label="Back"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M7 3h2v2H8v1h6v4H8v1h1v2H7v-1H6v-1H5V9H4V7h1V6h1V5h1z"/></svg></button>
+			<button class="navbtn fwd" type="button" data-nav="forward" aria-label="Forward"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M7 3h2v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1H9v1H7v-2h1v-1H2V6h6V5H7z"/></svg></button>
+			<button class="navbtn reload" type="button" data-nav="reload" aria-label="Reload"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M6 2h5v1h1v1h1V2h1v5H9V6h2V5h-1V4H6v1H5v1H4v4h1v1h1v1h4v-1h1v-1h1V9h2v2h-1v1h-1v1h-1v1H6v-1H5v-1H4v-1H3V9H2V6h1V5h1V4h1V3h1z"/></svg></button>
+			<a class="navbtn home" href="/" aria-label="Home"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M7 2h2v1h1v1h1v1h1v1h1v1h1v2h-2v5H9v-4H7v4H3V9H1V7h1V6h1V5h1V4h1V3h1z"/></svg></a>
+			<div class="address" id="address">
+				<img class="fav" src="img/favicon.png" alt="">
+				<span class="url" id="url" aria-label="address">http://trollclient/</span>
+				<span class="lock" id="lock" data-tip="secure connection. it's not 1998 any more" hidden><svg viewBox="0 0 10 12" shape-rendering="crispEdges"><path fill="currentColor" d="M3 0h4v1h1v4h1v7H1V5h1V1h1zm0 2v3h4V2zm1 5v3h2V7z"/></svg></span>
+				<button class="star" type="button" aria-label="Bookmark this page" data-tip="bookmark this page">&#9733;</button>
+				<i class="load" aria-hidden="true"></i>
+			</div>
+			<form class="searchbox" action="/modules" role="search">
+				<img src="img/icons/search.png" alt="">
+				<input name="q" type="search" placeholder="search modules" aria-label="Search modules" autocomplete="off">
+			</form>
+			<img class="throbber" id="throbber" src="img/spin.gif" alt="">
+		</div>
+		<div class="bookmarks">
+			<span class="bm-label">bookmarks</span>
+			<a class="bm hot" href="/skin-animation">&#9733; skin animation</a>
+			<a class="bm" href="/#tv">the video</a>
+			<a class="bm" href="/#demo">try the menu</a>
+			<a class="bm" href="/download">get v1.0</a>
+			<span class="grow"></span>
+			<button class="bm" type="button" id="theme-cycle" data-tip="cycle theme (right click goes back)"><img class="icon" src="img/icons/palette.png" alt=""> <span id="theme-name">Noir</span></button>
+			<button class="bm" type="button" id="crt-toggle" data-tip="scanlines + vignette">CRT: ON</button>
+			<button class="bm" type="button" id="sound-toggle" data-tip="chiptune bleeps for buttons">sound: off</button>
+		</div>
+		<div class="ticker" aria-label="news ticker">
+			<div class="ticker-track"><span class="ticker-text">*** NEW: SKIN ANIMATION! YOUR SKIN, ANIMATED, AND EVERYONE ON THE SERVER SEES IT *** BLINK / WAVE / RANDOM / STROBE *** <b data-stat="visits">1,337</b> VISITORS SO FAR *** <b data-stat="online">1</b> ONLINE RIGHT NOW *** VERSION 1.0 IS OUT *** 35 MODULES *** 5 SHADERS *** 7 THEMES *** SIGN THE GUESTBOOK. IT'S REAL NOW *** </span></div>
+		</div>
+	</header>
+
+	<div class="page">
+		<main class="content" id="content">

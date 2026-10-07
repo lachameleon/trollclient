@@ -1,0 +1,31 @@
+{
+	"required": true,
+	"package": "com.trollclient.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"AbstractArrowAccessor",
+		"AbstractClientPlayerMixin",
+		"AbstractContainerScreenAccessor",
+		"CameraMixin",
+		"ClientPacketListenerMixin",
+		"ConnectionMixin",
+		"GameRendererAccessor",
+		"GameRendererMixin",
+		"GuiMixin",
+		"KeyboardHandlerMixin",
+		"KeyboardInputMixin",
+		"LevelExtractorMixin",
+		"LocalPlayerAccessor",
+		"LocalPlayerMixin",
+		"MultiPlayerGameModeAccessor",
+		"MultiPlayerGameModeMixin",
+		"ToastManagerAccessor",
+		"ToastManagerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

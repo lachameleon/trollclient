@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troll Client :: cannot display the webpage</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/img/favicon.png">
+<link rel="stylesheet" href="/css/style.css?v=7">
+<style>
+	.nf { width: 640px; max-width: calc(100% - 16px); margin: 8vh auto 0; }
+	.nf .body { padding: 22px 26px 18px; display: grid; grid-template-columns: 64px 1fr; gap: 18px; }
+	@media (max-width: 520px) { .nf .body { grid-template-columns: 1fr; } }
+	.nf .face { width: 64px; height: 64px; image-rendering: pixelated; animation: wobble 2.4s ease-in-out infinite; }
+	.nf h1 { font-size: 24px; line-height: 32px; margin: 0 0 8px; }
+	.nf p, .nf li { color: var(--dim); }
+	.nf ul { margin: 6px 0 14px; }
+	.nf .code { font: 16px/22px "TrollTerminal", monospace; color: var(--dim); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; }
+	.nf .glitch { position: relative; display: inline-block; }
+	.nf .glitch::after { content: attr(data-text); position: absolute; left: 2px; top: 0; color: var(--dim); clip-path: inset(0 0 60% 0); animation: glitch 2.2s steps(1) infinite; }
+	@keyframes glitch { 0%, 92% { transform: none; opacity: 0; } 93% { transform: translateX(-3px); opacity: 1; } 96% { transform: translateX(2px); clip-path: inset(50% 0 0 0); opacity: 1; } }
+</style>
+</head>
+<body class="theme-noir crt" data-page="404">
+<script>try{var t=localStorage.getItem("troll-theme"),b=document.body;if(t&&/^[a-z]+$/.test(t)){b.className=b.className.replace(/theme-[a-z]+/,"theme-"+t);if(/^(paper|newsprint|ink|fog)$/.test(t))b.classList.add("light")}if(localStorage.getItem("troll-crt")==="0")b.classList.remove("crt")}catch(e){}</script>
+<div class="desktop" aria-hidden="true"><canvas id="wallpaper"></canvas></div>
+<div class="browser nf">
+	<div class="chrome">
+		<div class="titlebar">
+			<img class="app-icon" src="/img/logo-small.png" alt="">
+			<span class="title"><span class="t-page">Cannot find server</span><span class="t-app"> - Troll Navigator 2.0</span></span>
+		</div>
+	</div>
+	<div class="body">
+		<canvas class="face" id="face" width="8" height="8" aria-hidden="true"></canvas>
+		<div>
+			<h1 class="glitch" data-text="The page cannot be displayed">The page cannot be displayed</h1>
+			<p>The page you are looking for has been trolled, moved, renamed, or never existed in the first place.</p>
+			<p class="px">Please try the following:</p>
+			<ul>
+				<li>Check the address for typos. We didn't.</li>
+				<li>Open the <a href="/">home page</a> and look for links to the information you want.</li>
+				<li>Go and look at the <a href="/skin-animation">skin animation</a> instead. It's better anyway.</li>
+				<li>Click the <a href="javascript:history.back()">Back</a> button to try another link.</li>
+			</ul>
+			<a class="button primary" href="/">take me home</a>
+			<div class="code">HTTP 404 - File not found<br>Troll Navigator</div>
+		</div>
+	</div>
+</div>
+<script>
+	(function () {
+		var c = document.getElementById("face"), g = c.getContext("2d"), img = new Image();
+		img.onload = function () { g.imageSmoothingEnabled = false; g.drawImage(img, 8, 8, 8, 8, 0, 0, 8, 8); };
+		img.src = "/img/skins/tex/troll.png";
+	})();
+</script>
+</body>
+</html>

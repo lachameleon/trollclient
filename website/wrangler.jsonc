@@ -1,0 +1,21 @@
+{
+	// Troll Client homepage: static files from ./public, plus a small Worker for the live bits.
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "troll-client",
+	"main": "src/worker.js",
+	"compatibility_date": "2026-09-01",
+	"assets": {
+		"directory": "./public",
+		"binding": "ASSETS",
+		"not_found_handling": "404-page",
+		// everything else is served as a plain file without waking the Worker up
+		"run_worker_first": ["/api/*", "/downloads/*"]
+	},
+	"durable_objects": {
+		"bindings": [{ "name": "HQ", "class_name": "TrollHQ" }]
+	},
+	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["TrollHQ"] }],
+	"observability": { "enabled": true }
+	// optional secrets: `npx wrangler secret put ADMIN_TOKEN` (lets you hide guestbook entries)
+	// and `npx wrangler secret put SALT` (salts the daily visitor hashes)
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troll Client :: welcome to my homepage</title>
+<meta name="description" content="Troll Client: a black &amp; white Fabric client for Minecraft 26.2. 35 modules for being mildly annoying, and skin animation everyone on the server can see.">
+<meta name="theme-color" content="#090909">
+<link rel="icon" href="img/favicon.png">
+<link rel="stylesheet" href="css/style.css?v=7">
+<script>document.documentElement.className = "js";</script>
+</head>
+<body class="theme-noir crt" data-page="home">
+<script>try{var t=localStorage.getItem("troll-theme"),b=document.body;if(t&&/^[a-z]+$/.test(t)){b.className=b.className.replace(/theme-[a-z]+/,"theme-"+t);if(/^(paper|newsprint|ink|fog)$/.test(t))b.classList.add("light")}if(localStorage.getItem("troll-crt")==="0")b.classList.remove("crt")}catch(e){}</script>
+<!-- chrome:top:start -->
+<div class="desktop" aria-hidden="true">
+	<canvas id="wallpaper"></canvas>
+</div>
+<div class="desk-icons" role="group" aria-label="desktop icons">
+	<button class="desk-icon" data-open="/download" style="--x:0;--y:0"><span class="ico"><img src="img/icons/cube.png" alt=""></span><span class="lbl">troll-client-1.0.0.jar</span></button>
+	<button class="desk-icon" data-open="/skin-animation" style="--x:0;--y:1"><span class="ico"><img src="img/icons/player.png" alt=""><b class="mini-burst">NEW</b></span><span class="lbl">skin_animation.exe</span></button>
+	<button class="desk-icon" data-act="twerk" style="--x:0;--y:2"><span class="ico"><img src="img/icons/troll.png" alt=""></span><span class="lbl">twerk.exe</span></button>
+	<button class="desk-icon" data-act="bin" style="--x:0;--y:3"><span class="ico"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M5 1h6v1h4v2H1V2h4zM2 5h12v10H2zm2 2v6h1V7zm3 0v6h2V7zm4 0v6h1V7z"/></svg></span><span class="lbl">Recycle Bin</span></button>
+	<button class="desk-icon" data-open="/guestbook" style="--x:0;--y:4"><span class="ico"><img src="img/icons/chat.png" alt=""></span><span class="lbl">guestbook.txt</span></button>
+</div>
+
+<div class="browser" id="browser">
+	<header class="chrome">
+		<div class="titlebar" id="titlebar">
+			<img class="app-icon" src="img/logo-small.png" alt="">
+			<span class="title"><span class="t-page">Troll Client - Home</span><span class="t-app"> - Troll Navigator 2.0</span></span>
+			<span class="winbtns">
+				<button class="winbtn" data-win="min" aria-label="Minimize" title="Minimize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 7h8v2H1z"/></svg></button>
+				<button class="winbtn" data-win="max" aria-label="Maximize" title="Maximize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 1h8v8H1zm1 2v5h6V3z"/></svg></button>
+				<button class="winbtn close" data-win="close" aria-label="Close" title="Close"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 1h2v1h1v1h2V2h1V1h2v2H8v1H7v2h1v1h1v2H7V8H6V7H4v1H3v1H1V7h1V6h1V4H2V3H1z"/></svg></button>
+			</span>
+		</div>
+		<nav class="tabs" aria-label="Pages">
+			<a class="tab here" aria-current="page" data-tab="home" href="/"><img src="img/icons/star.png" alt=""><span class="lbl">home</span></a>
+			<a class="tab hot" data-tab="skin" href="/skin-animation"><img src="img/icons/player.png" alt=""><span class="lbl">skin animation</span><b class="burst" aria-label="new">NEW!</b></a>
+			<a class="tab" data-tab="modules" href="/modules"><img src="img/icons/gear.png" alt=""><span class="lbl">modules</span></a>
+			<a class="tab" data-tab="gallery" href="/gallery"><img src="img/icons/radar.png" alt=""><span class="lbl">gallery</span></a>
+			<a class="tab" data-tab="download" href="/download"><img src="img/icons/cube.png" alt=""><span class="lbl">download</span></a>
+			<a class="tab" data-tab="guestbook" href="/guestbook"><img src="img/icons/chat.png" alt=""><span class="lbl">guestbook</span></a>
+			<button class="tab-new" type="button" aria-label="Open a random page" data-tip="new tab: somewhere random">+</button>
+		</nav>
+		<div class="toolbar">
+			<button class="navbtn back" type="button" data-nav="back" aria-label="Back"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M7 3h2v2H8v1h6v4H8v1h1v2H7v-1H6v-1H5V9H4V7h1V6h1V5h1z"/></svg></button>
+			<button class="navbtn fwd" type="button" data-nav="forward" aria-label="Forward"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M7 3h2v1h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1H9v1H7v-2h1v-1H2V6h6V5H7z"/></svg></button>
+			<button class="navbtn reload" type="button" data-nav="reload" aria-label="Reload"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M6 2h5v1h1v1h1V2h1v5H9V6h2V5h-1V4H6v1H5v1H4v4h1v1h1v1h4v-1h1v-1h1V9h2v2h-1v1h-1v1h-1v1H6v-1H5v-1H4v-1H3V9H2V6h1V5h1V4h1V3h1z"/></svg></button>
+			<a class="navbtn home" href="/" aria-label="Home"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M7 2h2v1h1v1h1v1h1v1h1v1h1v2h-2v5H9v-4H7v4H3V9H1V7h1V6h1V5h1V4h1V3h1z"/></svg></a>
+			<div class="address" id="address">
+				<img class="fav" src="img/favicon.png" alt="">
+				<span class="url" id="url" aria-label="address">http://trollclient/</span>
+				<span class="lock" id="lock" data-tip="secure connection. it's not 1998 any more" hidden><svg viewBox="0 0 10 12" shape-rendering="crispEdges"><path fill="currentColor" d="M3 0h4v1h1v4h1v7H1V5h1V1h1zm0 2v3h4V2zm1 5v3h2V7z"/></svg></span>
+				<button class="star" type="button" aria-label="Bookmark this page" data-tip="bookmark this page">&#9733;</button>
+				<i class="load" aria-hidden="true"></i>
+			</div>
+			<form class="searchbox" action="/modules" role="search">
+				<img src="img/icons/search.png" alt="">
+				<input name="q" type="search" placeholder="search modules" aria-label="Search modules" autocomplete="off">
+			</form>
+			<img class="throbber" id="throbber" src="img/spin.gif" alt="">
+		</div>
+		<div class="bookmarks">
+			<span class="bm-label">bookmarks</span>
+			<a class="bm hot" href="/skin-animation">&#9733; skin animation</a>
+			<a class="bm" href="/#tv">the video</a>
+			<a class="bm" href="/#demo">try the menu</a>
+			<a class="bm" href="/download">get v1.0</a>
+			<span class="grow"></span>
+			<button class="bm" type="button" id="theme-cycle" data-tip="cycle theme (right click goes back)"><img class="icon" src="img/icons/palette.png" alt=""> <span id="theme-name">Noir</span></button>
+			<button class="bm" type="button" id="crt-toggle" data-tip="scanlines + vignette">CRT: ON</button>
+			<button class="bm" type="button" id="sound-toggle" data-tip="chiptune bleeps for buttons">sound: off</button>
+		</div>
+		<div class="ticker" aria-label="news ticker">
+			<div class="ticker-track"><span class="ticker-text">*** NEW: SKIN ANIMATION! YOUR SKIN, ANIMATED, AND EVERYONE ON THE SERVER SEES IT *** BLINK / WAVE / RANDOM / STROBE *** <b data-stat="visits">1,337</b> VISITORS SO FAR *** <b data-stat="online">1</b> ONLINE RIGHT NOW *** VERSION 1.0 IS OUT *** 35 MODULES *** 5 SHADERS *** 7 THEMES *** SIGN THE GUESTBOOK. IT'S REAL NOW *** </span></div>
+		</div>
+	</header>
+
+	<div class="page">
+		<main class="content" id="content">
+<!-- chrome:top:end -->
+			<div class="hero">
+				<canvas id="hero" aria-label="Troll Client title screen animation"></canvas>
+				<noscript><img src="img/logo.png" alt="TROLL CLIENT" style="display:block;margin:40px auto;max-width:90%"></noscript>
+				<div class="cta">
+					<a class="button primary huge pulse-ring" href="/download">&darr; download</a>
+					<a class="button huge" href="/skin-animation">skin animation <b class="burst">NEW!</b></a>
+					<div class="ver">v1.0 <img src="img/new.gif" width="34" height="13" alt="new!"><br><span class="dim">fabric &middot; minecraft 26.2 &middot; java 25</span></div>
+				</div>
+			</div>
+
+			<section class="feature-skin" data-reveal>
+				<div class="stage-wrap" data-skin3d="feature"></div>
+				<div>
+					<span class="kicker"><b class="burst small">NEW!</b> introducing</span>
+					<h2>SKIN <span class="blink-word" data-letters>ANIMATION</span></h2>
+					<p>Your skin, but it moves. <b>SkinBlink</b> flickers your hat, jacket, sleeves, trousers and cape in patterns, and <b>everyone on the server sees it</b>. Nothing to install on their end; it works on any server.</p>
+					<ul>
+						<li>4 patterns: blink, wave, random and strobe</li>
+						<li>9 triggers: always, in the air, sneaking, sprinting, getting hit...</li>
+						<li>1 to 20 ticks between changes, one tiny packet each</li>
+						<li>puts your skin settings back exactly how they were</li>
+					</ul>
+					<div class="actions">
+						<a class="button primary" href="/skin-animation">open the skin animation lab &raquo;</a>
+						<span class="dim small">try it on <b>your own skin</b> in there</span>
+					</div>
+				</div>
+			</section>
+
+			<h2 data-reveal>welcome!!</h2>
+			<p data-type="Troll Client is a black &amp; white client for Minecraft 26.2 with a CS:GO-cheat-menu style GUI, a demoscene title screen, skin animation and 35 modules for being mildly annoying.">Troll Client is a black &amp; white client for Minecraft 26.2 with a CS:GO-cheat-menu style GUI, a demoscene title screen, skin animation and 35 modules for being mildly annoying.</p>
+			<p class="dim">Press <kbd>Right Shift</kbd> in game. Left click a module to turn it on, right click it for settings. That's the whole manual.</p>
+			<div class="facts" data-reveal>
+				<div class="fact"><b data-count="35">35</b><span>modules</span></div>
+				<div class="fact"><b data-count="5">5</b><span>shaders</span></div>
+				<div class="fact"><b data-count="7">7</b><span>themes</span></div>
+				<div class="fact hot"><b data-count="4">4</b><span>skin patterns</span></div>
+			</div>
+
+			<hr class="divider">
+
+			<h2 id="tv" data-reveal>troll-vision</h2>
+			<p class="dim">Channel 1 is the showcase video, recorded straight out of the client: real gameplay, the skins, the shaders, no editing. Flip through the other channels for the five shaders.</p>
+			<div class="tv off" id="tv-set" data-reveal>
+				<div class="screen">
+					<video preload="none" poster="video/poster.jpg" playsinline controls>
+						<source src="video/showcase.mp4" type="video/mp4">
+						Your browser can't play this video. <a href="video/showcase.mp4">Download it</a> instead.
+					</video>
+					<img class="still" data-ch="2" data-name="noir" src="img/shots/shader_noir.jpg" alt="the Noir shader" loading="lazy">
+					<img class="still" data-ch="3" data-name="crt" src="img/shots/shader_crt.jpg" alt="the CRT shader" loading="lazy">
+					<img class="still" data-ch="4" data-name="dither" src="img/shots/shader_dither.jpg" alt="the Dither shader" loading="lazy">
+					<img class="still" data-ch="5" data-name="halftone" src="img/shots/shader_halftone.jpg" alt="the Halftone shader" loading="lazy">
+					<img class="still" data-ch="6" data-name="ink" src="img/shots/shader_ink.jpg" alt="the Ink shader" loading="lazy">
+					<canvas class="static" aria-hidden="true"></canvas>
+					<div class="osd" aria-live="polite"><span class="ch">CH 01</span><small>showcase</small></div>
+					<div class="glass"></div>
+					<div class="power-mask"></div>
+				</div>
+				<div class="knobs">
+					<span class="led" aria-hidden="true"></span>
+					<span class="brand">TROLL-VISION 2000</span>
+					<span class="chans" role="group" aria-label="channels">
+						<button class="chan on" type="button" data-ch="1" aria-label="channel 1: showcase video">1</button>
+						<button class="chan" type="button" data-ch="2" aria-label="channel 2: noir">2</button>
+						<button class="chan" type="button" data-ch="3" aria-label="channel 3: crt">3</button>
+						<button class="chan" type="button" data-ch="4" aria-label="channel 4: dither">4</button>
+						<button class="chan" type="button" data-ch="5" aria-label="channel 5: halftone">5</button>
+						<button class="chan" type="button" data-ch="6" aria-label="channel 6: ink">6</button>
+					</span>
+					<button class="knob" type="button" aria-label="next channel" data-tip="turn the dial"></button>
+					<button class="power" type="button" aria-label="power" data-tip="power"><img src="img/icons/power.png" alt=""></button>
+				</div>
+			</div>
+
+			<hr class="divider">
+
+			<h2 id="demo" data-reveal>try the menu</h2>
+			<p class="dim">This is the real menu, rebuilt for your browser. Left click toggles, right click opens settings, just start typing to search. The palette button changes the theme of this whole site.</p>
+			<div id="gui-demo" class="gui" data-reveal>
+				<noscript><p class="center">turn on javascript to try the menu. (yes, really. in 2006.)</p></noscript>
+			</div>
+
+			<hr class="divider">
+
+			<h2 data-reveal>features</h2>
+			<div class="grid">
+				<div class="card bevel" data-tilt data-reveal style="--i:0">
+					<h3><img class="icon" src="img/icons/player.png" alt="">skin animation</h3>
+					<p>Your outer skin layers blink, wave, strobe or flicker at random. Everyone sees it. Trigger it on jumps, sneaks, hits or always.</p>
+				</div>
+				<div class="card bevel" data-tilt data-reveal style="--i:1">
+					<h3><img class="icon" src="img/icons/keyboard.png" alt="">the menu</h3>
+					<p>Tabs, LED pips, equalizers on enabled modules, a fake shell prompt, typewriter tooltips, keyboard navigation and middle-click binds.</p>
+				</div>
+				<div class="card bevel" data-tilt data-reveal style="--i:2">
+					<h3><img class="icon" src="img/icons/palette.png" alt="">7 themes</h3>
+					<p>Noir, Paper, Graphite, Terminal, Newsprint, Ink, Fog, or build your own. Scanlines, film grain and dithered shadows included.</p>
+				</div>
+				<div class="card bevel" data-tilt data-reveal style="--i:3">
+					<h3><img class="icon" src="img/icons/eye.png" alt="">5 shaders</h3>
+					<p>Post-processing for the world: film noir, monochrome CRT, 1-bit dither, newspaper halftone and pen &amp; ink.</p>
+				</div>
+				<div class="card bevel" data-tilt data-reveal style="--i:4">
+					<h3><img class="icon" src="img/icons/star.png" alt="">title screen</h3>
+					<p>Warp starfield, a 3D pixel logo that drops in letter by letter, a sine scroller. Holds its ground against other mods' menus.</p>
+				</div>
+				<div class="card bevel" data-tilt data-reveal style="--i:5">
+					<h3><img class="icon" src="img/icons/cube.png" alt="">GUI tools + macros</h3>
+					<p>Drop or delay container packets, de-sync, save a GUI for later, and chain steps into macros you bind to keys.</p>
+				</div>
+				<div class="card bevel" data-tilt data-reveal style="--i:6">
+					<h3><img class="icon" src="img/icons/radar.png" alt="">HUD</h3>
+					<p>Animated module list, notifications, a sweep radar and a fighting-game target card with a health bar that shakes when they get hit.</p>
+				</div>
+				<div class="card bevel" data-tilt data-reveal style="--i:7">
+					<h3><img class="icon" src="img/icons/skull.png" alt="">35 modules</h3>
+					<p>Twerk, NoWayHome, Parrot, Racket, Honk, Graffiti and friends. All of them mildly annoying, some of them very.</p>
+				</div>
+			</div>
+
+			<hr class="divider">
+
+			<h2 data-reveal>skins</h2>
+			<p class="dim">SkinChanger ships five black &amp; white skins and the Troll Client cape (client-side: only you see those). Drag one to spin it. They're blinking because SkinBlink is on.</p>
+			<div class="skins" data-reveal>
+				<figure><span class="mini-stage" data-skin3d="skin:troll"></span>troll</figure>
+				<figure><span class="mini-stage" data-skin3d="skin:mime"></span>mime</figure>
+				<figure><span class="mini-stage" data-skin3d="skin:referee"></span>referee</figure>
+				<figure><span class="mini-stage" data-skin3d="skin:ghost"></span>ghost</figure>
+				<figure><span class="mini-stage" data-skin3d="skin:hacker"></span>hacker</figure>
+				<figure><span class="mini-stage" data-skin3d="skin:blink"></span>blink (demo)</figure>
+			</div>
+
+			<hr class="divider">
+
+			<h2 data-reveal>what's new</h2>
+			<div class="terminal changelog" data-reveal><span class="prompt">C:\TROLL&gt;</span> type CHANGES.TXT
+
+<span class="line">10/07/2026  web   the homepage moved into a Cloudflare Worker: real counter, guestbook, poll</span>
+<span class="line">10/07/2026  web   the skin animation lab: try SkinBlink on any Minecraft skin</span>
+<span class="line">10/05/2026  v1.0  SkinBlink triggers: blink only in the air, sneaking, hurt, eating...</span>
+<span class="line">10/05/2026  v1.0  GUI tools on every container, and a macro editor</span>
+<span class="line">10/04/2026  v1.0  shaders: noir, crt, dither, halftone, ink</span>
+<span class="line">10/04/2026  v1.0  SkinChanger with 5 skins and the Troll Client cape</span>
+<span class="line">10/04/2026  v1.0  new Chat category: ChatStyle, Spammer, Announcer, Parrot</span>
+<span class="line">10/04/2026  v1.0  Trapper, Stalker, Pelter, Confetti, SkinBlink</span>
+<span class="line">10/03/2026  v1.0  Mimic, Morse, Taunt, Racket, Gifter, Orbit, ItemFlex, PopCounter</span>
+<span class="line">10/03/2026  v1.0  the original nine. twerk was first. obviously.</span>
+
+<span class="prompt">C:\TROLL&gt;</span> <span class="cursor"></span></div>
+
+			<h2 data-reveal>pick a theme</h2>
+			<p class="dim">Same palettes as the client. Your pick is remembered, and the whole site follows it.</p>
+			<div class="themes"></div>
+<!-- chrome:bottom:start -->
+		</main>
+
+		<aside class="sidebar" aria-label="sidebar">
+			<section class="widget stats" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/eye.png" alt="">live stats <i class="live-dot" data-tip="live: updates by itself"></i></h4>
+				<div class="w-body">
+					<div class="dim small">you are visitor number</div>
+					<div class="odometer" data-stat="visits" data-digits="7" aria-label="visitor counter">0001337</div>
+					<div class="you dim small" id="you-were"></div>
+					<dl class="statlist">
+						<dt><i class="led"></i>online now</dt><dd data-stat="online">1</dd>
+						<dt>visits today</dt><dd data-stat="today">0</dd>
+						<dt>page views</dt><dd data-stat="views">0</dd>
+						<dt>downloads</dt><dd data-stat="downloads">0</dd>
+						<dt>guestbook</dt><dd data-stat="guestbook">1</dd>
+					</dl>
+					<div class="spark" id="spark" aria-label="visits over the last two weeks" data-tip="visits, last 14 days"></div>
+					<dl class="statlist tally">
+						<dt data-tip="modules people switched on and off in the menu demo">menu toggles</dt><dd data-stat="toggles">0</dd>
+						<dt data-tip="skin layer changes played in the skin animation lab, by everyone">skin blinks</dt><dd data-stat="blinks">0</dd>
+					</dl>
+				</div>
+			</section>
+
+			<section class="widget promo" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/player.png" alt="">skin animation <b class="burst small">NEW!</b></h4>
+				<a class="w-body promo-body" href="/skin-animation">
+					<span class="mini-stage" data-skin3d="mini" aria-hidden="true"></span>
+					<span class="promo-copy"><b>your skin, animated.</b> hat, jacket, sleeves, trousers and cape blink in patterns. <u>everyone on the server sees it.</u></span>
+					<span class="button glossy small">try it &raquo;</span>
+				</a>
+			</section>
+
+			<section class="widget poll" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/check.png" alt="">poll</h4>
+				<form class="w-body" id="poll">
+					<p class="q">best way to annoy people?</p>
+					<div class="poll-options"><span class="dim small">loading the ballot...</span></div>
+					<button class="button glossy small" type="submit" disabled>vote!</button>
+					<p class="dim small poll-total"></p>
+				</form>
+			</section>
+
+			<section class="widget" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/chat.png" alt="">guestbook</h4>
+				<div class="w-body center">
+					<a href="/guestbook"><img src="img/mail.gif" width="32" height="24" alt=""></a>
+					<div><a href="/guestbook">sign my guestbook!</a></div>
+					<div class="latest-entry dim small" id="latest-entry"></div>
+				</div>
+			</section>
+
+			<section class="widget webring" data-reveal>
+				<h4 class="w-head"><img class="icon" src="img/icons/world.png" alt="">webring</h4>
+				<div class="w-body center">
+					<div class="ring" aria-hidden="true"><span>T</span><span>R</span><span>O</span><span>L</span><span>L</span></div>
+					<div class="dim small">the troll webring</div>
+					<a href="/" data-ring="-1" data-tip="there is only one site in this ring">&laquo; prev</a> &middot;
+					<a href="/" data-ring="0" data-tip="it's always this one">random</a> &middot;
+					<a href="/" data-ring="1" data-tip="still this one">next &raquo;</a>
+				</div>
+			</section>
+
+			<div class="construction" data-reveal>
+				<img src="img/construction.gif" width="150" height="40" alt="under construction">
+				<div class="dim small">this site is forever under construction</div>
+			</div>
+		</aside>
+	</div>
+
+	<footer class="statusbar">
+		<span class="status" id="status">Done</span>
+		<span class="meter" aria-hidden="true" data-tip="how far down the page you are"><i id="scroll-meter"></i></span>
+		<span class="sb-online"><i class="led"></i><span data-stat="online">1</span> online</span>
+		<span class="zone"><img class="icon" src="img/icons/world.png" alt=""> Internet</span>
+	</footer>
+</div>
+
+<footer class="site-foot">
+	<div class="badges">
+		<a href="/"><img src="img/badges/troll.png" alt="Troll Client"></a>
+		<a href="https://fabricmc.net/" rel="noopener"><img src="img/badges/fabric.png" alt="Fabric powered"></a>
+		<img src="img/badges/mc.png" alt="Minecraft 26.2">
+		<img src="img/badges/java.png" alt="Java 25">
+		<img src="img/badges/bw.png" alt="black and white">
+		<img src="img/badges/notepad.png" alt="made with notepad">
+		<img src="img/badges/800.png" alt="best at 800x600">
+		<img src="img/badges/nofl.png" alt="no flash">
+	</div>
+	<p class="dim small">&copy; 2026 Troll Client &middot; not affiliated with Mojang or Microsoft &middot; Minecraft is a trademark of Mojang AB<br>
+	served by a Cloudflare Worker &middot; use it where this kind of thing is welcome</p>
+</footer>
+
+<button class="to-top" id="to-top" type="button" aria-label="Back to top"><svg viewBox="0 0 12 16" shape-rendering="crispEdges"><path fill="currentColor" d="M5 0h2v1h1v2h1v6h1v1h1v3h-1v-1H9v1H3v-1H2v1H1v-3h1V9h1V3h1V1h1zm0 4v2h2V4z"/><path class="flame" fill="currentColor" d="M4 14h1v1h2v-1h1v1H7v1H5v-1H4z"/></svg></button>
+
+<div class="taskbar" id="taskbar">
+	<button class="start" id="start" type="button" aria-haspopup="true" aria-expanded="false"><img src="img/logo-small.png" alt=""><span>start</span></button>
+	<span class="quick">
+		<a href="/" aria-label="home" data-tip="home"><img src="img/icons/star.png" alt=""></a>
+		<a href="/skin-animation" aria-label="skin animation" data-tip="skin animation"><img src="img/icons/player.png" alt=""></a>
+		<a href="/download" aria-label="download" data-tip="download"><img src="img/icons/cube.png" alt=""></a>
+	</span>
+	<button class="task on" id="task" type="button"><img src="img/logo-small.png" alt=""><span>Troll Client - Troll Navigator</span></button>
+	<span class="grow"></span>
+	<span class="tray" id="tray">
+		<button class="tray-btn" type="button" id="tray-sound" aria-label="Sound" data-tip="sound: off"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M2 6h3l4-4h1v12H9l-4-4H2z"/><path class="waves" fill="currentColor" d="M12 5h1v1h1v4h-1v1h-1V9h1V7h-1z"/></svg></button>
+		<span class="tray-online" data-tip="people on the site right now"><i class="led"></i><span data-stat="online">1</span></span>
+		<span class="clock" id="clock">00:00</span>
+	</span>
+</div>
+
+<div class="startmenu" id="startmenu" hidden>
+	<div class="sm-head"><span class="sm-avatar" data-head="troll"></span><b>troll user</b></div>
+	<div class="sm-cols">
+		<ul class="sm-left">
+			<li><a href="/"><img src="img/icons/star.png" alt="">home</a></li>
+			<li><a href="/skin-animation" class="hot"><img src="img/icons/player.png" alt=""><span>skin animation<small>your skin, animated</small></span></a></li>
+			<li><a href="/modules"><img src="img/icons/gear.png" alt="">modules</a></li>
+			<li><a href="/gallery"><img src="img/icons/radar.png" alt="">gallery</a></li>
+			<li><a href="/download"><img src="img/icons/cube.png" alt="">download</a></li>
+			<li><a href="/guestbook"><img src="img/icons/chat.png" alt="">guestbook</a></li>
+		</ul>
+		<ul class="sm-right">
+			<li><button type="button" data-sm="theme"><img src="img/icons/palette.png" alt="">next theme</button></li>
+			<li><button type="button" data-sm="crt"><img src="img/icons/eye.png" alt="">CRT on/off</button></li>
+			<li><button type="button" data-sm="sound"><img src="img/icons/keyboard.png" alt="">sound on/off</button></li>
+			<li><button type="button" data-sm="trail"><img src="img/icons/star.png" alt="">cursor trail</button></li>
+			<li><button type="button" data-sm="twerk"><img src="img/icons/troll.png" alt="">twerk.exe</button></li>
+		</ul>
+	</div>
+	<div class="sm-foot">
+		<button type="button" data-sm="logoff"><img src="img/icons/close.png" alt="">log off</button>
+		<button type="button" data-sm="shutdown"><img src="img/icons/power.png" alt="">turn off computer</button>
+	</div>
+</div>
+
+<div class="balloons" id="balloons" aria-live="polite"></div>
+<!-- chrome:bottom:end -->
+<script src="js/data.js?v=7"></script>
+<script src="js/site.js?v=7"></script>
+<script src="js/skin3d.js?v=7"></script>
+<script src="js/hero.js?v=7"></script>
+<script src="js/demo.js?v=7"></script>
+<script src="js/tv.js?v=7"></script>
+</body>
+</html>
