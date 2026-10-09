@@ -1,21 +1,28 @@
 package com.trollclient.module;
 
 import com.trollclient.TrollClient;
+import com.trollclient.module.client.ChatFormatModule;
 import com.trollclient.module.client.ClickGuiModule;
 import com.trollclient.module.client.GuiToolsModule;
 import com.trollclient.module.client.MacrosModule;
 import com.trollclient.module.client.HudModule;
+import com.trollclient.module.client.KeystrokesModule;
 import com.trollclient.module.client.ShadersModule;
+import com.trollclient.module.client.TelemetryModule;
 import com.trollclient.module.client.ThemeModule;
 import com.trollclient.module.client.TitleScreenModule;
 import com.trollclient.module.combat.ArrowDodge;
 import com.trollclient.module.combat.CrystalCancel;
 import com.trollclient.module.combat.Grudge;
+import com.trollclient.module.combat.KillStreak;
 import com.trollclient.module.combat.PopCounter;
+import com.trollclient.module.movement.Bodyguard;
 import com.trollclient.module.movement.Goalie;
+import com.trollclient.module.movement.Npc;
 import com.trollclient.module.movement.Orbit;
 import com.trollclient.module.movement.PlayerAvoid;
 import com.trollclient.module.movement.PlayerFollow;
+import com.trollclient.module.player.Fidget;
 import com.trollclient.module.player.ItemFlex;
 import com.trollclient.module.player.ItemPickup;
 import com.trollclient.module.player.Juggle;
@@ -27,22 +34,30 @@ import com.trollclient.module.troll.NoWayHome;
 import com.trollclient.module.chat.Announcer;
 import com.trollclient.module.chat.AutoReply;
 import com.trollclient.module.chat.ChatStyle;
+import com.trollclient.module.chat.Countdown;
 import com.trollclient.module.chat.Greeter;
+import com.trollclient.module.chat.Hypeman;
+import com.trollclient.module.chat.Narrator;
 import com.trollclient.module.chat.Parrot;
+import com.trollclient.module.chat.Quizmaster;
 import com.trollclient.module.chat.Spammer;
 import com.trollclient.module.chat.Typo;
 import com.trollclient.module.combat.Trapper;
 import com.trollclient.module.movement.Stalker;
 import com.trollclient.module.player.SkinBlink;
 import com.trollclient.module.player.SkinChanger;
+import com.trollclient.module.troll.Angler;
 import com.trollclient.module.troll.Confetti;
+import com.trollclient.module.troll.Gardener;
 import com.trollclient.module.troll.Graffiti;
 import com.trollclient.module.troll.Honk;
 import com.trollclient.module.troll.Pelter;
 import com.trollclient.module.troll.Racket;
+import com.trollclient.module.troll.Stare;
 import com.trollclient.module.troll.Taunt;
 import com.trollclient.module.troll.Twerk;
 import com.trollclient.module.troll.WindAnnoy;
+import com.trollclient.telemetry.Telemetry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -67,12 +82,15 @@ public final class ModuleManager {
 		register(new PopCounter());
 		register(new Trapper());
 		register(new Grudge());
+		register(new KillStreak());
 		// movement
 		register(new PlayerAvoid());
 		register(new PlayerFollow());
 		register(new Orbit());
 		register(new Stalker());
 		register(new Goalie());
+		register(new Bodyguard());
+		register(new Npc());
 		// troll
 		register(new Twerk());
 		register(new WindAnnoy());
@@ -87,6 +105,9 @@ public final class ModuleManager {
 		register(new Confetti());
 		register(new Graffiti());
 		register(new Honk());
+		register(new Stare());
+		register(new Angler());
+		register(new Gardener());
 		// chat
 		register(new Parrot());
 		register(new ChatStyle());
@@ -95,20 +116,28 @@ public final class ModuleManager {
 		register(new Greeter());
 		register(new AutoReply());
 		register(new Typo());
+		register(new Narrator());
+		register(new Hypeman());
+		register(new Quizmaster());
+		register(new Countdown());
 		// player
 		register(new ItemPickup());
 		register(new ItemFlex());
 		register(new Juggle());
 		register(new SkinBlink());
 		register(new SkinChanger());
+		register(new Fidget());
 		// client
 		register(new ClickGuiModule());
 		register(new HudModule());
+		register(new KeystrokesModule());
+		register(new ChatFormatModule());
 		register(new ThemeModule());
 		register(new ShadersModule());
 		register(new TitleScreenModule());
 		register(new GuiToolsModule());
 		register(new MacrosModule());
+		register(new TelemetryModule());
 		TrollClient.LOGGER.info("Registered {} modules", MODULES.size());
 	}
 
@@ -156,6 +185,7 @@ public final class ModuleManager {
 					m.onTick();
 				} catch (RuntimeException e) {
 					TrollClient.LOGGER.error("Module {} crashed while ticking, disabling it", m.getName(), e);
+					Telemetry.moduleError(m, e);
 					m.setEnabled(false);
 				}
 			}
@@ -199,6 +229,7 @@ public final class ModuleManager {
 			hook.run();
 		} catch (RuntimeException e) {
 			TrollClient.LOGGER.error("Module {} crashed in an event hook, disabling it", m.getName(), e);
+			Telemetry.moduleError(m, e);
 			m.setEnabled(false);
 		}
 	}
@@ -214,7 +245,7 @@ public final class ModuleManager {
 		boolean any = false;
 		for (Module m : MODULES) {
 			if (m.getKey() == key && key > 0) {
-				m.toggle();
+				Telemetry.via("key", m::toggle);
 				any = true;
 			}
 		}

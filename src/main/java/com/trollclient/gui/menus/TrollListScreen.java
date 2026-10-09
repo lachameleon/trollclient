@@ -210,7 +210,7 @@ public abstract class TrollListScreen<T> extends Screen {
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
 		Theme.update();
-		Draw.rect(g, 0, 0, width, height, 0xFF000000 | Theme.bg);
+		Draw.screen(g, width, height);
 		backdrop.render(g, ModuleManager.get(ClickGuiModule.class).backdrop.get(), width, height, dt, Motion.outCubic(open.get()));
 	}
 

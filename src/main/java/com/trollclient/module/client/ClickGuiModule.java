@@ -20,7 +20,8 @@ public class ClickGuiModule extends Module {
 	public final NumberSetting dim = add(new NumberSetting("Dim", "How dark the background gets", 55, 0, 100, 1).unit("%"))
 			.visibleWhen(() -> background.get().contains("Dim"));
 	public final ModeSetting backdrop = add(new ModeSetting("Backdrop", "Animated effect behind the window (Theme picks one to suit the preset)",
-			"Rain", "None", "Theme", "Rain", "Grid", "Dust", "Stars", "Waves", "Halftone", "Fog"));
+			"Rain", "None", "Theme", "Rain", "Grid", "Dust", "Stars", "Waves", "Halftone", "Fog", "Bubbles", "Snow",
+			"Embers", "Petals", "Aurora", "Sunset"));
 	public final BoolSetting sounds = add(new BoolSetting("Sounds", "Clicky feedback", true));
 	public final BoolSetting tooltips = add(new BoolSetting("Tooltips", "Describe things on hover", true));
 	public final BoolSetting rememberModule = add(new BoolSetting("Remember Selection", "Reopen on the last module you looked at", true));

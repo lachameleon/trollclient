@@ -2,8 +2,11 @@
    Static files come straight from ./public (the assets binding). The Worker only runs for
    /api/* and /downloads/*, and everything that has to be remembered lives in one Durable
    Object, TrollHQ: the hit counter, downloads, the guestbook, the poll, a couple of fun
-   global tallies, and live WebSockets that push all of it to every open tab. */
+   global tallies, and live WebSockets that push all of it to every open tab. Anonymous
+   usage stats from the client itself live in a second object, TrollTelemetry (telemetry.js),
+   and feed the analytics page. */
 import { DurableObject } from "cloudflare:workers";
+export { TrollTelemetry } from "./telemetry.js";
 
 const POLL = [
 	["skinblink", "SkinBlink (skin animation)"],
@@ -272,12 +275,14 @@ async function playerSkin(name, ctx) {
 	return out;
 }
 
-async function body(request) {
+async function body(request, max = 4096) {
 	if (!(request.headers.get("content-type") || "").includes("application/json")) return null;
 	const text = await request.text();
-	if (text.length > 4096) return null;
+	if (text.length > max) return null;
 	try { return JSON.parse(text); } catch (e) { return null; }
 }
+
+const telemetry = (env) => env.TELEMETRY.get(env.TELEMETRY.idFromName("global"));
 
 async function api(request, env, ctx, url) {
 	const hq = env.HQ.get(env.HQ.idFromName("global"));
@@ -333,6 +338,24 @@ async function api(request, env, ctx, url) {
 		const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
 		if (!env.ADMIN_TOKEN || token !== env.ADMIN_TOKEN) return json({ error: "nope" }, 403);
 		return json(await hq.hide(parseInt(del[1], 10)));
+	}
+	if (path === "/api/telemetry" && method === "POST") {
+		const report = await body(request, 65536);
+		if (!report) return json({ error: "that didn't look like a report" }, 400);
+		const cf = request.cf || {};
+		// where, roughly: what Cloudflare already knows. Not the IP, not the city.
+		const geo = { country: String(cf.country || ""), continent: String(cf.continent || ""), region: String(cf.region || "") };
+		const { status, ...result } = await telemetry(env).ingest(report, geo, await visitorHash(request, env));
+		return json(result, status || 200);
+	}
+	if (path === "/api/analytics" && method === "GET") {
+		const days = url.searchParams.get("days") === "all" ? 3650 : parseInt(url.searchParams.get("days") || "30", 10);
+		return json(await telemetry(env).analytics(days), 200, { "cache-control": "public, max-age=30" });
+	}
+	if (path === "/api/analytics/sessions" && method === "GET") {
+		const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+		if (!env.ADMIN_TOKEN || token !== env.ADMIN_TOKEN) return json({ error: "nope" }, 403);
+		return json({ sessions: await telemetry(env).latestSessions(parseInt(url.searchParams.get("limit") || "50", 10)) });
 	}
 	const skin = path.match(/^\/api\/skin\/([^/]+)$/);
 	if (skin && method === "GET") return playerSkin(decodeURIComponent(skin[1]), ctx);

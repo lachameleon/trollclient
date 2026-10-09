@@ -128,6 +128,32 @@ public final class Draw {
 			}
 			default -> rect(g, x, y, w, h, fill);
 		}
+		if (Theme.gloss) {
+			gloss(g, x + 1, y + 1, w - 2, h - 2, ColorUtil.alpha(fill) / 255f);
+		}
+	}
+
+	/**
+	 * Aero-style shine: a white sheen fading down the top half of a box, ending
+	 * in a hard edge, like light on a glass button. {@code strength} 0..1.
+	 */
+	public static void gloss(GuiGraphicsExtractor g, float x, float y, float w, float h, float strength) {
+		if (w <= 0 || h < 3 || strength <= 0.01f) {
+			return;
+		}
+		float half = Math.max(1, Math.round(h * 0.48f));
+		gradientV(g, x, y, w, half, ColorUtil.argb(Math.round(170 * strength), 255, 255, 255),
+				ColorUtil.argb(Math.round(55 * strength), 255, 255, 255));
+		rect(g, x, y, w, 1, ColorUtil.argb(Math.round(120 * strength), 255, 255, 255));
+	}
+
+	/** The theme's full-screen background, for screens with no world behind them. */
+	public static void screen(GuiGraphicsExtractor g, int width, int height) {
+		if (Theme.screenTop == Theme.screenBottom) {
+			rect(g, 0, 0, width, height, 0xFF000000 | Theme.screenTop);
+		} else {
+			gradientV(g, 0, 0, width, height, 0xFF000000 | Theme.screenTop, 0xFF000000 | Theme.screenBottom);
+		}
 	}
 
 	/** Border that matches {@link #panel}'s corners. */

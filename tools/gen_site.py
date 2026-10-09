@@ -42,6 +42,7 @@ PAGES = {
     "gallery.html": ("gallery", "Gallery"),
     "download.html": ("download", "Download"),
     "guestbook.html": ("guestbook", "Guestbook"),
+    "analytics.html": ("analytics", "Analytics"),
 }
 
 WHITE = (240, 240, 240, 255)

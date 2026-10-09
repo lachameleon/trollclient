@@ -42,6 +42,7 @@
 			<a class="tab" data-tab="gallery" href="/gallery"><img src="img/icons/radar.png" alt=""><span class="lbl">gallery</span></a>
 			<a class="tab here" aria-current="page" data-tab="download" href="/download"><img src="img/icons/cube.png" alt=""><span class="lbl">download</span></a>
 			<a class="tab" data-tab="guestbook" href="/guestbook"><img src="img/icons/chat.png" alt=""><span class="lbl">guestbook</span></a>
+			<a class="tab" data-tab="analytics" href="/analytics"><img src="img/icons/eye.png" alt=""><span class="lbl">analytics</span></a>
 			<button class="tab-new" type="button" aria-label="Open a random page" data-tip="new tab: somewhere random">+</button>
 		</nav>
 		<div class="toolbar">
@@ -150,6 +151,11 @@
 			<p>Troll Client replaces vanilla, subclassed and modded main menus, and checks every tick. If you'd rather keep the other mod's menu, turn off <b>Replace Modded Menus</b> under Client &rarr; TitleScreen.</p></details>
 			<details class="group"><summary>why is everything black and white?</summary>
 			<p>Colour costs extra.</p></details>
+			<details class="group"><summary>does it phone home?</summary>
+				<p>Yes, anonymously, and you can switch it off. The client sends usage stats (which modules get used, playtime, your setup) under a random id it
+					makes up itself, never your account, chat, coordinates or IP. Everyone's adds up into the <a href="/analytics">analytics page</a>, which also
+					lists exactly what's sent. Switch off <b>Client &rsaquo; Telemetry</b> (or <code>.toggle telemetry</code>) and it stops counting straight away.</p>
+			</details>
 <!-- chrome:bottom:start -->
 		</main>
 
@@ -272,6 +278,7 @@
 			<li><a href="/gallery"><img src="img/icons/radar.png" alt="">gallery</a></li>
 			<li><a href="/download"><img src="img/icons/cube.png" alt="">download</a></li>
 			<li><a href="/guestbook"><img src="img/icons/chat.png" alt="">guestbook</a></li>
+			<li><a href="/analytics"><img src="img/icons/eye.png" alt="">analytics</a></li>
 		</ul>
 		<ul class="sm-right">
 			<li><button type="button" data-sm="theme"><img src="img/icons/palette.png" alt="">next theme</button></li>

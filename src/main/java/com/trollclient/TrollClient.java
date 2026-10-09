@@ -13,6 +13,7 @@ import com.trollclient.module.chat.Announcer;
 import com.trollclient.module.chat.ChatStyle;
 import com.trollclient.module.chat.Typo;
 import com.trollclient.module.player.SkinBlink;
+import com.trollclient.telemetry.Telemetry;
 import com.trollclient.util.ChatUtil;
 import com.trollclient.util.MovementControl;
 import com.trollclient.util.Rotations;
@@ -39,6 +40,7 @@ public class TrollClient implements ClientModInitializer {
 		ModuleManager.init();
 		ConfigManager.load();
 		MacroManager.load();
+		Telemetry.init();
 
 		ClientTickEvents.START_CLIENT_TICK.register(mc -> {
 			// requests are rebuilt from scratch every tick, before the player moves
@@ -54,6 +56,7 @@ public class TrollClient implements ClientModInitializer {
 			ConfigManager.tick();
 			MacroManager.saveTick();
 			TitleScreenGuard.tick(mc);
+			Telemetry.tick(mc);
 		});
 		ScreenEvents.AFTER_INIT.register((mc, screen, width, height) -> {
 			TitleScreenGuard.afterInit(mc, screen, width);
@@ -69,10 +72,15 @@ public class TrollClient implements ClientModInitializer {
 		}
 
 		ClientEntityEvents.ENTITY_LOAD.register((entity, level) -> ModuleManager.entityAdded(entity));
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, mc) -> Telemetry.joined(mc));
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> {
 			ModuleManager.worldLeft();
 			MacroManager.worldLeft();
+			Telemetry.left();
 		});
+		// counts only: what was said or typed is never looked at
+		ClientSendMessageEvents.CHAT.register(message -> Telemetry.count("chat_sent"));
+		ClientSendMessageEvents.COMMAND.register(command -> Telemetry.count("server_commands"));
 		ClientSendMessageEvents.ALLOW_CHAT.register(message -> !Commands.handle(message));
 		ClientReceiveMessageEvents.CHAT.register((message, signed, sender, params, time) -> ChatUtil.onPlayerChat(message, signed, sender));
 		ClientReceiveMessageEvents.GAME.register(ChatUtil::onSystemChat);
@@ -96,6 +104,7 @@ public class TrollClient implements ClientModInitializer {
 			ModuleManager.get(SkinBlink.class).restore();
 			ConfigManager.save();
 			MacroManager.save();
+			Telemetry.shutdown();
 		});
 
 		HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(MOD_ID, "hud"), HudRenderer::render);

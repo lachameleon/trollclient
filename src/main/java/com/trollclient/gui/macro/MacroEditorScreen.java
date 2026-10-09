@@ -339,7 +339,7 @@ public class MacroEditorScreen extends Screen {
 		ClickGuiModule gui = ModuleManager.get(ClickGuiModule.class);
 		float p = Motion.outCubic(open.get());
 		if (minecraft.level == null) {
-			Draw.rect(g, 0, 0, width, height, 0xFF000000 | Theme.bg);
+			Draw.screen(g, width, height);
 		} else {
 			String mode = gui.background.get();
 			if (mode.contains("Blur") && p > 0.05f) {

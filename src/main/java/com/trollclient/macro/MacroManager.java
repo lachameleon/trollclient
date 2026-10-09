@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import com.trollclient.TrollClient;
 import com.trollclient.gui.clickgui.TerminalLog;
 import com.trollclient.macro.steps.FlowSteps;
+import com.trollclient.telemetry.Telemetry;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -129,6 +130,7 @@ public final class MacroManager {
 		stop(m);
 		MacroRun run = new MacroRun(m);
 		RUNS.add(run);
+		Telemetry.count("macro_runs");
 		TerminalLog.push("macro --run \"" + m.getName().toLowerCase(Locale.ROOT) + "\"");
 		return run;
 	}

@@ -12,10 +12,17 @@
 		"run_worker_first": ["/api/*", "/downloads/*"]
 	},
 	"durable_objects": {
-		"bindings": [{ "name": "HQ", "class_name": "TrollHQ" }]
+		"bindings": [
+			{ "name": "HQ", "class_name": "TrollHQ" },
+			// anonymous usage reports from the client, for /analytics
+			{ "name": "TELEMETRY", "class_name": "TrollTelemetry" }
+		]
 	},
-	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["TrollHQ"] }],
+	"migrations": [
+		{ "tag": "v1", "new_sqlite_classes": ["TrollHQ"] },
+		{ "tag": "v2", "new_sqlite_classes": ["TrollTelemetry"] }
+	],
 	"observability": { "enabled": true }
-	// optional secrets: `npx wrangler secret put ADMIN_TOKEN` (lets you hide guestbook entries)
+	// optional secrets: `npx wrangler secret put ADMIN_TOKEN` (lets you hide guestbook entries and see raw telemetry sessions)
 	// and `npx wrangler secret put SALT` (salts the daily visitor hashes)
 }

@@ -15,7 +15,8 @@ public class TitleScreenModule extends Module {
 			"Troll Client versions of the singleplayer and multiplayer screens", true));
 	public final ModeSetting background = add(new ModeSetting("Background",
 			"Behind the menu. Theme picks one to suit the preset (stars for Noir, rain for Terminal...)",
-			"Theme", "Theme", "Stars", "Rain", "Grid", "Dust", "Waves", "Halftone", "Fog", "None"));
+			"Theme", "Theme", "Stars", "Rain", "Grid", "Dust", "Waves", "Halftone", "Fog", "Bubbles", "Snow", "Embers",
+			"Petals", "Aurora", "Sunset", "None"));
 	public final NumberSetting stars = add(new NumberSetting("Stars", "How many stars", 320, 50, 900, 10))
 			.visibleWhen(this::starfield);
 	public final BoolSetting warp = add(new BoolSetting("Warp On Hover", "Stars speed up while you hover a button", true))

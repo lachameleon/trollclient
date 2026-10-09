@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Troll Client :: skin animation</title>
-<meta name="description" content="Skin animation for Minecraft: SkinBlink flickers your hat, jacket, sleeves, trousers and cape in patterns, and everyone on the server sees it. Try it on your own skin.">
+<title>Troll Client :: analytics</title>
+<meta name="description" content="Troll Client: a black &amp; white Fabric client for Minecraft 26.2. 35 modules for being mildly annoying, and skin animation everyone on the server can see.">
 <meta name="theme-color" content="#090909">
 <link rel="icon" href="img/favicon.png">
 <link rel="stylesheet" href="css/style.css?v=7">
 <script>document.documentElement.className = "js";</script>
 </head>
-<body class="theme-noir crt" data-page="skin">
+<body class="theme-noir crt" data-page="analytics">
 <script>try{var t=localStorage.getItem("troll-theme"),b=document.body;if(t&&/^[a-z]+$/.test(t)){b.className=b.className.replace(/theme-[a-z]+/,"theme-"+t);if(/^(paper|newsprint|ink|fog)$/.test(t))b.classList.add("light")}if(localStorage.getItem("troll-crt")==="0")b.classList.remove("crt")}catch(e){}</script>
 <!-- chrome:top:start -->
 <div class="desktop" aria-hidden="true">
@@ -28,7 +28,7 @@
 	<header class="chrome">
 		<div class="titlebar" id="titlebar">
 			<img class="app-icon" src="img/logo-small.png" alt="">
-			<span class="title"><span class="t-page">Troll Client - Skin Animation</span><span class="t-app"> - Troll Navigator 2.0</span></span>
+			<span class="title"><span class="t-page">Troll Client - Analytics</span><span class="t-app"> - Troll Navigator 2.0</span></span>
 			<span class="winbtns">
 				<button class="winbtn" data-win="min" aria-label="Minimize" title="Minimize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 7h8v2H1z"/></svg></button>
 				<button class="winbtn" data-win="max" aria-label="Maximize" title="Maximize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 1h8v8H1zm1 2v5h6V3z"/></svg></button>
@@ -37,12 +37,12 @@
 		</div>
 		<nav class="tabs" aria-label="Pages">
 			<a class="tab" data-tab="home" href="/"><img src="img/icons/star.png" alt=""><span class="lbl">home</span></a>
-			<a class="tab hot here" aria-current="page" data-tab="skin" href="/skin-animation"><img src="img/icons/player.png" alt=""><span class="lbl">skin animation</span><b class="burst" aria-label="new">NEW!</b></a>
+			<a class="tab hot" data-tab="skin" href="/skin-animation"><img src="img/icons/player.png" alt=""><span class="lbl">skin animation</span><b class="burst" aria-label="new">NEW!</b></a>
 			<a class="tab" data-tab="modules" href="/modules"><img src="img/icons/gear.png" alt=""><span class="lbl">modules</span></a>
 			<a class="tab" data-tab="gallery" href="/gallery"><img src="img/icons/radar.png" alt=""><span class="lbl">gallery</span></a>
 			<a class="tab" data-tab="download" href="/download"><img src="img/icons/cube.png" alt=""><span class="lbl">download</span></a>
 			<a class="tab" data-tab="guestbook" href="/guestbook"><img src="img/icons/chat.png" alt=""><span class="lbl">guestbook</span></a>
-			<a class="tab" data-tab="analytics" href="/analytics"><img src="img/icons/eye.png" alt=""><span class="lbl">analytics</span></a>
+			<a class="tab here" aria-current="page" data-tab="analytics" href="/analytics"><img src="img/icons/eye.png" alt=""><span class="lbl">analytics</span></a>
 			<button class="tab-new" type="button" aria-label="Open a random page" data-tip="new tab: somewhere random">+</button>
 		</nav>
 		<div class="toolbar">
@@ -82,88 +82,149 @@
 	<div class="page">
 		<main class="content" id="content">
 <!-- chrome:top:end -->
-			<div class="lab-title">
-				<span class="px dim">module: SkinBlink &middot; category: player &middot; <b class="burst small">NEW!</b></span>
-				<h1 class="blink-word" data-letters aria-label="skin animation">SKIN ANIMATION</h1>
-				<p>Your hat, jacket, sleeves, trousers and cape, flickering in patterns, and <b>everyone on the server sees it</b>. These are the module's real settings: play with them on our demo skin, or load your own.</p>
+			<h2>analytics <i class="live-dot" id="an-live" data-tip="refreshes by itself every minute"></i></h2>
+			<p class="dim">How Troll Client actually gets used, live from every copy that has telemetry switched on. Every client
+				reports anonymously under a random id it made up itself, so nothing here can be traced back to a Minecraft account.
+				<a href="#an-collected">what's collected, and how to turn it off &raquo;</a></p>
+
+			<div class="an-controls" role="group" aria-label="time range">
+				<span class="dim small">show the last</span>
+				<button class="chip" type="button" data-days="1">24 hours</button>
+				<button class="chip" type="button" data-days="7">7 days</button>
+				<button class="chip on" type="button" data-days="30">30 days</button>
+				<button class="chip" type="button" data-days="90">90 days</button>
+				<button class="chip" type="button" data-days="all">all time</button>
+				<span class="grow"></span>
+				<span class="dim small" id="an-updated" aria-live="polite">loading...</span>
 			</div>
 
-			<div class="lab" id="lab">
-				<div class="lab-stage">
-					<div class="stage-box">
-						<div class="osd"><span class="rec">LIVE</span><span><b id="osd-pattern">wave</b> &middot; <b id="osd-trigger">always</b></span></div>
-						<div class="stage" id="lab-stage"></div>
+			<div id="an-body" aria-busy="true">
+				<p class="dim" id="an-empty">opening the books...</p>
+
+				<div class="an-kpis" id="an-kpis"></div>
+
+				<div class="group">
+					<span class="legend"><img class="icon" src="img/icons/radar.png" alt=""> over time</span>
+					<div class="an-chip-row" role="group" aria-label="metric" id="an-metric">
+						<button class="chip on" type="button" data-metric="active">active installs</button>
+						<button class="chip" type="button" data-metric="sessions">sessions</button>
+						<button class="chip" type="button" data-metric="hours">hours played</button>
+						<button class="chip" type="button" data-metric="newInstalls">new installs</button>
+					</div>
+					<div class="an-chart" id="an-series"></div>
+				</div>
+
+				<div class="group">
+					<span class="legend"><img class="icon" src="img/icons/gear.png" alt=""> modules</span>
+					<p class="dim small">Users = installs that switched it on or had it running. Click a heading to sort.</p>
+					<div class="an-scroll"><table class="data an-table" id="an-modules"></table></div>
+				</div>
+
+				<div class="an-cols">
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/star.png" alt=""> where the time goes</span>
+						<div id="an-time"></div>
+					</div>
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/check.png" alt=""> things people did</span>
+						<div id="an-events"></div>
 					</div>
 				</div>
-				<div class="lab-panel">
-					<div class="gui">
-						<div class="gui-header"><div class="gui-logo"><span class="tag">TROLL</span> CLIENT <span class="dim">&rsaquo; player &rsaquo; skinblink</span></div></div>
-						<div class="group gui-settings" id="lab-settings"><span class="legend">skinblink<span class="blink">_</span></span></div>
+
+				<div class="group">
+					<span class="legend"><img class="icon" src="img/icons/world.png" alt=""> when people play <span class="dim">(their local time)</span></span>
+					<div id="an-heat"></div>
+				</div>
+
+				<div class="group">
+					<span class="legend"><img class="icon" src="img/icons/eye.png" alt=""> sessions</span>
+					<div class="an-grid" id="an-dists"></div>
+				</div>
+
+				<div class="group">
+					<span class="legend"><img class="icon" src="img/icons/cube.png" alt=""> setups <span class="dim">(% of installs)</span></span>
+					<div class="an-grid" id="an-setups"></div>
+				</div>
+
+				<div class="an-cols">
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/world.png" alt=""> servers</span>
+						<p class="dim small">Public hostnames only. Bare IPs, LAN worlds and Realms show up as just that.</p>
+						<div id="an-servers"></div>
+					</div>
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/cube.png" alt=""> other mods alongside it</span>
+						<div id="an-mods"></div>
+					</div>
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/keyboard.png" alt=""> chat commands</span>
+						<div id="an-commands"></div>
+					</div>
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/palette.png" alt=""> settings people change</span>
+						<div id="an-settings"></div>
+					</div>
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/client.png" alt=""> screens</span>
+						<div id="an-screens"></div>
+					</div>
+					<div class="group">
+						<span class="legend"><img class="icon" src="img/icons/skull.png" alt=""> module errors</span>
+						<div id="an-errors"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="group" id="an-admin">
+				<span class="legend"><img class="icon" src="img/icons/power.png" alt=""> raw sessions <span class="dim">(site owner only)</span></span>
+				<form class="an-admin-form" id="an-admin-form">
+					<label for="an-token" class="dim small">admin token</label>
+					<input id="an-token" type="password" autocomplete="off" placeholder="the ADMIN_TOKEN secret">
+					<button class="button small" type="submit">unlock</button>
+					<span class="form-msg" id="an-admin-msg" role="status"></span>
+				</form>
+				<div id="an-raw"></div>
+			</div>
+
+			<div class="group" id="an-collected">
+				<span class="legend"><img class="icon" src="img/icons/check.png" alt=""> what's collected</span>
+				<p>Every copy of the client reports once a few seconds after it starts, every five minutes while it runs, and once when you quit.
+					Each report carries running totals for that session, so a report that gets lost changes nothing.</p>
+				<div class="an-cols">
+					<div>
+						<h4>what gets sent</h4>
+						<ul class="small">
+							<li>a random install id and session id (made up on your machine, not your account)</li>
+							<li>client, Minecraft, Fabric Loader and Fabric API versions; the ids of other mods you have installed</li>
+							<li>OS, version and architecture; Java version and vendor; CPU threads, system RAM, memory given to the game</li>
+							<li>GPU name, vendor, driver and graphics backend</li>
+							<li>window size, fullscreen, refresh rate, GUI scale, render and simulation distance, graphics preset, FPS limit, vsync, FOV</li>
+							<li>game language, system locale and timezone</li>
+							<li>time played: total, focused, in a world, singleplayer, multiplayer, menus, paused; average, lowest and highest FPS</li>
+							<li>every module: times switched on and off (and how: key, command or menu), time spent on, errors</li>
+							<li>which modules are on at launch; theme, font, command prefix; how many keybinds, changed settings, macros and friends</li>
+							<li>names of settings changed and chat commands used (just the command, never what came after it)</li>
+							<li>screens opened, worlds and servers joined (public hostnames only), deaths, macros run, how many chat messages and server commands were sent</li>
+							<li>how many crash reports appeared since the last launch, and whether they mention Troll Client</li>
+							<li>roughly where: the country, continent and region Cloudflare works out from the connection</li>
+						</ul>
 					</div>
 					<div>
-						<div class="px dim">what you're doing in game</div>
-						<div class="lab-actions" id="lab-actions">
-							<button class="button" type="button" data-act="walk" aria-pressed="false">walk <kbd>W</kbd></button>
-							<button class="button" type="button" data-act="sprint" aria-pressed="false">sprint <kbd>Ctrl</kbd></button>
-							<button class="button" type="button" data-act="sneak" aria-pressed="false">sneak <kbd>Shift</kbd></button>
-							<button class="button" type="button" data-act="jump">jump <kbd>Space</kbd></button>
-							<button class="button" type="button" data-act="hurt">get hit <kbd>click</kbd></button>
-							<button class="button" type="button" data-act="use" aria-pressed="false">eat <kbd>E</kbd></button>
-						</div>
-					</div>
-					<div>
-						<div class="px dim">skin</div>
-						<div class="skin-picker" id="skin-picker"></div>
-						<form class="userskin" id="userskin" style="margin-top:8px">
-							<input name="name" placeholder="your minecraft name" maxlength="16" autocomplete="off" spellcheck="false" aria-label="Minecraft username">
-							<button class="button" type="submit">load</button>
-						</form>
-						<div class="form-msg" id="userskin-msg">any Minecraft Java player's skin works, slim arms and all.</div>
+						<h4>what never gets sent</h4>
+						<ul class="small">
+							<li>your username, UUID, or anything that identifies your Minecraft account</li>
+							<li>your IP address (it's used for a daily-salted rate limit, never stored), or your city</li>
+							<li>chat text, command arguments, sign or book text, anything you type</li>
+							<li>coordinates, world names, seeds, or who else is on the server</li>
+							<li>session tokens, passwords, or files</li>
+						</ul>
+						<h4>turning it off</h4>
+						<p class="small">Switch off <b>Client &rsaquo; Telemetry</b> in the menu (or <code>.toggle telemetry</code>). Counting stops
+							immediately and anything not yet sent is thrown away. <b>Copy Report</b> on the same module puts exactly what the next
+							report would say on your clipboard, and <b>Reset ID</b> starts over with a new random id.
+							Launching with <code>-Dtrollclient.telemetry=false</code> also turns it off.</p>
 					</div>
 				</div>
-				<div class="timeline-wrap">
-					<div class="timeline-head"><span>skin layers, tick by tick <span class="dim">(20 ticks a second)</span></span><span>packets sent: <b id="pkt-count">0</b> &middot; <b id="pkt-rate">0</b>/s</span></div>
-					<div class="timeline"><div class="rows" id="timeline-rows"></div><canvas id="timeline" aria-label="which skin layers are showing, over time"></canvas></div>
-					<div class="wire"><span>your client</span><span class="track" id="wire"></span><span class="server" id="server"><i></i>server &rarr; everyone</span></div>
-				</div>
-			</div>
-
-			<h2 data-reveal>how it works</h2>
-			<div class="flow" data-reveal>
-				<div class="node bevel"><b>your client</b><span>flips your skin layers on and off: the same switches as Options &rarr; Skin Customization</span></div>
-				<div class="arrow" aria-hidden="true">&rarr;</div>
-				<div class="node bevel"><b>the server</b><span>gets one small client settings packet per change, the kind every client sends</span></div>
-				<div class="arrow" aria-hidden="true">&rarr;</div>
-				<div class="node bevel"><b>everyone else</b><span>watches your skin animate. Plain vanilla clients, nothing to install</span></div>
-			</div>
-
-			<h2 data-reveal>four patterns</h2>
-			<div class="patterns" id="patterns" data-reveal>
-				<div class="pattern bevel" data-pattern="Blink"><h3>blink</h3><div class="strip"></div><p>everything on, everything off</p></div>
-				<div class="pattern bevel" data-pattern="Wave"><h3>wave</h3><div class="strip"></div><p>a gap travels up your body</p></div>
-				<div class="pattern bevel" data-pattern="Random"><h3>random</h3><div class="strip"></div><p>every layer flips a coin</p></div>
-				<div class="pattern bevel" data-pattern="Strobe"><h3>strobe</h3><div class="strip"></div><p>a flash every fourth step</p></div>
-			</div>
-
-			<h2 data-reveal>nine triggers</h2>
-			<p class="dim">Only animate while something's going on; the rest of the time your skin looks perfectly normal.</p>
-			<div class="triggers" data-reveal><span>always</span><span>in air</span><span>on ground</span><span>moving</span><span>still</span><span>sneaking</span><span>sprinting</span><span>hurt</span><span>using item</span></div>
-
-			<h2 data-reveal>faq</h2>
-			<details class="group"><summary>can other people really see it?</summary>
-			<p>Yes. Which skin layers you show is part of your client settings, and the server passes it on to every player who can see you. That's why it works on any server, and why nobody needs a mod to see it.</p></details>
-			<details class="group"><summary>will it mess up my skin settings?</summary>
-			<p>No. SkinBlink remembers which layers you had on when it starts and puts them back when you switch it off, when the trigger stops, and when you leave a world, so your options file never saves a half-blinked skin.</p></details>
-			<details class="group"><summary>how many packets is that?</summary>
-			<p>One per change. At the fastest setting (1 tick) that's 20 a second; at the default of 3 ticks, about 7. If a server complains, turn the interval up.</p></details>
-			<details class="group"><summary>my skin doesn't have an outer layer</summary>
-			<p>Then only your cape has anything to flicker. Skins with a hat, jacket, sleeves and trousers layer look best. Load yours in the lab above to see what you're working with.</p></details>
-			<details class="group"><summary>where is it in the client?</summary>
-			<p>Press <kbd>Right Shift</kbd>, open the Player tab, left click SkinBlink to switch it on and right click it for these settings. Or type <code>.toggle skinblink</code> in chat.</p></details>
-
-			<div class="center" style="margin-top:24px" data-reveal>
-				<a class="button primary huge pulse-ring" href="/download">get skin animation</a>
-				<p class="dim small" style="margin-top:10px">it's in Troll Client v1.0 &middot; Player &rarr; SkinBlink</p>
 			</div>
 <!-- chrome:bottom:start -->
 		</main>
@@ -307,6 +368,6 @@
 <!-- chrome:bottom:end -->
 <script src="js/site.js?v=7"></script>
 <script src="js/skin3d.js?v=7"></script>
-<script src="js/lab.js?v=7"></script>
+<script src="js/analytics.js?v=7"></script>
 </body>
 </html>

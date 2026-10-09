@@ -243,7 +243,7 @@ public class TrollTitleScreen extends Screen {
 	@Override
 	public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partialTick) {
 		Theme.update();
-		Draw.rect(g, 0, 0, width, height, 0xFF000000 | Theme.bg);
+		Draw.screen(g, width, height);
 	}
 
 	@Override
@@ -324,11 +324,11 @@ public class TrollTitleScreen extends Screen {
 		float top = menuTop() - 6;
 		float bottom = menuTop() + items.size() * itemH() + 18;
 		int layers = 6;
+		int clearing = ColorUtil.fade(0xFF000000 | Theme.screenAt((top + bottom) / 2f / height), 0.13f);
 		for (int i = 0; i < layers; i++) {
 			float insetX = i * 9;
 			float insetY = i * 2.5f;
-			Draw.rect(g, menuX() - 60 + insetX, top + insetY, menuW() + 120 - insetX * 2, bottom - top - insetY * 2,
-					ColorUtil.fade(Theme.bg, 0.13f));
+			Draw.rect(g, menuX() - 60 + insetX, top + insetY, menuW() + 120 - insetX * 2, bottom - top - insetY * 2, clearing);
 		}
 	}
 

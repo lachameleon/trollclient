@@ -13,11 +13,14 @@ import net.minecraft.util.Mth;
  * server's own physics would land us exactly where we end up.</p>
  */
 public final class MovementControl {
+	public static final int PRIORITY_FIDGET = -5;
 	public static final int PRIORITY_TWERK = 0;
+	public static final int PRIORITY_NPC = 2;
 	public static final int PRIORITY_SIGNAL = 5;
 	public static final int PRIORITY_FOLLOW = 10;
 	public static final int PRIORITY_ORBIT = 12;
 	public static final int PRIORITY_GOALIE = 13;
+	public static final int PRIORITY_BODYGUARD = 14;
 	public static final int PRIORITY_MIMIC = 15;
 	public static final int PRIORITY_PICKUP = 20;
 	public static final int PRIORITY_AVOID = 30;

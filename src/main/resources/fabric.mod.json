@@ -12,6 +12,9 @@
 		"client": ["com.trollclient.TrollClient"]
 	},
 	"mixins": ["trollclient.mixins.json"],
+	"custom": {
+		"trollclient:telemetry": "${telemetryUrl}"
+	},
 	"depends": {
 		"fabricloader": ">=0.19.5",
 		"minecraft": "~26.2",

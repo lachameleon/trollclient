@@ -1405,6 +1405,80 @@ body.skinblinked .content > * { animation: page-blink 0.8s steps(1) 4; animation
 	.tv .osd { font-size: 24px; right: 14px; top: 8px; }
 }
 
+/* ---------------------------------------------------------------- analytics page: one ink, any theme */
+h2 .live-dot { display: inline-block; vertical-align: middle; margin-left: 6px; }
+.an-controls, .an-chip-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 4px; }
+.an-controls .grow { flex: 1; }
+button.chip { cursor: pointer; }
+.an-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 16px 0 4px; }
+.an-kpi { padding: 8px 10px; min-width: 0; }
+.an-kpi-n { font: 32px/38px "TrollTerminal", monospace; -webkit-font-smoothing: none; color: var(--text); overflow-wrap: anywhere; }
+.an-kpi-n.long { font-size: 24px; }
+.an-alltime { grid-column: 1 / -1; margin: 0; }
+.an-single { padding: 20px 0; text-align: center; }
+.an-chart svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; }
+.an-grid-line { stroke: var(--border); stroke-width: 1; }
+.an-axis { fill: var(--dim); font: 11px Verdana, Tahoma, sans-serif; }
+.an-area { fill: var(--text); opacity: 0.08; }
+.an-line { fill: none; stroke: var(--text); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.an-cross { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 3 3; }
+.an-dot { fill: var(--text); stroke: var(--panel); stroke-width: 2; }
+.an-hit { fill: transparent; }
+.an-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.an-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0 16px; align-items: start; }
+.an-cols h4 { margin: 0 0 6px; }
+.an-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px 18px; }
+.an-setup h4, .an-dist h4 { margin: 0 0 6px; font-size: 16px; line-height: 20px; }
+.an-bars { list-style: none; margin: 0; padding: 0; }
+.an-bars li { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; padding: 2px 0 5px; font-size: 11px; line-height: 15px; border-radius: 2px; }
+.an-bars li:hover, .an-bars li:focus-visible { background: var(--panel2); outline: none; }
+.an-bar-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.an-bar-num { font: 16px/15px "TrollTerminal", monospace; -webkit-font-smoothing: none; color: var(--text); }
+.an-bar { grid-column: 1 / -1; display: block; height: 6px; margin-top: 2px; background: var(--panel2); border-radius: 0 3px 3px 0; overflow: hidden; }
+.an-bar i { display: block; height: 100%; background: var(--text); border-radius: 0 3px 3px 0; transform-origin: left; animation: an-grow 0.6s cubic-bezier(.3, 1.1, .5, 1) both; }
+@keyframes an-grow { from { transform: scaleX(0); } }
+.an-cols-chart { display: flex; align-items: stretch; gap: 3px; height: 140px; padding-top: 16px; }
+.an-col { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; text-align: center; border-radius: 2px; }
+.an-col:hover, .an-col:focus-visible { background: var(--panel2); outline: none; }
+.an-col-n { font: 16px/16px "TrollTerminal", monospace; -webkit-font-smoothing: none; color: var(--text); }
+.an-col-bar { display: block; margin: 2px 2px 0; background: var(--text); border-radius: 3px 3px 0 0; transform-origin: bottom; animation: grow 0.6s cubic-bezier(.3, 1.2, .5, 1) both; }
+.an-col-k { display: block; padding-top: 3px; border-top: 1px solid var(--border-hi); font-size: 10px; line-height: 11px; min-height: 22px; color: var(--dim); overflow-wrap: anywhere; }
+.an-heat { display: grid; grid-template-columns: 34px repeat(24, minmax(0, 1fr)); gap: 2px; font-size: 10px; color: var(--dim); }
+.an-heat-h { text-align: left; }
+.an-heat-d { line-height: 18px; }
+.an-cell { height: 18px; border-radius: 2px; background: var(--text); opacity: var(--a); }
+.an-cell.zero { background: none; opacity: 1; box-shadow: inset 0 0 0 1px var(--border); }
+.an-cell:hover { outline: 1px solid var(--text); outline-offset: 1px; }
+.an-scroll { overflow-x: auto; margin: 0 0 4px; }
+.an-table { margin: 0; }
+table.data.an-table th { padding: 0; white-space: nowrap; }
+.an-table th button { all: unset; display: block; padding: 7px 10px; cursor: pointer; }
+.an-table th button:focus-visible { outline: 1px dashed var(--on-accent); outline-offset: -3px; }
+.an-table th.num button { text-align: right; }
+.an-table td.num { text-align: right; white-space: nowrap; font: 16px/22px "TrollTerminal", monospace; -webkit-font-smoothing: none; }
+.an-table td.name a { color: inherit; }
+.an-inline { display: inline-block; width: 46px; height: 6px; margin-right: 8px; vertical-align: 2px; background: var(--panel2); border-radius: 0 3px 3px 0; overflow: hidden; }
+.an-inline i { display: block; height: 100%; background: var(--text); }
+.an-tip {
+	position: fixed; z-index: 210; pointer-events: none; max-width: 280px; padding: 5px 9px 6px;
+	background: var(--panel2); color: var(--text); border: 1px solid var(--border-hi); border-radius: 6px;
+	box-shadow: 3px 3px 0 var(--shadow); font: 11px/1.45 Verdana, Tahoma, sans-serif;
+}
+.an-tip .dim { color: var(--dim); }
+.an-admin-form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.an-admin-form input { flex: 1 1 180px; min-width: 0; padding: 4px 8px; background: var(--panel2); color: var(--text); border: 1px solid var(--border-hi); border-radius: 3px; font: 11px Verdana, sans-serif; }
+.an-raw { margin-top: 12px; font-size: 11px; }
+.an-raw pre { max-width: 520px; max-height: 320px; overflow: auto; margin: 4px 0 0; padding: 6px; background: var(--panel2); font-size: 10px; white-space: pre-wrap; word-break: break-all; }
+#an-collected ul { margin: 0 0 12px; padding-left: 18px; }
+#an-collected li { margin-bottom: 3px; }
+@media (max-width: 760px) {
+	.an-kpi-n { font-size: 24px; line-height: 30px; }
+	.an-heat { grid-template-columns: 28px repeat(24, minmax(0, 1fr)); gap: 1px; }
+	.an-cell, .an-heat-d { height: 12px; line-height: 12px; }
+	.an-heat-h { font-size: 8px; }
+	table.data.an-table { table-layout: auto; overflow-wrap: normal; }
+}
+
 /* ---------------------------------------------------------------- reduced motion: keep it still */
 @media (prefers-reduced-motion: reduce) {
 	*, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; scroll-behavior: auto !important; }

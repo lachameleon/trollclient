@@ -27,6 +27,7 @@ work on the Workers free plan.
 | `gallery.html` | stills from the showcase recording, with a lightbox that zooms out of the thumbnail |
 | `download.html` | the jar, its size and SHA-256, the live download count, install steps, controls, commands, FAQ |
 | `guestbook.html` | a real guestbook: entries are stored by the Worker and new ones show up live |
+| `analytics.html` | anonymous usage from the client itself: active installs over time, every module's users and time on, setups (OS, GPU, Java, versions, mods...), when people play, servers, commands, settings, errors, plus what's collected and how to turn it off |
 | `404.html` | served for anything that doesn't exist |
 
 The window chrome (title bar, tabs, toolbar, ticker, sidebar, status bar, taskbar, start menu) lives in
@@ -46,6 +47,17 @@ The window chrome (title bar, tabs, toolbar, ticker, sidebar, status bar, taskba
 - **Tallies**: modules toggled in the menu demo and layer changes played in the skin lab, batched by the
   page into `POST /api/bump` every few seconds.
 - **Skins**: `GET /api/skin/<name>` looks a player up with Mojang and returns their skin (cached for an hour).
+- **Client telemetry**: the client's Telemetry module posts `POST /api/telemetry` on launch, every five minutes and on quit.
+  Each report carries running totals for the session; a second Durable Object, `TrollTelemetry` (`src/telemetry.js`),
+  keeps the last totals per session and adds only the difference to per-day tables, so lost or repeated reports never
+  double-count. `GET /api/analytics?days=1|7|30|90|all` is what the analytics page draws (public, aggregates only);
+  `GET /api/analytics/sessions` (with `authorization: Bearer $ADMIN_TOKEN`) returns the newest raw sessions, and the
+  page unlocks that view too. Clients are told apart by a random install id; location is the country, continent and
+  region from Cloudflare, never the IP.
+
+The client finds the endpoint in `telemetry_url` in `gradle.properties` (baked into `fabric.mod.json` at build time;
+empty means a build that never reports). Dev runs (`./gradlew runClient`) report to `http://localhost:8642` instead, and
+`-Dtrollclient.telemetry.url=...` or `-Dtrollclient.telemetry=false` override both.
 
 Visitors are told apart by a SHA-256 of their IP and a salt that changes every day. No IP is stored.
 If the site is served without the Worker (any plain static host), everything still works except the live

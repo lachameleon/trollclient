@@ -10,6 +10,8 @@ import com.trollclient.module.ModuleManager;
 import com.trollclient.mixin.ToastManagerAccessor;
 import com.trollclient.module.client.GuiToolsModule;
 import com.trollclient.module.client.HudModule;
+import com.trollclient.module.client.KeystrokesModule;
+import com.trollclient.module.combat.KillStreak;
 import com.trollclient.macro.MacroManager;
 import com.trollclient.macro.MacroRun;
 import com.trollclient.packet.PacketGate;
@@ -68,6 +70,14 @@ public final class HudRenderer {
 			if (hud.coords.get()) {
 				coords(g, mc, height);
 			}
+		}
+		KeystrokesModule keys = ModuleManager.get(KeystrokesModule.class);
+		if (keys.isEnabled()) {
+			keys.render(g, width, height, dt);
+		}
+		KillStreak streak = ModuleManager.get(KillStreak.class);
+		if (streak.isEnabled()) {
+			streak.render(g, width, height);
 		}
 		Notifications.render(g, width, height, dt);
 		badges(g, width);

@@ -74,9 +74,11 @@ public final class DevShots {
 		});
 		step("title", () -> mc.gui.screen() instanceof TrollTitleScreen, 110, () -> shot("01_title"));
 		// the title screen under every other preset: its background, logo and chrome should follow the theme
-		for (String preset : new String[]{"Graphite", "Terminal", "Paper", "Newsprint", "Ink", "Fog"}) {
-			step("title " + preset.toLowerCase(java.util.Locale.ROOT), () -> true, 1, () -> theme.preset.set(preset));
-			step("", () -> true, 30, () -> shot("01t_title_" + preset.toLowerCase(java.util.Locale.ROOT)));
+		for (String preset : new String[]{"Graphite", "Terminal", "Paper", "Newsprint", "Ink", "Fog", "Frutiger Aero", "Vaporwave",
+				"Amber", "Phosphor", "Classic", "Sakura", "Ocean", "Dracula", "Nord", "Solarized", "Crimson", "Aurora", "Handheld"}) {
+			String file = preset.toLowerCase(java.util.Locale.ROOT).replace(' ', '_');
+			step("title " + file, () -> true, 1, () -> theme.preset.set(preset));
+			step("", () -> true, 30, () -> shot("01t_title_" + file));
 		}
 		step("title glow", () -> true, 1, () -> {
 			theme.preset.set("Noir");
@@ -228,6 +230,20 @@ public final class DevShots {
 			openGui(Category.CLIENT, "ClickGUI");
 		});
 		step("", () -> true, 45, () -> shot("06_gui_graphite_rainbow"));
+		step("frutiger aero", () -> true, 1, () -> {
+			theme.preset.set("Frutiger Aero");
+			theme.accentMode.set("Shimmer");
+			theme.corners.set("Round");
+			gui.backdrop.set("Theme");
+			openGui(Category.TROLL, "Twerk");
+		});
+		step("", () -> true, 45, () -> shot("06b_gui_frutiger_aero"));
+		step("vaporwave", () -> true, 1, () -> {
+			theme.preset.set("Vaporwave");
+			theme.corners.set("Notched");
+			openGui(Category.CHAT, "Hypeman");
+		});
+		step("", () -> true, 45, () -> shot("06c_gui_vaporwave"));
 		step("crt mid-animation", () -> true, 1, () -> {
 			theme.preset.set("Noir");
 			theme.accentMode.set("Shimmer");
@@ -587,8 +603,9 @@ public final class DevShots {
 			for (String name : new String[]{"Grudge", "Greeter", "Honk", "Juggle", "Typo"}) {
 				module(name).setEnabled(false);
 			}
-			mc.level.removeEntity(dummy.getId(), net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
 		});
+		newModules(mc);
+		step("", () -> true, 5, () -> mc.level.removeEntity(dummy.getId(), net.minecraft.world.entity.Entity.RemovalReason.DISCARDED));
 		step("gui tools", () -> true, 5, () -> {
 			mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
 			net.minecraft.core.BlockPos chest = mc.player.blockPosition().east(2);
@@ -741,6 +758,177 @@ public final class DevShots {
 			TrollClient.LOGGER.info("[devshots] finished, stopping client");
 			mc.stop();
 		});
+	}
+
+	/** The second wave of modules, mostly against the dummy (which only exists on our side, so the server never sees it). */
+	private static void newModules(Minecraft mc) {
+		// a fresh platform up in the air: by now the first one is often half flooded, depending on the seed
+		step("new modules", () -> true, 10, () -> cmd("tp @s ~ ~30 ~"));
+		step("", () -> true, 5, () -> {
+			cmd("fill ~-9 ~-1 ~-9 ~9 ~-1 ~9 stone");
+			cmd("fill ~-9 ~ ~-9 ~9 ~5 ~9 air");
+		});
+		step("stare + narrator", () -> mc.player.onGround(), 5, () -> {
+			net.minecraft.world.phys.Vec3 at = mc.player.position().add(4, 0, 0);
+			dummy.snapTo(at.x, at.y, at.z, 90f, 0f);
+			dummy.setYHeadRot(90f);
+			module("Stare").getSetting("Mode").parse("Nod");
+			module("Stare").setEnabled(true);
+			Module narrator = module("Narrator");
+			narrator.getSetting("Audience").parse("Client");
+			narrator.getSetting("Chance").parse("100");
+			narrator.getSetting("Cooldown").parse("2");
+			narrator.setEnabled(true);
+			module("Keystrokes").setEnabled(true);
+		});
+		step("", () -> true, 10, () -> dummy.setPose(net.minecraft.world.entity.Pose.CROUCHING));
+		step("", () -> true, 50, () -> {
+			TrollClient.LOGGER.info("[devshots] stare: info={}, server pitch={}; narrator lines={}", module("Stare").getInfo(),
+					String.format("%.1f", com.trollclient.util.Rotations.serverPitch()), module("Narrator").getInfo());
+			dummy.setPose(net.minecraft.world.entity.Pose.STANDING);
+			mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
+		});
+		step("", () -> true, 4, () -> {
+			shot("22_stare_keystrokes");
+			mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+			module("Stare").setEnabled(false);
+			module("Narrator").setEnabled(false);
+			com.trollclient.util.Friends.add("Dummy");
+			module("Bodyguard").setEnabled(true);
+		});
+		step("", () -> true, 60, () -> {
+			TrollClient.LOGGER.info("[devshots] bodyguard: distance to dummy {} (want about 2-3), info={}",
+					String.format("%.2f", mc.player.distanceTo(dummy)), module("Bodyguard").getInfo());
+			module("Bodyguard").setEnabled(false);
+			com.trollclient.util.Friends.remove("Dummy");
+			module("NPC").setEnabled(true);
+		});
+		step("", () -> true, 40, () -> {
+			TrollClient.LOGGER.info("[devshots] npc: info={} (dummy within stare range)", module("NPC").getInfo());
+			module("NPC").setEnabled(false);
+			cmd("give @s fishing_rod");
+			module("Angler").setEnabled(true);
+		});
+		step("", () -> true, 12, () -> TrollClient.LOGGER.info("[devshots] angler: line out={}", mc.player.fishing != null));
+		step("", () -> true, 30, () -> {
+			// the server can't hook a dummy it doesn't know about: the cast should time out and reel back in
+			TrollClient.LOGGER.info("[devshots] angler: line out after giving up={}, casts={}", mc.player.fishing != null,
+					field(module("Angler"), "casts"));
+			module("Angler").setEnabled(false);
+		});
+		step("", () -> true, 10, () -> {
+			TrollClient.LOGGER.info("[devshots] angler: after switching off, line out={}, holding={}", mc.player.fishing != null,
+					mc.player.getMainHandItem().getItem());
+			cmd("fill ~-6 ~-1 ~-6 ~6 ~-1 ~6 grass_block");
+			cmd("give @s bone_meal 16");
+			module("Gardener").setEnabled(true);
+		});
+		step("", () -> true, 50, () -> {
+			int plants = 0;
+			for (net.minecraft.core.BlockPos p : net.minecraft.core.BlockPos.betweenClosed(dummy.blockPosition().offset(-5, 0, -5),
+					dummy.blockPosition().offset(5, 0, 5))) {
+				if (!mc.level.getBlockState(p).isAir()) {
+					plants++;
+				}
+			}
+			TrollClient.LOGGER.info("[devshots] gardener: bone meals={}, plants around the dummy={}", module("Gardener").getInfo(), plants);
+			module("Gardener").setEnabled(false);
+			Module streak = module("KillStreak");
+			streak.getSetting("Mobs Count").parse("true");
+			streak.setEnabled(true);
+			cmd("item replace entity @s weapon.mainhand with diamond_sword");
+			cmd("summon chicken ~1.6 ~ ~1 {NoAI:1b}");
+			cmd("summon chicken ~1.6 ~ ~-1 {NoAI:1b}");
+		});
+		step("", () -> true, 15, () -> hitChicken(mc));
+		step("", () -> true, 16, () -> hitChicken(mc));
+		step("", () -> true, 6, () -> {
+			TrollClient.LOGGER.info("[devshots] kill streak: streak={}", module("KillStreak").getInfo());
+			shot("23_killstreak");
+		});
+		step("", () -> true, 50, () -> {
+			module("KillStreak").setEnabled(false);
+			Module fidget = module("Fidget");
+			fidget.getSetting("Idle After").parse("3");
+			fidget.getSetting("Every").parse("1");
+			fidget.setEnabled(true);
+		});
+		step("", () -> true, 120, () -> {
+			TrollClient.LOGGER.info("[devshots] fidget: info={}", module("Fidget").getInfo());
+			module("Fidget").setEnabled(false);
+			Module hype = module("Hypeman");
+			hype.getSetting("Chance").parse("100");
+			hype.getSetting("Delay").parse("0");
+			hype.setEnabled(true);
+			ModuleManager.chatMessage("Dummy", "check out my new house");
+		});
+		step("", () -> true, 10, () -> {
+			TrollClient.LOGGER.info("[devshots] hypeman: reactions={}", module("Hypeman").getInfo());
+			module("Hypeman").setEnabled(false);
+			// the chat parser against layouts real servers use; our own name is the only one in the tab list
+			String me = mc.player.getGameProfile().name();
+			for (String line : new String[]{"<" + me + "> plain vanilla", "<[VIP] " + me + "> ranked vanilla",
+					"[Owner] " + me + " » arrow style", "Party > [MVP+] " + me + ": party chat", "[G] " + me + " | guild chat",
+					"✦ " + me + " ➥ fancy symbols", me + " joined the game", me + " was slain by Zombie",
+					"~ " + me + " ~ says: custom layout"}) {
+				String[] parsed = com.trollclient.util.ChatUtil.parse(line);
+				TrollClient.LOGGER.info("[devshots] chat parse: \"{}\" -> {}", line, parsed == null ? "not chat" : parsed[0] + " / " + parsed[1]);
+			}
+			module("ChatFormat").getSetting("Formats").parse("~ {player} ~ says: {message}");
+			String[] custom = com.trollclient.util.ChatUtil.parse("~ " + me + " ~ says: custom layout");
+			TrollClient.LOGGER.info("[devshots] chat parse with a custom format: {}", custom == null ? "not chat" : custom[0] + " / " + custom[1]);
+			module("ChatFormat").getSetting("Formats").parse("");
+			Module quiz = module("Quizmaster");
+			quiz.getSetting("Topic").parse("Custom");
+			quiz.getSetting("Custom Questions").parse("what's the best block? = dirt | who made this quiz? = troll client");
+			quiz.getSetting("Min Players").parse("0");
+			quiz.getSetting("Message Gap").parse("500");
+			quiz.setEnabled(true);
+		});
+		step("", () -> true, 90, () -> {
+			// one of these is right, whichever question came up; the second is misspelled on purpose
+			ModuleManager.chatMessage("Dummy", "is it dirt");
+			ModuleManager.chatMessage("Dummy", "troll clinet");
+		});
+		step("", () -> true, 20, () -> {
+			TrollClient.LOGGER.info("[devshots] quizmaster: info={}, question still open={}", module("Quizmaster").getInfo(),
+					field(module("Quizmaster"), "current") != null);
+			ModuleManager.chatMessage("Dummy", "!top");
+		});
+		step("", () -> true, 20, () -> {
+			module("Quizmaster").setEnabled(false);
+			Module countdown = module("Countdown");
+			countdown.getSetting("From").parse("3");
+			countdown.getSetting("Interval").parse("1");
+			countdown.setEnabled(true);
+		});
+		step("", () -> true, 120, () -> {
+			TrollClient.LOGGER.info("[devshots] countdown: still on after finishing={}", module("Countdown").isEnabled());
+			module("Keystrokes").setEnabled(false);
+			// mow the lawn: tall grass and flowers would catch the crosshair in the chest test
+			cmd("fill ~-9 ~ ~-9 ~9 ~5 ~9 air");
+		});
+	}
+
+	private static void hitChicken(Minecraft mc) {
+		for (Entity e : mc.level.entitiesForRendering()) {
+			if (e instanceof net.minecraft.world.entity.animal.chicken.Chicken chicken && chicken.isAlive() && chicken.distanceTo(mc.player) < 3.5) {
+				mc.gameMode.attack(mc.player, chicken);
+				mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+				return;
+			}
+		}
+		TrollClient.LOGGER.info("[devshots] kill streak: no chicken in reach");
+	}
+
+	private static Object field(Object owner, String name) {
+		try {
+			java.lang.reflect.Field f = owner.getClass().getDeclaredField(name);
+			f.setAccessible(true);
+			return f.get(owner);
+		} catch (ReflectiveOperationException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	private static com.trollclient.macro.MacroStep newStep(String id) {

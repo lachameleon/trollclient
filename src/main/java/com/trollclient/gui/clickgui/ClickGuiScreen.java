@@ -231,7 +231,7 @@ public class ClickGuiScreen extends Screen {
 		ClickGuiModule gui = ModuleManager.get(ClickGuiModule.class);
 		float p = Motion.outCubic(progress);
 		if (minecraft.level == null) {
-			Draw.rect(g, 0, 0, width, height, 0xFF000000 | Theme.bg);
+			Draw.screen(g, width, height);
 		} else {
 			String mode = gui.background.get();
 			if (mode.contains("Blur") && p > 0.05f) {
@@ -484,6 +484,10 @@ public class ClickGuiScreen extends Screen {
 	private void drawHeader(GuiGraphicsExtractor g, float mx, float my) {
 		Draw.rect(g, 1, 4, W - 2, HEADER - 4, Theme.a(Theme.panel));
 		Draw.rect(g, 1, HEADER, W - 2, 1, Theme.a(Theme.border));
+		if (Theme.gloss) {
+			// glass title bar, accent stripe included
+			Draw.gloss(g, 1, 1, W - 2, HEADER - 1, Theme.opacity);
+		}
 
 		// logo: inverted [TROLL] block then CLIENT, with the occasional glitch
 		String a = glitchText("TROLL", 0);
@@ -580,6 +584,9 @@ public class ClickGuiScreen extends Screen {
 		Draw.rect(g, 1, iy, SIDEBAR - 1, 1, Theme.a(Theme.border));
 		Draw.rect(g, 1, iy + TAB_H - 1, SIDEBAR - 1, 1, Theme.a(Theme.border));
 		Draw.rect(g, 1, iy + 4, 2, TAB_H - 8, Theme.accent(0.1f));
+		if (Theme.gloss) {
+			Draw.gloss(g, 3, iy + 1, SIDEBAR - 3, TAB_H - 2, 0.6f * Theme.opacity);
+		}
 
 		for (int i = 0; i < cats.length; i++) {
 			Category c = cats[i];

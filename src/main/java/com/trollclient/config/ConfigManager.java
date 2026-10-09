@@ -35,6 +35,11 @@ public final class ConfigManager {
 		return FabricLoader.getInstance().getConfigDir().resolve("trollclient.json");
 	}
 
+	/** True while the file is being read back in, so restored values don't look like changes. */
+	public static boolean isLoading() {
+		return loading;
+	}
+
 	public static void markDirty() {
 		if (!loading && dirtySince < 0) {
 			dirtySince = System.currentTimeMillis();

@@ -31,6 +31,11 @@ public final class Theme {
 	public static int accentBase;
 	public static boolean light;
 	public static float opacity = 1f;
+	/** Full-screen background where there's no world behind: top and bottom of a vertical gradient. */
+	public static int screenTop;
+	public static int screenBottom;
+	/** Glassy highlight across the top half of every panel (Frutiger Aero). */
+	public static boolean gloss;
 
 	private static FontDescription font = FontDescription.DEFAULT;
 	private static boolean shadow;
@@ -53,6 +58,30 @@ public final class Theme {
 			case "Ink" -> new int[]{0xFFFFFFFF, 0xFFFFFFFF, 0xFFF1F1F1, 0xFF1C1C1C, 0xFF000000, 0xFF000000, 0xFF5E5E5E, 0xFF000000};
 			// everything mid-grey, like a foggy CRT turned way down
 			case "Fog" -> new int[]{0xFF7E7E7E, 0xFF8B8B8B, 0xFF979797, 0xFF6E6E6E, 0xFF5A5A5A, 0xFF101010, 0xFF3C3C3C, 0xFF0A0A0A};
+			// glossy sky-blue glass, aqua accent: Vista-era optimism. Entries 8 and 9 are the screen gradient
+			case "Frutiger Aero" -> new int[]{0xFFE2F3FD, 0xFFF6FCFF, 0xFFD0EBFA, 0xFF9CCFEC, 0xFF3E9FD8, 0xFF0A3150, 0xFF5785A3, 0xFF0C9BDC,
+					0xFF5DBDF0, 0xFFE9F9FF};
+			case "Vaporwave" -> new int[]{0xFF1B0B33, 0xFF240F42, 0xFF2F1553, 0xFF4E2380, 0xFFB24BD8, 0xFFFBE8FF, 0xFFB79AD6, 0xFFFF71CE,
+					0xFF12062A, 0xFF4A1257};
+			// monochrome monitors: amber and green phosphor
+			case "Amber" -> new int[]{0xFF0A0600, 0xFF100A00, 0xFF1A1100, 0xFF4A3000, 0xFFB87A00, 0xFFFFB000, 0xFF9C6B00, 0xFFFFC94A};
+			case "Phosphor" -> new int[]{0xFF000A03, 0xFF001105, 0xFF001A09, 0xFF0B4A1C, 0xFF1FBF4D, 0xFF41FF6E, 0xFF1E9440, 0xFF8CFFA8};
+			// grey window, white fields, navy title bar, teal desktop
+			case "Classic" -> new int[]{0xFFC0C0C0, 0xFFD4D0C8, 0xFFFFFFFF, 0xFF808080, 0xFF404040, 0xFF000000, 0xFF2E2E2E, 0xFF000080,
+					0xFF2A9D9D, 0xFF2A9D9D};
+			case "Sakura" -> new int[]{0xFFFFF0F5, 0xFFFFF8FB, 0xFFFDE3EC, 0xFFF2B8CC, 0xFFDB7A9D, 0xFF4B1A2C, 0xFFA06A80, 0xFFE84A85,
+					0xFFFFE1ED, 0xFFFFF8FB};
+			case "Ocean" -> new int[]{0xFF031A2E, 0xFF05233D, 0xFF082E4F, 0xFF0F4770, 0xFF2D86C2, 0xFFD9F2FF, 0xFF6E9DC0, 0xFF2EE6D0,
+					0xFF0A3A5E, 0xFF010A14};
+			case "Dracula" -> new int[]{0xFF21222C, 0xFF282A36, 0xFF343746, 0xFF44475A, 0xFF6272A4, 0xFFF8F8F2, 0xFF8B8FAF, 0xFFBD93F9};
+			case "Nord" -> new int[]{0xFF2E3440, 0xFF3B4252, 0xFF434C5E, 0xFF4C566A, 0xFF7B88A1, 0xFFECEFF4, 0xFF9AA4B6, 0xFF88C0D0};
+			case "Solarized" -> new int[]{0xFFEEE8D5, 0xFFFDF6E3, 0xFFF4EEDB, 0xFFD6CDB4, 0xFF93A1A1, 0xFF073642, 0xFF657B83, 0xFF268BD2};
+			case "Crimson" -> new int[]{0xFF0D0203, 0xFF150405, 0xFF200709, 0xFF4A0E12, 0xFF9C1C24, 0xFFF6DADA, 0xFFA06A6C, 0xFFFF2E3C,
+					0xFF1A0406, 0xFF050001};
+			case "Aurora" -> new int[]{0xFF060A1A, 0xFF0B1126, 0xFF111934, 0xFF1D2A50, 0xFF3E5AA8, 0xFFE4EAFF, 0xFF7F8CB8, 0xFF5CFFB1,
+					0xFF02040D, 0xFF0E1A3A};
+			// the four greens of an old handheld's LCD
+			case "Handheld" -> new int[]{0xFF8BAC0F, 0xFF9BBC0F, 0xFF8BAC0F, 0xFF306230, 0xFF0F380F, 0xFF0F380F, 0xFF306230, 0xFF0F380F};
 			case "Custom" -> custom(t);
 			default -> new int[]{0xFF090909, 0xFF101010, 0xFF181818, 0xFF262626, 0xFF3C3C3C, 0xFFEDEDED, 0xFF7A7A7A, 0xFFFFFFFF};
 		};
@@ -64,7 +93,14 @@ public final class Theme {
 		text = p[5];
 		textDim = p[6];
 		accentBase = t.customAccent.get() || t.preset.is("Custom") ? t.accent.get() | 0xFF000000 : p[7];
+		screenTop = p.length > 8 ? p[8] : bg;
+		screenBottom = p.length > 9 ? p[9] : screenTop;
 		light = ColorUtil.luminance(panel) > 0.5f;
+		gloss = switch (t.gloss.get()) {
+			case "On" -> true;
+			case "Off" -> false;
+			default -> t.preset.is("Frutiger Aero");
+		};
 		opacity = t.opacity.getFloat() / 100f;
 		font = switch (t.font.get()) {
 			case "Terminal" -> TERMINAL;
@@ -109,19 +145,32 @@ public final class Theme {
 		return accent(0.5f);
 	}
 
+	/** Screen background colour {@code t} of the way down (0 = top, 1 = bottom). */
+	public static int screenAt(float t) {
+		return ColorUtil.lerp(screenTop, screenBottom, t);
+	}
+
 	/**
 	 * The animated backdrop that suits the preset, used wherever a backdrop
 	 * setting is left on "Theme": stars for Noir, binary rain for Terminal,
-	 * halftone dots for Newsprint, pen traces for Ink...
+	 * halftone dots for Newsprint, pen traces for Ink, bubbles for Aero...
 	 */
 	public static String scene() {
 		return switch (settings().preset.get()) {
 			case "Graphite" -> "Grid";
-			case "Terminal" -> "Rain";
-			case "Paper" -> "Dust";
-			case "Newsprint" -> "Halftone";
+			case "Terminal", "Amber", "Phosphor" -> "Rain";
+			case "Paper", "Solarized" -> "Dust";
+			case "Newsprint", "Handheld" -> "Halftone";
 			case "Ink" -> "Waves";
 			case "Fog" -> "Fog";
+			case "Frutiger Aero", "Ocean" -> "Bubbles";
+			case "Vaporwave" -> "Sunset";
+			case "Sakura" -> "Petals";
+			case "Nord" -> "Snow";
+			case "Crimson" -> "Embers";
+			case "Aurora" -> "Aurora";
+			// a plain desktop, the way it came out of the box
+			case "Classic" -> "None";
 			default -> "Stars";
 		};
 	}

@@ -12,6 +12,7 @@ import com.trollclient.module.ModuleManager;
 import com.trollclient.module.client.ClickGuiModule;
 import com.trollclient.module.movement.PlayerFollow;
 import com.trollclient.setting.Setting;
+import com.trollclient.telemetry.Telemetry;
 import com.trollclient.util.Friends;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -63,8 +64,13 @@ public final class Commands {
 					ConfigManager.load();
 					info("Config reloaded.");
 				}
-				default -> error("Unknown command. Try " + prefix + "help");
+				default -> {
+					Telemetry.command(cmd, false);
+					error("Unknown command. Try " + prefix + "help");
+					return true;
+				}
 			}
+			Telemetry.command(cmd, true);
 		} catch (RuntimeException e) {
 			error("That didn't work: " + e.getMessage());
 		}
@@ -96,7 +102,7 @@ public final class Commands {
 			error(m.getName() + " is settings-only.");
 			return;
 		}
-		m.toggle();
+		Telemetry.via("command", m::toggle);
 	}
 
 	private static void bind(String[] args) {

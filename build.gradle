@@ -14,10 +14,13 @@ dependencies {
 
 processResources {
 	def version = project.version
+	// where the client posts anonymous usage stats; empty turns telemetry off in the build
+	def telemetryUrl = project.findProperty("telemetry_url") ?: ""
 	inputs.property "version", version
+	inputs.property "telemetryUrl", telemetryUrl
 
 	filesMatching("fabric.mod.json") {
-		expand "version": version
+		expand "version": version, "telemetryUrl": telemetryUrl
 	}
 }
 

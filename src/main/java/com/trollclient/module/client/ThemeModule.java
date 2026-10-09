@@ -9,7 +9,8 @@ import com.trollclient.setting.NumberSetting;
 
 public class ThemeModule extends Module {
 	public final ModeSetting preset = add(new ModeSetting("Preset", "Base palette", "Noir",
-			"Noir", "Paper", "Graphite", "Terminal", "Newsprint", "Ink", "Fog", "Custom"));
+			"Noir", "Paper", "Graphite", "Terminal", "Newsprint", "Ink", "Fog", "Frutiger Aero", "Vaporwave", "Amber", "Phosphor",
+			"Classic", "Sakura", "Ocean", "Dracula", "Nord", "Solarized", "Crimson", "Aurora", "Handheld", "Custom"));
 	public final ModeSetting font = add(new ModeSetting("Font", "Typeface for the client UI", "Terminal",
 			"Minecraft", "Terminal", "Unicode"));
 	public final ModeSetting accentMode = add(new ModeSetting("Accent Mode", "How the accent colour behaves",
@@ -24,6 +25,8 @@ public class ThemeModule extends Module {
 	public final ColorSetting textColor = add(new ColorSetting("Text", "Text colour (Custom preset)", 0xFFF0F0F0))
 			.visibleWhen(() -> preset.is("Custom"));
 	public final ModeSetting corners = add(new ModeSetting("Corners", "Panel corner style", "Notched", "Sharp", "Notched", "Round"));
+	public final ModeSetting gloss = add(new ModeSetting("Gloss", "Glassy shine on panels and buttons (Theme = only on glossy presets like Frutiger Aero)",
+			"Theme", "Theme", "On", "Off"));
 	public final NumberSetting opacity = add(new NumberSetting("Opacity", "Window opacity", 96, 40, 100, 1).unit("%"));
 	public final BoolSetting textShadow = add(new BoolSetting("Text Shadow", "Drop shadow under text", false));
 	public final BoolSetting ditherShadow = add(new BoolSetting("Dither Shadow", "Old-school checkerboard drop shadow", true));

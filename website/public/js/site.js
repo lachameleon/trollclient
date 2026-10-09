@@ -14,7 +14,7 @@
 		{ id: "ink", name: "Ink", light: true, c: ["#ffffff", "#ffffff", "#000000", "#000000", "#000000"] },
 		{ id: "fog", name: "Fog", light: true, c: ["#7e7e7e", "#8b8b8b", "#101010", "#0a0a0a", "#555555"] }
 	];
-	var PAGES = [["/", "home"], ["/skin-animation", "skin animation"], ["/modules", "modules"], ["/gallery", "gallery"], ["/download", "download"], ["/guestbook", "guestbook"]];
+	var PAGES = [["/", "home"], ["/skin-animation", "skin animation"], ["/modules", "modules"], ["/gallery", "gallery"], ["/download", "download"], ["/guestbook", "guestbook"], ["/analytics", "analytics"]];
 	var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 	var fine = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
 

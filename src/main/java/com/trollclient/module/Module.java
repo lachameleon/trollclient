@@ -3,6 +3,7 @@ package com.trollclient.module;
 import com.trollclient.config.ConfigManager;
 import com.trollclient.gui.hud.Notifications;
 import com.trollclient.setting.Setting;
+import com.trollclient.telemetry.Telemetry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -63,6 +64,7 @@ public abstract class Module {
 			onDisable();
 		}
 		Notifications.moduleToggled(this);
+		Telemetry.moduleToggled(this, enabled);
 		ConfigManager.markDirty();
 	}
 
