@@ -289,6 +289,39 @@ public final class DevShots {
 			mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
 			mc.gui.hud.getChat().clearMessages(false);
 		});
+		// chat tips: typing a client command lists what can come next, and Tab fills it in
+		step("chat tips", () -> true, 5, () -> mc.gui.setScreen(new net.minecraft.client.gui.screens.ChatScreen(".t", false)));
+		step("", () -> mc.gui.screen() instanceof net.minecraft.client.gui.screens.ChatScreen, 15, () -> shot("08b_chat_tips_commands"));
+		step("", () -> true, 1, () -> {
+			net.minecraft.client.gui.screens.ChatScreen chat = (net.minecraft.client.gui.screens.ChatScreen) mc.gui.screen();
+			net.minecraft.client.input.KeyEvent tab = new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_TAB, 0, 0);
+			boolean ours = chat.keyPressed(tab);
+			TrollClient.LOGGER.info("[devshots] chat tips: Tab on \".t\" handled = {}, box = \"{}\"", ours, chatBox(chat));
+			chat.insertText(".set clickgui op", true);
+		});
+		step("", () -> true, 10, () -> {
+			shot("08c_chat_tips_setting");
+			net.minecraft.client.gui.screens.ChatScreen chat = (net.minecraft.client.gui.screens.ChatScreen) mc.gui.screen();
+			chat.keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_TAB, 0, 0));
+			TrollClient.LOGGER.info("[devshots] chat tips: Tab on \".set clickgui op\" gives \"{}\"", chatBox(chat));
+			chat.keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN, 0, 0));
+			chat.keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_TAB, 0, 0));
+			TrollClient.LOGGER.info("[devshots] chat tips: Down, Tab on the modes gives \"{}\"", chatBox(chat));
+		});
+		step("", () -> true, 10, () -> {
+			shot("08d_chat_tips_value");
+			((net.minecraft.client.gui.screens.ChatScreen) mc.gui.screen()).insertText(".nonsense", true);
+		});
+		step("", () -> true, 10, () -> {
+			shot("08e_chat_tips_unknown");
+			mc.gui.setScreen(null);
+			TrollClient.LOGGER.info("[devshots] commands: .chat off the record = {}, .update = {}",
+					com.trollclient.command.Commands.handle(".chat hello room"), com.trollclient.command.Commands.handle(".update"));
+		});
+		step("", () -> true, 10, () -> {
+			shot("08f_chat_commands_feedback");
+			mc.gui.hud.getChat().clearMessages(false);
+		});
 		step("drop item", () -> true, 10, () -> {
 			// sneaking and eating both slow walking, so test pickup on its own
 			module("Twerk").setEnabled(false);
@@ -1095,6 +1128,17 @@ public final class DevShots {
 
 	private static void cmd(String command) {
 		Minecraft.getInstance().player.connection.sendCommand(command);
+	}
+
+	/** What's typed in the chat box right now. */
+	private static String chatBox(net.minecraft.client.gui.screens.ChatScreen chat) {
+		try {
+			java.lang.reflect.Field input = net.minecraft.client.gui.screens.ChatScreen.class.getDeclaredField("input");
+			input.setAccessible(true);
+			return ((net.minecraft.client.gui.components.EditBox) input.get(chat)).getValue();
+		} catch (ReflectiveOperationException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	private static void shot(String name) {

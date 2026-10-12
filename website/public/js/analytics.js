@@ -241,7 +241,7 @@
 	function render(d) {
 		state.data = d;
 		var t = d.totals;
-		$("an-empty").textContent = t.sessions ? "" : "no reports in this range yet. once someone launches the client with telemetry on, it shows up here within a minute.";
+		$("an-empty").textContent = t.sessions ? "" : "no reports in this range yet. once someone launches the client, it shows up here within a minute.";
 		$("an-empty").hidden = !!t.sessions;
 		kpis(t);
 		series(d.series);
@@ -332,10 +332,10 @@
 	document.addEventListener("visibilitychange", function () { if (!document.hidden && Date.now() - state.loadedAt > 60000) load(); });
 	load();
 
-	// ------------------------------------------------------------ raw sessions, for whoever holds ADMIN_TOKEN
+	// ------------------------------------------------------------ raw sessions, for moderators (a key from `.mod web` in game, shared with the forum page)
 	var form = $("an-admin-form");
 	function token(v) {
-		try { if (v === undefined) return sessionStorage.getItem("troll-admin") || ""; sessionStorage.setItem("troll-admin", v); } catch (e) { /* private mode */ }
+		try { if (v === undefined) return sessionStorage.getItem("troll-mod") || ""; sessionStorage.setItem("troll-mod", v); } catch (e) { /* private mode */ }
 		return "";
 	}
 	function raw() {
@@ -345,7 +345,7 @@
 		fetch("/api/analytics/sessions?limit=100", { headers: { authorization: "Bearer " + t } })
 			.then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
 			.then(function (res) {
-				if (!res.ok) { $("an-admin-msg").textContent = res.j.error === "nope" ? "wrong token" : (res.j.error || "that didn't work"); token(""); return; }
+				if (!res.ok) { $("an-admin-msg").textContent = res.j.error === "nope" ? "that key isn't good (they last 12 hours)" : (res.j.error || "that didn't work"); token(""); return; }
 				$("an-admin-msg").textContent = res.j.sessions.length + " newest sessions";
 				$("an-raw").innerHTML = '<div class="an-scroll"><table class="data an-table an-raw"><thead><tr><th>last seen</th><th>install</th><th>where</th><th>setup</th>' +
 					'<th class="num">length</th><th class="num">fps</th><th>modules used</th><th>everything</th></tr></thead><tbody>' +

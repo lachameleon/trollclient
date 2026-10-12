@@ -12,7 +12,7 @@
 						<dt>visits today</dt><dd data-stat="today">0</dd>
 						<dt>page views</dt><dd data-stat="views">0</dd>
 						<dt>downloads</dt><dd data-stat="downloads">0</dd>
-						<dt>guestbook</dt><dd data-stat="guestbook">1</dd>
+						<dt>forum posts</dt><dd data-stat="posts">0</dd>
 					</dl>
 					<div class="spark" id="spark" aria-label="visits over the last two weeks" data-tip="visits, last 14 days"></div>
 					<dl class="statlist tally">
@@ -42,10 +42,11 @@
 			</section>
 
 			<section class="widget" data-reveal>
-				<h4 class="w-head"><img class="icon" src="img/icons/chat.png" alt="">guestbook</h4>
+				<h4 class="w-head"><img class="icon" src="img/icons/chat.png" alt="">forum</h4>
 				<div class="w-body center">
-					<a href="/guestbook"><img src="img/mail.gif" width="32" height="24" alt=""></a>
-					<div><a href="/guestbook">sign my guestbook!</a></div>
+					<a href="/forum"><img src="img/mail.gif" width="32" height="24" alt=""></a>
+					<div><a href="/forum">come post on the forum!</a></div>
+					<div class="dim small"><span data-stat="threads">0</span> threads &middot; <span data-stat="posts">0</span> posts</div>
 					<div class="latest-entry dim small" id="latest-entry"></div>
 				</div>
 			</section>
@@ -88,7 +89,7 @@
 		<img src="img/badges/nofl.png" alt="no flash">
 	</div>
 	<p class="dim small">&copy; 2026 Troll Client &middot; not affiliated with Mojang or Microsoft &middot; Minecraft is a trademark of Mojang AB<br>
-	served by a Cloudflare Worker &middot; use it where this kind of thing is welcome</p>
+	served by a Cloudflare Worker &middot; use it where this kind of thing is welcome &middot; <a href="/privacy">privacy</a></p>
 </footer>
 
 <button class="to-top" id="to-top" type="button" aria-label="Back to top"><svg viewBox="0 0 12 16" shape-rendering="crispEdges"><path fill="currentColor" d="M5 0h2v1h1v2h1v6h1v1h1v3h-1v-1H9v1H3v-1H2v1H1v-3h1V9h1V3h1V1h1zm0 4v2h2V4z"/><path class="flame" fill="currentColor" d="M4 14h1v1h2v-1h1v1H7v1H5v-1H4z"/></svg></button>
@@ -118,7 +119,7 @@
 			<li><a href="/modules"><img src="img/icons/gear.png" alt="">modules</a></li>
 			<li><a href="/gallery"><img src="img/icons/radar.png" alt="">gallery</a></li>
 			<li><a href="/download"><img src="img/icons/cube.png" alt="">download</a></li>
-			<li><a href="/guestbook"><img src="img/icons/chat.png" alt="">guestbook</a></li>
+			<li><a href="/forum"><img src="img/icons/chat.png" alt="">forum</a></li>
 			<li><a href="/analytics"><img src="img/icons/eye.png" alt="">analytics</a></li>
 		</ul>
 		<ul class="sm-right">

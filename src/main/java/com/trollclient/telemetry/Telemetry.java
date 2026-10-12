@@ -19,7 +19,6 @@ import com.trollclient.macro.MacroManager;
 import com.trollclient.module.Module;
 import com.trollclient.module.ModuleManager;
 import com.trollclient.module.client.ClickGuiModule;
-import com.trollclient.module.client.TelemetryModule;
 import com.trollclient.module.client.ThemeModule;
 import com.trollclient.setting.Setting;
 import com.trollclient.util.Friends;
@@ -53,8 +52,9 @@ import java.util.stream.Stream;
  * quit), so a lost or repeated report never double-counts: the Worker only adds what's new.
  *
  * <p>Identity is a random install id in its own file, never the Minecraft account. No chat text,
- * command arguments, coordinates, IPs or tokens are ever read. Turn it off with the Telemetry
- * module or {@code -Dtrollclient.telemetry=false}.
+ * command arguments, coordinates, IPs or tokens are ever read. There is no switch for it in the
+ * menu; the Telemetry module shows what's sent and resets the id, and
+ * {@code -Dtrollclient.telemetry=false} stops it for a launch.
  */
 public final class Telemetry {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -125,13 +125,12 @@ public final class Telemetry {
 		ready = true;
 	}
 
-	/** Off in dev recordings, with -Dtrollclient.telemetry=false, without an endpoint, or with the module off. */
+	/** Off in dev recordings, with -Dtrollclient.telemetry=false, or without an endpoint. */
 	public static boolean active() {
 		if (!ready || Showcase.enabled() || DevShots.enabled() || "false".equals(System.getProperty("trollclient.telemetry"))) {
 			return false;
 		}
-		TelemetryModule module = ModuleManager.get(TelemetryModule.class);
-		return module != null && module.isEnabled() && !endpoint().isEmpty();
+		return !endpoint().isEmpty();
 	}
 
 	/** -Dtrollclient.telemetry.url wins; dev runs talk to `npm run dev`; releases use the URL baked into fabric.mod.json. */
@@ -164,7 +163,7 @@ public final class Telemetry {
 		// a frozen window or a breakpoint shouldn't count as an hour of play
 		long dt = lastTick == 0 ? 0 : Math.min(1000, (now - lastTick) / 1_000_000);
 		lastTick = now;
-		// nothing is even counted while it's off
+		// nothing is even counted while it can't be sent
 		if (!active()) {
 			lastScreen = null;
 			return;
@@ -189,8 +188,7 @@ public final class Telemetry {
 				}
 			}
 			for (Module m : ModuleManager.all()) {
-				// it's always on for anyone who reports, so its time says nothing
-				if (m.isToggleable() && m.isEnabled() && !(m instanceof TelemetryModule)) {
+				if (m.isToggleable() && m.isEnabled()) {
 					module(m).ms += dt;
 				}
 			}
@@ -254,7 +252,7 @@ public final class Telemetry {
 		if (!told) {
 			told = true;
 			saveState();
-			Notifications.post("Telemetry", "anonymous usage stats are on. Client > Telemetry turns them off", Icon.EYE, false);
+			Notifications.post("Telemetry", "anonymous usage stats are on. Client > Telemetry shows what's sent", Icon.EYE, false);
 		}
 	}
 
@@ -510,7 +508,7 @@ public final class Telemetry {
 		int hidden = 0;
 		int modified = 0;
 		for (Module m : ModuleManager.all()) {
-			if (m.isToggleable() && m.isEnabled() && !(m instanceof TelemetryModule)) {
+			if (m.isToggleable() && m.isEnabled()) {
 				enabled.add(m.getName());
 			}
 			if (m.getKey() > 0) {
@@ -694,10 +692,7 @@ public final class Telemetry {
 		saveState();
 	}
 
-	/**
-	 * Forgets everything counted so far and starts a new session, so turning telemetry off and on
-	 * again never sends what happened in between.
-	 */
+	/** Forgets everything counted so far and starts a new session, so nothing counted under the old id goes out under the new one. */
 	public static void clear() {
 		MODULES.clear();
 		SETTINGS.clear();

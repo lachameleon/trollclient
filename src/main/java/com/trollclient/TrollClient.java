@@ -1,5 +1,6 @@
 package com.trollclient;
 
+import com.trollclient.chat.Chatroom;
 import com.trollclient.command.Commands;
 import com.trollclient.config.ConfigManager;
 import com.trollclient.dev.DevShots;
@@ -14,6 +15,7 @@ import com.trollclient.module.chat.ChatStyle;
 import com.trollclient.module.chat.Typo;
 import com.trollclient.module.player.SkinBlink;
 import com.trollclient.telemetry.Telemetry;
+import com.trollclient.update.Updater;
 import com.trollclient.util.ChatUtil;
 import com.trollclient.util.MovementControl;
 import com.trollclient.util.Rotations;
@@ -41,6 +43,7 @@ public class TrollClient implements ClientModInitializer {
 		ConfigManager.load();
 		MacroManager.load();
 		Telemetry.init();
+		Updater.init();
 
 		ClientTickEvents.START_CLIENT_TICK.register(mc -> {
 			// requests are rebuilt from scratch every tick, before the player moves
@@ -57,6 +60,8 @@ public class TrollClient implements ClientModInitializer {
 			MacroManager.saveTick();
 			TitleScreenGuard.tick(mc);
 			Telemetry.tick(mc);
+			Updater.tick(mc);
+			Chatroom.tick(mc);
 		});
 		ScreenEvents.AFTER_INIT.register((mc, screen, width, height) -> {
 			TitleScreenGuard.afterInit(mc, screen, width);
@@ -87,7 +92,8 @@ public class TrollClient implements ClientModInitializer {
 		// every line, ours included, for macros' Wait Chat steps
 		ClientReceiveMessageEvents.CHAT.register((message, signed, sender, params, time) -> MacroManager.onChat(message.getString()));
 		ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-			if (!overlay) {
+			// not the chatroom's lines: a stranger there shouldn't be able to finish someone's Wait Chat step
+			if (!overlay && !ChatUtil.isPrinting()) {
 				MacroManager.onChat(message.getString());
 			}
 		});
@@ -104,6 +110,7 @@ public class TrollClient implements ClientModInitializer {
 			ModuleManager.get(SkinBlink.class).restore();
 			ConfigManager.save();
 			MacroManager.save();
+			Chatroom.disconnect();
 			Telemetry.shutdown();
 		});
 

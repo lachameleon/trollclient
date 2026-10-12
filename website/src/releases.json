@@ -1,0 +1,14 @@
+{
+ "releases": [
+  {
+   "version": "1.0.0",
+   "minecraft": [
+    "26.2"
+   ],
+   "file": "troll-client-1.0.0.jar",
+   "size": 905530,
+   "sha256": "7f93174a767706e8196f97bba139ea7a0ece8956b5463cee558ec93078135a61",
+   "date": "2026-10-13"
+  }
+ ]
+}

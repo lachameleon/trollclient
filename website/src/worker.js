@@ -1,12 +1,16 @@
 /* TROLL CLIENT HOMEPAGE - the Cloudflare Worker.
    Static files come straight from ./public (the assets binding). The Worker only runs for
-   /api/* and /downloads/*, and everything that has to be remembered lives in one Durable
-   Object, TrollHQ: the hit counter, downloads, the guestbook, the poll, a couple of fun
-   global tallies, and live WebSockets that push all of it to every open tab. Anonymous
-   usage stats from the client itself live in a second object, TrollTelemetry (telemetry.js),
-   and feed the analytics page. */
+   /api/* and /downloads/*, and everything that has to be remembered lives in Durable Objects:
+   TrollHQ has the hit counter, downloads, the forum (forum.js), the poll, a couple of fun global
+   tallies, and live WebSockets that push all of it to every open tab. TrollTelemetry (telemetry.js)
+   holds anonymous usage stats from the client for the analytics page, and TrollChat (chat.js) is
+   the chatroom every running client is in. The client's updater asks /api/update what's new. */
 import { DurableObject } from "cloudflare:workers";
+import RELEASES from "./releases.json";
+import * as Forum from "./forum.js";
+import { json, today, visitorHash, clean, body, moderator, compareVersions } from "./util.js";
 export { TrollTelemetry } from "./telemetry.js";
+export { TrollChat } from "./chat.js";
 
 const POLL = [
 	["skinblink", "SkinBlink (skin animation)"],
@@ -17,33 +21,7 @@ const POLL = [
 	["honk", "Honk"]
 ];
 const BUMPABLE = { toggles: 100, blinks: 400 };
-const AVATARS = ["blink", "troll", "mime", "referee", "ghost", "hacker"];
-const PAGE_SIZE = 20;
-
-const json = (data, status = 200, headers = {}) =>
-	new Response(JSON.stringify(data), {
-		status,
-		headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...headers }
-	});
-
-const today = () => new Date().toISOString().slice(0, 10);
-
-/** A visitor fingerprint that can't be turned back into an IP: salted, and the salt changes daily. */
-async function visitorHash(request, env) {
-	const ip = request.headers.get("cf-connecting-ip") || "local";
-	const data = new TextEncoder().encode((env.SALT || "troll-salt") + "|" + today() + "|" + ip);
-	const digest = await crypto.subtle.digest("SHA-256", data);
-	return [...new Uint8Array(digest).slice(0, 12)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-/** Strips control characters (keeps newlines where asked) and trims to a length. */
-function clean(value, max, multiline = false) {
-	if (typeof value !== "string") return "";
-	const pattern = multiline ? /[\u0000-\u0009\u000b-\u001f\u007f‪-‮⁦-⁩]/g : /[\u0000-\u001f\u007f‪-‮⁦-⁩]/g;
-	let out = value.replace(pattern, "").trim();
-	if (multiline) out = out.replace(/\n{3,}/g, "\n\n");
-	return [...out].slice(0, max).join("");
-}
+const FORUM_OPS = ["index", "board", "thread", "find", "create", "reply", "edit", "remove", "moderate", "search"];
 
 export class TrollHQ extends DurableObject {
 	constructor(ctx, env) {
@@ -71,12 +49,13 @@ export class TrollHQ extends DurableObject {
 		`);
 		for (const [id] of POLL) this.sql.exec("INSERT OR IGNORE INTO poll (option, votes) VALUES (?, 0)", id);
 		// the odometer was already rolling when the site moved here
-		this.sql.exec("INSERT OR IGNORE INTO counters (name, value) VALUES ('visits', 1337), ('views', 4200), ('downloads', 0), ('toggles', 0), ('blinks', 0)");
-		if (this.sql.exec("SELECT COUNT(*) AS n FROM guestbook").one().n === 0) {
-			this.sql.exec("INSERT INTO guestbook (name, site, msg, avatar, at) VALUES (?, '', ?, 'troll', ?)",
-				"webmaster", "welcome to the guestbook! it's real now: everyone can read what you write here, so be nice. ish.",
-				Date.parse("2026-10-04T12:00:00Z"));
-		}
+		this.sql.exec("INSERT OR IGNORE INTO counters (name, value) VALUES ('visits', 1337), ('views', 4200), ('downloads', 0), ('updates', 0), ('toggles', 0), ('blinks', 0)");
+		// things the site has to keep to itself, made here instead of being configured: the salt for visitor hashes and tripcodes
+		this.sql.exec("CREATE TABLE IF NOT EXISTS kept (name TEXT PRIMARY KEY, value TEXT NOT NULL)");
+		const random = [...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, "0")).join("");
+		this.sql.exec("INSERT OR IGNORE INTO kept (name, value) VALUES ('salt', ?)", random);
+		// the guestbook table stays as it was; the forum copies its entries in once and takes over from there
+		Forum.migrate(this);
 	}
 
 	counter(name) {
@@ -103,19 +82,21 @@ export class TrollHQ extends DurableObject {
 	stats() {
 		const days = this.sql.exec("SELECT day, visits, views FROM daily ORDER BY day DESC LIMIT 14").toArray().reverse();
 		const t = days.length && days[days.length - 1].day === today() ? days[days.length - 1] : { visits: 0, views: 0 };
-		const latest = this.sql.exec("SELECT name, substr(msg, 1, 80) AS msg, at FROM guestbook WHERE hidden = 0 ORDER BY id DESC LIMIT 1").toArray()[0] || null;
+		const forum = Forum.counts(this);
 		return {
 			visits: this.counter("visits"),
 			views: this.counter("views"),
 			downloads: this.counter("downloads"),
+			updates: this.counter("updates"),
 			toggles: this.counter("toggles"),
 			blinks: this.counter("blinks"),
-			guestbook: this.sql.exec("SELECT COUNT(*) AS n FROM guestbook WHERE hidden = 0").one().n,
+			posts: forum.posts,
+			threads: forum.threads,
 			online: this.ctx.getWebSockets().length,
 			today: t.visits,
 			todayViews: t.views,
 			days,
-			latest
+			latest: forum.latest
 		};
 	}
 
@@ -189,31 +170,20 @@ export class TrollHQ extends DurableObject {
 		return true;
 	}
 
-	guestbook(before) {
-		const rows = before
-			? this.sql.exec("SELECT id, name, site, msg, avatar, at FROM guestbook WHERE hidden = 0 AND id < ? ORDER BY id DESC LIMIT ?", before, PAGE_SIZE + 1).toArray()
-			: this.sql.exec("SELECT id, name, site, msg, avatar, at FROM guestbook WHERE hidden = 0 ORDER BY id DESC LIMIT ?", PAGE_SIZE + 1).toArray();
-		return { entries: rows.slice(0, PAGE_SIZE), more: rows.length > PAGE_SIZE, total: this.stats().guestbook };
+	/** For the Worker's visitor hashes and tripcodes (util.js caches it). It never goes anywhere else. */
+	salt() {
+		return this.sql.exec("SELECT value FROM kept WHERE name = 'salt'").one().value;
 	}
 
-	sign(who, entry) {
-		if (!this.allow("sign:" + who, 45000)) return { error: "slow down! one entry every 45 seconds.", status: 429 };
-		const last = this.sql.exec("SELECT msg FROM guestbook ORDER BY id DESC LIMIT 1").toArray()[0];
-		if (last && last.msg === entry.msg) return { error: "someone just said exactly that.", status: 409 };
-		const at = Date.now();
-		const id = this.sql.exec("INSERT INTO guestbook (name, site, msg, avatar, at) VALUES (?, ?, ?, ?, ?) RETURNING id",
-			entry.name, entry.site, entry.msg, entry.avatar, at).one().id;
-		const saved = { id, ...entry, at };
-		this.broadcast({ type: "guestbook", entry: saved });
-		this.pushStats();
-		return { entry: saved };
+	/** The client's updater fetched a jar: counted on its own, never as a download. */
+	updated() {
+		this.add("updates");
 	}
 
-	hide(id) {
-		this.sql.exec("UPDATE guestbook SET hidden = 1 WHERE id = ?", id);
-		this.broadcast({ type: "unsign", id });
-		this.pushStats();
-		return { ok: true };
+	/** Everything the forum does, by name (see forum.js). */
+	forum(op, ...args) {
+		if (!FORUM_OPS.includes(op)) return { error: "no such thing", status: 404 };
+		return Forum[op](this, ...args);
 	}
 
 	poll() {
@@ -275,14 +245,30 @@ async function playerSkin(name, ctx) {
 	return out;
 }
 
-async function body(request, max = 4096) {
-	if (!(request.headers.get("content-type") || "").includes("application/json")) return null;
-	const text = await request.text();
-	if (text.length > max) return null;
-	try { return JSON.parse(text); } catch (e) { return null; }
-}
-
 const telemetry = (env) => env.TELEMETRY.get(env.TELEMETRY.idFromName("global"));
+const chat = (env) => env.CHAT.get(env.CHAT.idFromName("global"));
+
+// ------------------------------------------------------------ updates, for the client's updater
+/** True if a release built for `built` ("26.2") runs on `minecraft` ("26.2" or a patch of it, "26.2.1"). */
+const runsOn = (built, minecraft) => minecraft === built || minecraft.startsWith(built + ".");
+
+/**
+ * The newest release for the Minecraft version the client is actually running, and only if it's newer
+ * than what it has. A client on another Minecraft version is never offered a jar that wasn't built for it.
+ */
+function updateFor(version, minecraft) {
+	const fits = (RELEASES.releases || [])
+		.filter((r) => (r.minecraft || []).some((built) => runsOn(built, minecraft)))
+		.sort((a, b) => compareVersions(b.version, a.version));
+	const best = fits[0];
+	if (!best || !version || compareVersions(best.version, version) <= 0) {
+		return { update: false, version, minecraft, latest: best ? best.version : null };
+	}
+	return {
+		update: true, version: best.version, minecraft: best.minecraft, file: best.file, size: best.size, sha256: best.sha256,
+		date: best.date || "", url: "/api/update/" + best.file
+	};
+}
 
 async function api(request, env, ctx, url) {
 	const hq = env.HQ.get(env.HQ.idFromName("global"));
@@ -309,36 +295,44 @@ async function api(request, env, ctx, url) {
 		const { status, ...result } = await hq.vote(await visitorHash(request, env), String(data.option));
 		return json(result, status || 200);
 	}
-	if (path === "/api/guestbook" && method === "GET") {
-		const before = parseInt(url.searchParams.get("before") || "0", 10);
-		return json(await hq.guestbook(before > 0 ? before : 0));
+	if (path === "/api/forum" || path.startsWith("/api/forum/")) return Forum.forumApi(request, env, hq, path, url);
+
+	if (path === "/api/chat") {
+		if (request.headers.get("upgrade") !== "websocket") return json({ error: "this one's a websocket" }, 426);
+		// the room gets the visitor hash (for rate limits and mutes), never the address
+		const to = new URL(request.url);
+		to.searchParams.set("who", await visitorHash(request, env));
+		return chat(env).fetch(new Request(to, request));
 	}
-	if (path === "/api/guestbook" && method === "POST") {
-		const data = await body(request);
-		if (!data) return json({ error: "that didn't look like a guestbook entry" }, 400);
-		// bots fill in every field, including the one people can't see
-		if (data.homepage2) return json({ entry: { id: 0, name: "bot", site: "", msg: "", avatar: "troll", at: Date.now() } });
-		const name = clean(data.name, 32) || "anonymous coward";
-		let site = clean(data.site, 120);
-		const msg = clean(data.msg, 500, true);
-		const avatar = AVATARS.includes(data.avatar) ? data.avatar : "troll";
-		if (msg.length < 2) return json({ error: "say a bit more than that" }, 400);
-		if (site && !/^https?:\/\//i.test(site)) site = "http://" + site;
-		if (site) {
-			try {
-				const u = new URL(site);
-				site = u.protocol === "http:" || u.protocol === "https:" ? u.href : "";
-			} catch (e) { site = ""; }
-		}
-		const { status, ...result } = await hq.sign(await visitorHash(request, env), { name, site, msg, avatar });
+	// who a website key belongs to, so a page can tell a good key from a stale one
+	if (path === "/api/mod" && method === "GET") {
+		const name = await moderator(request, env);
+		return name ? json({ moderator: name }) : json({ error: "nope" }, 403);
+	}
+	if (path === "/api/chat/history" && method === "GET") {
+		return json(await chat(env).room(parseInt(url.searchParams.get("limit") || "30", 10)));
+	}
+	const said = path.match(/^\/api\/chat\/(\d+)(\/mute)?$/);
+	if (said && (method === "DELETE" || (said[2] && method === "POST"))) {
+		if (!(await moderator(request, env))) return json({ error: "nope" }, 403);
+		if (!said[2]) return json(await chat(env).hide(parseInt(said[1], 10)));
+		const data = (await body(request)) || {};
+		const { status, ...result } = await chat(env).mute(parseInt(said[1], 10), Number(data.hours));
 		return json(result, status || 200);
 	}
-	const del = path.match(/^\/api\/guestbook\/(\d+)$/);
-	if (del && method === "DELETE") {
-		const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-		if (!env.ADMIN_TOKEN || token !== env.ADMIN_TOKEN) return json({ error: "nope" }, 403);
-		return json(await hq.hide(parseInt(del[1], 10)));
+
+	if (path === "/api/update" && method === "GET") {
+		return json(updateFor(clean(url.searchParams.get("version") || "", 40), clean(url.searchParams.get("minecraft") || "", 40)));
 	}
+	const jar = path.match(/^\/api\/update\/([A-Za-z0-9._+-]+\.jar)$/);
+	if (jar && method === "GET") {
+		// only jars in the release list, and without touching the download counter
+		if (!(RELEASES.releases || []).some((r) => r.file === jar[1])) return json({ error: "no such release" }, 404);
+		const res = await env.ASSETS.fetch(new Request(new URL("/downloads/" + jar[1], url), { method: "GET" }));
+		if (res.status === 200) ctx.waitUntil(hq.updated());
+		return res;
+	}
+
 	if (path === "/api/telemetry" && method === "POST") {
 		const report = await body(request, 65536);
 		if (!report) return json({ error: "that didn't look like a report" }, 400);
@@ -353,8 +347,7 @@ async function api(request, env, ctx, url) {
 		return json(await telemetry(env).analytics(days), 200, { "cache-control": "public, max-age=30" });
 	}
 	if (path === "/api/analytics/sessions" && method === "GET") {
-		const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-		if (!env.ADMIN_TOKEN || token !== env.ADMIN_TOKEN) return json({ error: "nope" }, 403);
+		if (!(await moderator(request, env))) return json({ error: "nope" }, 403);
 		return json({ sessions: await telemetry(env).latestSessions(parseInt(url.searchParams.get("limit") || "50", 10)) });
 	}
 	const skin = path.match(/^\/api\/skin\/([^/]+)$/);

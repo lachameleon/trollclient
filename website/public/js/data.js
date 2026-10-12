@@ -453,6 +453,53 @@ window.TROLL = {
    "toggleable": true
   },
   {
+   "name": "KillStreak",
+   "desc": "Counts your kills and calls out multi-kills and streaks in big letters (and in chat, if you're brave).",
+   "category": "COMBAT",
+   "settings": [
+    {
+     "type": "number",
+     "name": "Multi Kill Window",
+     "desc": "Kills this close together chain into a double, triple...",
+     "value": 4.0,
+     "min": 1.0,
+     "max": 15.0,
+     "step": 0.5,
+     "unit": "s"
+    },
+    {
+     "type": "bool",
+     "name": "Mobs Count",
+     "desc": "Count mob kills too, not just players",
+     "value": false
+    },
+    {
+     "type": "bool",
+     "name": "On Screen",
+     "desc": "Big call-outs over the crosshair",
+     "value": true
+    },
+    {
+     "type": "mode",
+     "name": "Chat",
+     "desc": "Announce it in chat",
+     "value": "Off",
+     "modes": [
+      "Off",
+      "Streaks",
+      "Every Kill"
+     ]
+    },
+    {
+     "type": "bool",
+     "name": "Sound",
+     "desc": "A little fanfare with each call-out",
+     "value": true
+    }
+   ],
+   "toggleable": true
+  },
+  {
    "name": "PlayerAvoid",
    "desc": "Runs away from every player within a radius using a threat-aware pathfinder.",
    "category": "MOVEMENT",
@@ -795,6 +842,110 @@ window.TROLL = {
      "name": "Ignore Friends",
      "desc": "Don't pick friends as the nearest target",
      "value": true
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Bodyguard",
+   "desc": "Shadows a friend and steps between them and anyone who gets too close, staring the intruder down.",
+   "category": "MOVEMENT",
+   "settings": [
+    {
+     "type": "text",
+     "name": "Protect",
+     "desc": "Player to guard (blank = nearest friend)",
+     "value": ""
+    },
+    {
+     "type": "number",
+     "name": "Range",
+     "desc": "Only guard someone this close to you",
+     "value": 32.0,
+     "min": 4.0,
+     "max": 64.0,
+     "step": 1.0,
+     "unit": "m"
+    },
+    {
+     "type": "number",
+     "name": "Personal Space",
+     "desc": "Anyone this close to them is a threat",
+     "value": 6.0,
+     "min": 2.0,
+     "max": 16.0,
+     "step": 0.5,
+     "unit": "m"
+    },
+    {
+     "type": "number",
+     "name": "Follow Distance",
+     "desc": "How far from them to stand when nobody's around",
+     "value": 2.5,
+     "min": 1.0,
+     "max": 6.0,
+     "step": 0.5,
+     "unit": "m"
+    },
+    {
+     "type": "number",
+     "name": "Guard Distance",
+     "desc": "How far in front of them to stand against a threat",
+     "value": 1.3,
+     "min": 0.8,
+     "max": 4.0,
+     "step": 0.1,
+     "unit": "m"
+    },
+    {
+     "type": "bool",
+     "name": "Warn",
+     "desc": "Crouch at intruders who get really close",
+     "value": true
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "NPC",
+   "desc": "Wanders around aimlessly like a villager, stops to stare at anyone who walks by, and mumbles \"hrmm\".",
+   "category": "MOVEMENT",
+   "settings": [
+    {
+     "type": "number",
+     "name": "Roam",
+     "desc": "Wander at most this far from where you switched it on",
+     "value": 10.0,
+     "min": 3.0,
+     "max": 40.0,
+     "step": 1.0,
+     "unit": "m"
+    },
+    {
+     "type": "number",
+     "name": "Stare Range",
+     "desc": "Stop and stare at players this close (0 = never)",
+     "value": 6.0,
+     "min": 0.0,
+     "max": 16.0,
+     "step": 1.0,
+     "unit": "m"
+    },
+    {
+     "type": "bool",
+     "name": "Mumble",
+     "desc": "Say \"hrmm\" in chat now and then",
+     "value": false
+    },
+    {
+     "type": "number",
+     "name": "Mumble Every",
+     "desc": "Average time between mumbles",
+     "value": 40.0,
+     "min": 10.0,
+     "max": 300.0,
+     "step": 5.0,
+     "unit": "s"
     }
    ],
    "toggleable": true
@@ -1760,6 +1911,188 @@ window.TROLL = {
    "toggleable": true
   },
   {
+   "name": "Stare",
+   "desc": "Stares a player down without blinking. Can nod, shake its head, side-eye, or get shy when they look back.",
+   "category": "TROLL",
+   "settings": [
+    {
+     "type": "text",
+     "name": "Target",
+     "desc": "Player to stare at (blank = nearest)",
+     "value": ""
+    },
+    {
+     "type": "number",
+     "name": "Range",
+     "desc": "Only stare at players this close",
+     "value": 24.0,
+     "min": 4.0,
+     "max": 64.0,
+     "step": 1.0,
+     "unit": "m"
+    },
+    {
+     "type": "mode",
+     "name": "Mode",
+     "desc": "What your head does while you stare",
+     "value": "Stare",
+     "modes": [
+      "Stare",
+      "Nod",
+      "Shake",
+      "Judge",
+      "Side Eye",
+      "Shy"
+     ]
+    },
+    {
+     "type": "number",
+     "name": "Speed",
+     "desc": "How fast nods, shakes and glances go",
+     "value": 1.0,
+     "min": 0.25,
+     "max": 3.0,
+     "step": 0.05,
+     "unit": "x"
+    },
+    {
+     "type": "bool",
+     "name": "Crouch",
+     "desc": "Crouch the whole time, for extra menace",
+     "value": false
+    },
+    {
+     "type": "bool",
+     "name": "Ignore Friends",
+     "desc": "Don't pick friends as the nearest target",
+     "value": false
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Angler",
+   "desc": "Casts a fishing rod at nearby players and reels them in for a yank. Solves the cast's arc.",
+   "category": "TROLL",
+   "settings": [
+    {
+     "type": "number",
+     "name": "Range",
+     "desc": "Cast at players within this distance (rods don't go far)",
+     "value": 9.0,
+     "min": 3.0,
+     "max": 12.0,
+     "step": 0.5,
+     "unit": "m"
+    },
+    {
+     "type": "number",
+     "name": "Delay",
+     "desc": "Time between casts",
+     "value": 900.0,
+     "min": 200.0,
+     "max": 5000.0,
+     "step": 50.0,
+     "unit": "ms"
+    },
+    {
+     "type": "number",
+     "name": "Reel After",
+     "desc": "How long to keep someone on the hook before yanking",
+     "value": 6.0,
+     "min": 1.0,
+     "max": 40.0,
+     "step": 1.0,
+     "unit": "t"
+    },
+    {
+     "type": "number",
+     "name": "Give Up After",
+     "desc": "Reel in a cast that hasn't hooked anyone after this long",
+     "value": 25.0,
+     "min": 8.0,
+     "max": 80.0,
+     "step": 1.0,
+     "unit": "t"
+    },
+    {
+     "type": "bool",
+     "name": "Predict",
+     "desc": "Lead moving targets",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Swap Back",
+     "desc": "Return to your previous hotbar slot after each yank",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Ignore Friends",
+     "desc": "Friends don't get hooked",
+     "value": true
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Gardener",
+   "desc": "Bone meals the grass around nearby players so flowers spring up wherever they stand.",
+   "category": "TROLL",
+   "settings": [
+    {
+     "type": "mode",
+     "name": "Mode",
+     "desc": "Whose feet the flowers go round",
+     "value": "Near Players",
+     "modes": [
+      "Near Players",
+      "Around Me"
+     ]
+    },
+    {
+     "type": "number",
+     "name": "Delay",
+     "desc": "Time between bone meals",
+     "value": 400.0,
+     "min": 100.0,
+     "max": 3000.0,
+     "step": 50.0,
+     "unit": "ms"
+    },
+    {
+     "type": "number",
+     "name": "Spread",
+     "desc": "How far from their feet to fertilise",
+     "value": 2.0,
+     "min": 0.0,
+     "max": 4.0,
+     "step": 1.0,
+     "unit": "m"
+    },
+    {
+     "type": "bool",
+     "name": "Rotate",
+     "desc": "Look at the ground you fertilise",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Swap Back",
+     "desc": "Return to your previous hotbar slot",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Ignore Friends",
+     "desc": "Leave friends' lawns alone",
+     "value": false
+    }
+   ],
+   "toggleable": true
+  },
+  {
    "name": "Parrot",
    "desc": "Repeats other players' chat back at them in mOcKiNg case (or worse).",
    "category": "CHAT",
@@ -2214,6 +2547,330 @@ window.TROLL = {
    "toggleable": true
   },
   {
+   "name": "Narrator",
+   "desc": "Narrates what nearby players are doing, like a nature documentary or a sports commentator.",
+   "category": "CHAT",
+   "settings": [
+    {
+     "type": "mode",
+     "name": "Style",
+     "desc": "Whose voice the commentary is in",
+     "value": "Documentary",
+     "modes": [
+      "Documentary",
+      "Sports",
+      "Plain"
+     ]
+    },
+    {
+     "type": "number",
+     "name": "Range",
+     "desc": "Narrate players this close",
+     "value": 16.0,
+     "min": 4.0,
+     "max": 64.0,
+     "step": 1.0,
+     "unit": "m"
+    },
+    {
+     "type": "bool",
+     "name": "Arrivals",
+     "desc": "Narrate players coming into range and leaving it",
+     "value": true
+    },
+    {
+     "type": "mode",
+     "name": "Audience",
+     "desc": "Say it in chat, or just show it to you",
+     "value": "Public",
+     "modes": [
+      "Public",
+      "Client"
+     ]
+    },
+    {
+     "type": "number",
+     "name": "Cooldown",
+     "desc": "Minimum gap between lines (servers kick spammers)",
+     "value": 8.0,
+     "min": 2.0,
+     "max": 60.0,
+     "step": 1.0,
+     "unit": "s"
+    },
+    {
+     "type": "number",
+     "name": "Chance",
+     "desc": "Chance to narrate any given moment",
+     "value": 60.0,
+     "min": 5.0,
+     "max": 100.0,
+     "step": 5.0,
+     "unit": "%"
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Hypeman",
+   "desc": "Reacts to every chat message: hypes people up, hates on them, agrees with everything or stays confused.",
+   "category": "CHAT",
+   "settings": [
+    {
+     "type": "mode",
+     "name": "Mode",
+     "desc": "What kind of reaction everyone gets",
+     "value": "Hype",
+     "modes": [
+      "Hype",
+      "Hater",
+      "Yes Man",
+      "Confused",
+      "Villager",
+      "Custom"
+     ]
+    },
+    {
+     "type": "text",
+     "name": "Lines",
+     "desc": "Options split with |. {player} is who spoke",
+     "value": "based | {player} said what we were all thinking | and that's on that"
+    },
+    {
+     "type": "number",
+     "name": "Chance",
+     "desc": "Chance to react to any given message",
+     "value": 50.0,
+     "min": 5.0,
+     "max": 100.0,
+     "step": 5.0,
+     "unit": "%"
+    },
+    {
+     "type": "number",
+     "name": "Delay",
+     "desc": "Wait before reacting, like you're typing",
+     "value": 1200.0,
+     "min": 0.0,
+     "max": 8000.0,
+     "step": 100.0,
+     "unit": "ms"
+    },
+    {
+     "type": "number",
+     "name": "Cooldown",
+     "desc": "Minimum gap between reactions (servers kick spammers)",
+     "value": 5.0,
+     "min": 1.0,
+     "max": 60.0,
+     "step": 1.0,
+     "unit": "s"
+    },
+    {
+     "type": "bool",
+     "name": "Ignore Friends",
+     "desc": "Don't react to friends",
+     "value": false
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Quizmaster",
+   "desc": "Hosts a trivia quiz in chat: questions, hints, typo-proof answers, rounds, scores and !commands for players.",
+   "category": "CHAT",
+   "settings": [
+    {
+     "type": "mode",
+     "name": "Topic",
+     "desc": "What the questions are about",
+     "value": "Mixed",
+     "modes": [
+      "Mixed",
+      "Minecraft",
+      "General",
+      "Maths",
+      "Custom"
+     ]
+    },
+    {
+     "type": "text",
+     "name": "Custom Questions",
+     "desc": "Your own questions, split with |. Write them as question = answer, other accepted answer",
+     "value": "what's my favourite block? = dirt | who made this quiz? = me"
+    },
+    {
+     "type": "number",
+     "name": "Interval",
+     "desc": "Time between questions",
+     "value": 45.0,
+     "min": 10.0,
+     "max": 600.0,
+     "step": 5.0,
+     "unit": "s"
+    },
+    {
+     "type": "number",
+     "name": "Answer Time",
+     "desc": "How long everyone gets to answer",
+     "value": 30.0,
+     "min": 10.0,
+     "max": 120.0,
+     "step": 5.0,
+     "unit": "s"
+    },
+    {
+     "type": "mode",
+     "name": "Hints",
+     "desc": "Letters given away as time runs out",
+     "value": "Two",
+     "modes": [
+      "Off",
+      "One",
+      "Two"
+     ]
+    },
+    {
+     "type": "bool",
+     "name": "Forgive Typos",
+     "desc": "Accept answers that are a letter or two off",
+     "value": true
+    },
+    {
+     "type": "mode",
+     "name": "Scoring",
+     "desc": "Points for a right answer",
+     "value": "Speed Bonus",
+     "modes": [
+      "One Point",
+      "Speed Bonus"
+     ]
+    },
+    {
+     "type": "number",
+     "name": "Round Length",
+     "desc": "Questions per round, then a winner is crowned (0 = endless)",
+     "value": 10.0,
+     "min": 0.0,
+     "max": 50.0,
+     "step": 1.0,
+     "unit": ""
+    },
+    {
+     "type": "bool",
+     "name": "Stop After Round",
+     "desc": "Switch off when a round ends instead of starting another",
+     "value": false
+    },
+    {
+     "type": "number",
+     "name": "Min Players",
+     "desc": "Only ask when at least this many other players are online",
+     "value": 1.0,
+     "min": 0.0,
+     "max": 20.0,
+     "step": 1.0,
+     "unit": ""
+    },
+    {
+     "type": "bool",
+     "name": "Player Commands",
+     "desc": "Players can use !hint, !skip, !score, !top and !question",
+     "value": true
+    },
+    {
+     "type": "text",
+     "name": "Command Prefix",
+     "desc": "What players type before those commands",
+     "value": "!"
+    },
+    {
+     "type": "number",
+     "name": "Skip Votes",
+     "desc": "How many players have to !skip a question",
+     "value": 2.0,
+     "min": 1.0,
+     "max": 10.0,
+     "step": 1.0,
+     "unit": ""
+    },
+    {
+     "type": "text",
+     "name": "Channel",
+     "desc": "Command in front of every quiz line, e.g. /pc for party chat or /gc for guild chat (blank = public)",
+     "value": ""
+    },
+    {
+     "type": "text",
+     "name": "Tag",
+     "desc": "Put in front of everything the quizmaster says",
+     "value": "[quiz]"
+    },
+    {
+     "type": "number",
+     "name": "Message Gap",
+     "desc": "Minimum time between quiz lines (servers kick fast talkers)",
+     "value": 1500.0,
+     "min": 500.0,
+     "max": 5000.0,
+     "step": 100.0,
+     "unit": "ms"
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Countdown",
+   "desc": "Dramatically counts down in chat to... nothing. Turns itself off when it's done.",
+   "category": "CHAT",
+   "settings": [
+    {
+     "type": "number",
+     "name": "From",
+     "desc": "Number to count down from",
+     "value": 5.0,
+     "min": 3.0,
+     "max": 20.0,
+     "step": 1.0,
+     "unit": ""
+    },
+    {
+     "type": "number",
+     "name": "Interval",
+     "desc": "Time between numbers (servers kick fast talkers)",
+     "value": 2.0,
+     "min": 1.0,
+     "max": 10.0,
+     "step": 0.5,
+     "unit": "s"
+    },
+    {
+     "type": "mode",
+     "name": "Style",
+     "desc": "How the numbers are said",
+     "value": "Dramatic",
+     "modes": [
+      "Numbers",
+      "Words",
+      "Dramatic"
+     ]
+    },
+    {
+     "type": "text",
+     "name": "Intro",
+     "desc": "Said before the count starts. Options split with |",
+     "value": "self destruct sequence initiated | launch sequence started | something big is about to happen | everyone stay calm"
+    },
+    {
+     "type": "text",
+     "name": "Finale",
+     "desc": "Said when it hits zero. Options split with |",
+     "value": "jk | ... | nothing happened | ok i forgot what was supposed to happen | boom (not really) | happy new year"
+    }
+   ],
+   "toggleable": true
+  },
+  {
    "name": "ItemPickup",
    "desc": "Instantly runs over and grabs any item another player drops.",
    "category": "PLAYER",
@@ -2425,6 +3082,64 @@ window.TROLL = {
    "toggleable": true
   },
   {
+   "name": "Fidget",
+   "desc": "Idle twitches while you're AFK (glances, crouch taps, hotbar flicks) so you never look away from keyboard.",
+   "category": "PLAYER",
+   "settings": [
+    {
+     "type": "number",
+     "name": "Idle After",
+     "desc": "Start fidgeting once you haven't touched anything for this long",
+     "value": 20.0,
+     "min": 3.0,
+     "max": 300.0,
+     "step": 1.0,
+     "unit": "s"
+    },
+    {
+     "type": "number",
+     "name": "Every",
+     "desc": "Average time between fidgets",
+     "value": 4.0,
+     "min": 1.0,
+     "max": 30.0,
+     "step": 0.5,
+     "unit": "s"
+    },
+    {
+     "type": "bool",
+     "name": "Look Around",
+     "desc": "Glance in random directions (your camera stays put)",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Crouch",
+     "desc": "Tap crouch once or twice",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Scroll",
+     "desc": "Flick to the next hotbar slot and back",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Swing",
+     "desc": "Swing your arm at nothing",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Hop",
+     "desc": "The occasional little jump",
+     "value": false
+    }
+   ],
+   "toggleable": true
+  },
+  {
    "name": "ClickGUI",
    "desc": "The menu you're looking at. Bound to Right Shift by default.",
    "category": "CLIENT",
@@ -2499,7 +3214,13 @@ window.TROLL = {
       "Stars",
       "Waves",
       "Halftone",
-      "Fog"
+      "Fog",
+      "Bubbles",
+      "Snow",
+      "Embers",
+      "Petals",
+      "Aurora",
+      "Sunset"
      ]
     },
     {
@@ -2656,6 +3377,88 @@ window.TROLL = {
    "toggleable": true
   },
   {
+   "name": "Keystrokes",
+   "desc": "WASD, space and mouse buttons on the HUD, lighting up as you press them, with clicks per second.",
+   "category": "CLIENT",
+   "settings": [
+    {
+     "type": "number",
+     "name": "X",
+     "desc": "Horizontal position, from the left edge",
+     "value": 1.0,
+     "min": 0.0,
+     "max": 100.0,
+     "step": 0.5,
+     "unit": "%"
+    },
+    {
+     "type": "number",
+     "name": "Y",
+     "desc": "Vertical position, from the top edge",
+     "value": 45.0,
+     "min": 0.0,
+     "max": 100.0,
+     "step": 0.5,
+     "unit": "%"
+    },
+    {
+     "type": "number",
+     "name": "Scale",
+     "desc": "Size of the keys",
+     "value": 1.0,
+     "min": 0.5,
+     "max": 2.0,
+     "step": 0.05,
+     "unit": "x"
+    },
+    {
+     "type": "bool",
+     "name": "Mouse",
+     "desc": "Show the mouse buttons",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "CPS",
+     "desc": "Clicks per second on the mouse buttons",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Space",
+     "desc": "Show the space bar",
+     "value": true
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "ChatFormat",
+   "desc": "Teaches the chat modules your server's chat layout: ranks, prefixes, nicknames and party chat.",
+   "category": "CLIENT",
+   "settings": [
+    {
+     "type": "text",
+     "name": "Formats",
+     "desc": "Your server's chat layouts, split with |. {player} = name, {message} = what they said, * = anything. \"\n\t\t\t\t\t+ \"Leave blank and most layouts are recognised on their own",
+     "value": ""
+    },
+    {
+     "type": "bool",
+     "name": "Nicknames",
+     "desc": "Match the names servers show in the tab list, not just account names",
+     "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Show Parsed",
+     "desc": "Print who said what for every line the client understood (for setting up Formats)",
+     "value": false
+    }
+   ],
+   "toggleable": false
+  },
+  {
    "name": "Theme",
    "desc": "Colours, type and all the old-school screen effects.",
    "category": "CLIENT",
@@ -2673,6 +3476,19 @@ window.TROLL = {
       "Newsprint",
       "Ink",
       "Fog",
+      "Frutiger Aero",
+      "Vaporwave",
+      "Amber",
+      "Phosphor",
+      "Classic",
+      "Sakura",
+      "Ocean",
+      "Dracula",
+      "Nord",
+      "Solarized",
+      "Crimson",
+      "Aurora",
+      "Handheld",
       "Custom"
      ]
     },
@@ -2742,6 +3558,17 @@ window.TROLL = {
       "Sharp",
       "Notched",
       "Round"
+     ]
+    },
+    {
+     "type": "mode",
+     "name": "Gloss",
+     "desc": "Glassy shine on panels and buttons (Theme = only on glossy presets like Frutiger Aero)",
+     "value": "Theme",
+     "modes": [
+      "Theme",
+      "On",
+      "Off"
      ]
     },
     {
@@ -2861,6 +3688,12 @@ window.TROLL = {
       "Waves",
       "Halftone",
       "Fog",
+      "Bubbles",
+      "Snow",
+      "Embers",
+      "Petals",
+      "Aurora",
+      "Sunset",
       "None"
      ]
     },
@@ -2960,6 +3793,51 @@ window.TROLL = {
   {
    "name": "Macros",
    "desc": "Chains of steps (clicks, packets, chat, waits...) you bind to keys, run from the GUI tools or with .macro run.",
+   "category": "CLIENT",
+   "settings": [],
+   "toggleable": false
+  },
+  {
+   "name": "Chatroom",
+   "desc": "One chat room for everyone running Troll Client, on any server or none. .chat <message> talks in it, and what others say shows up in your chat tagged [room]. Your Minecraft name is only sent when you talk.",
+   "category": "CLIENT",
+   "settings": [
+    {
+     "type": "bool",
+     "name": "Verified Only",
+     "desc": "Hide people whose Minecraft name couldn't be checked with Mojang",
+     "value": false
+    },
+    {
+     "type": "bool",
+     "name": "Join Note",
+     "desc": "Say how many people are in the room when you join a world",
+     "value": true
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Updater",
+   "desc": "Gets new versions by itself: checks on launch, downloads the build for the Minecraft version you're running, and loads it next time you start the game. Never a build for another Minecraft version.",
+   "category": "CLIENT",
+   "settings": [
+    {
+     "type": "mode",
+     "name": "Mode",
+     "desc": "Install new versions for the next launch, or only say when there is one",
+     "value": "Install",
+     "modes": [
+      "Install",
+      "Notify"
+     ]
+    }
+   ],
+   "toggleable": true
+  },
+  {
+   "name": "Telemetry",
+   "desc": "Anonymous usage stats (modules, playtime, setup) for the analytics page on the website. A random id, never your account, chat, coordinates or IP.",
    "category": "CLIENT",
    "settings": [],
    "toggleable": false

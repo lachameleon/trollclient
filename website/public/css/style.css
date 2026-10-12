@@ -2,7 +2,8 @@
    TROLL CLIENT HOMEPAGE
    A mid-2000s homepage, kept in good repair: a monochrome desktop, a glossy browser
    window with tabs, an LCD ticker and a taskbar. Same seven palettes and the same 5x7
-   pixel font as the client itself.
+   pixel font as the client itself, plus the client's Frutiger Aero preset in full colour
+   (at the bottom of this file).
    ========================================================================== */
 
 @font-face {
@@ -23,6 +24,8 @@ body.theme-noir {
 	--desk: #060606; --desk-ink: #222222;
 	--lcd-bg: #050505; --lcd-on: #f2f2f2; --lcd-off: rgba(255, 255, 255, 0.05); --lcd-glow: rgba(255, 255, 255, 0.55);
 	--tile: url("../img/bg.png");
+	/* the pixel font, as a variable so a theme can swap it (Frutiger Aero does) */
+	--px: "TrollTerminal", "Courier New", monospace;
 }
 body.theme-paper {
 	--bg: #e9e9e9; --panel: #f7f7f7; --panel2: #e6e6e6; --border: #c4c4c4; --border-hi: #9c9c9c;
@@ -98,7 +101,7 @@ img { image-rendering: pixelated; }
 button { font: inherit; color: inherit; }
 .icon { width: 16px; height: 16px; filter: var(--icon); vertical-align: -3px; }
 .px, h1, h2, h3, h4, .button, .tab, .bm, .statusbar, .taskbar, .startmenu, kbd, code, .terminal, .gui, .lcd, .odometer, .balloon, .dialog, table.data th {
-	font-family: "TrollTerminal", "Courier New", monospace;
+	font-family: var(--px);
 	-webkit-font-smoothing: none;
 	font-smooth: never;
 }
@@ -175,7 +178,7 @@ input:focus-visible, textarea:focus-visible { animation: none; background-image:
 .desk-icon.sel .ico::after { content: ""; position: absolute; inset: 0; background: repeating-conic-gradient(var(--accent) 0 25%, transparent 0 50%) 0 0 / 2px 2px; opacity: 0.35; }
 .desk-icon.dragging { opacity: 0.7; z-index: 3; transition: none; }
 .desk-icon.snap { transition: left 0.18s cubic-bezier(.3, 1.4, .5, 1), top 0.18s cubic-bezier(.3, 1.4, .5, 1); }
-.mini-burst { position: absolute; right: -10px; top: -6px; font: 8px/1 "TrollTerminal", monospace; background: var(--accent); color: var(--on-accent); padding: 2px 3px; border-radius: 2px; animation: wobble 1.6s ease-in-out infinite; }
+.mini-burst { position: absolute; right: -10px; top: -6px; font: 8px/1 var(--px); background: var(--accent); color: var(--on-accent); padding: 2px 3px; border-radius: 2px; animation: wobble 1.6s ease-in-out infinite; }
 
 /* ---------------------------------------------------------------- the browser window */
 .browser {
@@ -214,7 +217,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 .titlebar .app-icon { width: 16px; height: 16px; filter: var(--icon); position: relative; }
 .titlebar .title {
 	position: relative; flex: 1; min-width: 0;
-	font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/24px var(--px); -webkit-font-smoothing: none;
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 	text-shadow: 0 1px 0 var(--shadow);
 }
@@ -278,7 +281,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 	flex: none; width: 26px; height: 24px; margin: 0 0 3px 4px;
 	border: 1px solid var(--border); border-radius: 4px;
 	background: var(--panel2); color: var(--dim);
-	font: 16px/1 "TrollTerminal", monospace;
+	font: 16px/1 var(--px);
 	transition: transform 0.2s;
 }
 .tab-new:hover { color: var(--text); transform: rotate(90deg); }
@@ -286,7 +289,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 /* NEW! starbursts */
 .burst {
 	position: relative; display: inline-grid; place-items: center;
-	font: 8px/1 "TrollTerminal", monospace; font-weight: normal; letter-spacing: 0;
+	font: 8px/1 var(--px); font-weight: normal; letter-spacing: 0;
 	color: var(--on-accent); padding: 0 2px; margin-left: 2px;
 	width: 34px; height: 34px; margin: -8px -10px -8px -2px;
 	isolation: isolate;
@@ -338,7 +341,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 	border: 1px solid var(--border-hi); border-radius: 4px;
 	box-shadow: inset 0 2px 3px var(--shadow);
 	overflow: hidden;
-	font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/24px var(--px); -webkit-font-smoothing: none;
 }
 .address .fav { width: 16px; height: 16px; filter: var(--icon); position: relative; z-index: 1; }
 .address .url { position: relative; z-index: 1; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: clip; color: var(--text); }
@@ -370,7 +373,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 }
 .searchbox:focus-within { width: 230px; border-color: var(--accent); }
 .searchbox img { width: 16px; height: 16px; filter: var(--icon); }
-.searchbox input { flex: 1; min-width: 0; border: 0; background: none; color: var(--text); font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none; outline: none; }
+.searchbox input { flex: 1; min-width: 0; border: 0; background: none; color: var(--text); font: 16px/24px var(--px); -webkit-font-smoothing: none; outline: none; }
 .searchbox input::-webkit-search-cancel-button { display: none; }
 .throbber { flex: none; width: 32px; height: 32px; filter: var(--icon); margin: -4px 0; }
 .throbber.fast { animation: spin 0.4s linear infinite; }
@@ -383,7 +386,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 	border-bottom: 1px solid var(--border);
 	font-size: 16px; line-height: 24px;
 	overflow-x: auto; scrollbar-width: none;
-	font-family: "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font-family: var(--px); -webkit-font-smoothing: none;
 }
 .bookmarks::-webkit-scrollbar { display: none; }
 .bm-label { color: var(--dim); padding-right: 6px; }
@@ -407,7 +410,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 	border-bottom: 1px solid var(--border-hi);
 	box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
 	color: var(--lcd-on);
-	font: 16px/30px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/30px var(--px); -webkit-font-smoothing: none;
 	text-shadow: 0 0 6px var(--lcd-glow);
 }
 .ticker::after {
@@ -496,7 +499,7 @@ html.js .browser.opening { animation: win-open 0.45s cubic-bezier(.2, .9, .3, 1.
 	display: inline-flex; align-items: center; gap: 6px;
 	padding: 0 8px;
 	background: var(--bg); border: 1px solid var(--border-hi); border-radius: 3px;
-	font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/24px var(--px); -webkit-font-smoothing: none;
 	color: var(--text);
 }
 
@@ -567,7 +570,7 @@ table.data th { background: linear-gradient(180deg, var(--gloss) 0 50%, transpar
 table.data tr:nth-child(even) td { background: var(--panel); }
 table.data tbody tr { transition: background 0.15s; }
 table.data tbody tr:hover td { background: var(--panel2); }
-table.data td.name { white-space: nowrap; color: var(--text); font: 16px/22px "TrollTerminal", monospace; -webkit-font-smoothing: none; }
+table.data td.name { white-space: nowrap; color: var(--text); font: 16px/22px var(--px); -webkit-font-smoothing: none; }
 table.data td .settings { color: var(--dim); font-size: 11px; margin-top: 2px; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
@@ -652,7 +655,7 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 .you { text-align: center; min-height: 16px; }
 .statlist { display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; margin: 10px 0 8px; font-size: 11px; }
 .statlist dt { color: var(--dim); }
-.statlist dd { margin: 0; text-align: right; font: 16px/18px "TrollTerminal", monospace; -webkit-font-smoothing: none; transition: text-shadow 0.3s; }
+.statlist dd { margin: 0; text-align: right; font: 16px/18px var(--px); -webkit-font-smoothing: none; transition: text-shadow 0.3s; }
 .statlist dd.flash { animation: dd-flash 0.8s ease-out; }
 @keyframes dd-flash { 0% { background: var(--accent); color: var(--on-accent); } }
 .statlist.tally { border-top: 1px dotted var(--border-hi); padding-top: 6px; margin-bottom: 0; }
@@ -660,18 +663,18 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 .spark i { flex: 1; min-height: 1px; background: repeating-linear-gradient(0deg, var(--text) 0 2px, transparent 2px 3px); opacity: 0.75; transform-origin: bottom; animation: grow 0.6s cubic-bezier(.3, 1.4, .5, 1) both; animation-delay: calc(var(--i) * 30ms); }
 .spark i:last-child { opacity: 1; background: var(--text); }
 @keyframes grow { from { transform: scaleY(0); } }
-.plus-one { position: absolute; font: 16px/1 "TrollTerminal", monospace; color: var(--text); pointer-events: none; animation: float-up 1.4s ease-out forwards; text-shadow: 0 0 6px var(--lcd-glow); }
+.plus-one { position: absolute; font: 16px/1 var(--px); color: var(--text); pointer-events: none; animation: float-up 1.4s ease-out forwards; text-shadow: 0 0 6px var(--lcd-glow); }
 @keyframes float-up { to { transform: translateY(-36px); opacity: 0; } }
 
 .promo-body { display: grid; justify-items: center; gap: 8px; text-decoration: none; color: var(--text); text-align: center; }
 .promo-body:hover { background: var(--bg); color: var(--text); }
 .promo-body:hover .mini-stage { transform: scale(1.05); }
 .promo-copy { font-size: 11px; line-height: 1.5; color: var(--dim); }
-.promo-copy b { color: var(--text); font-weight: normal; font: 16px/20px "TrollTerminal", monospace; display: block; }
+.promo-copy b { color: var(--text); font-weight: normal; font: 16px/20px var(--px); display: block; }
 .promo-copy u { color: var(--text); text-decoration-style: dotted; }
 .mini-stage { display: block; width: 120px; height: 130px; transition: transform 0.3s cubic-bezier(.3, 1.6, .5, 1); }
 
-.poll .q { margin: 0 0 6px; font: 16px/20px "TrollTerminal", monospace; -webkit-font-smoothing: none; }
+.poll .q { margin: 0 0 6px; font: 16px/20px var(--px); -webkit-font-smoothing: none; }
 .poll-options { display: grid; gap: 4px; margin-bottom: 8px; }
 .poll-opt { display: flex; align-items: center; gap: 6px; font-size: 11px; }
 .poll-opt input { accent-color: var(--accent); margin: 0; }
@@ -684,10 +687,10 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 	transition: width 1s cubic-bezier(.3, 1.2, .5, 1);
 }
 .poll-bar.mine .label::after { content: " \2190 you"; color: var(--dim); }
-.poll-bar .num { float: right; font: 16px/16px "TrollTerminal", monospace; }
+.poll-bar .num { float: right; font: 16px/16px var(--px); }
 
 .latest-entry { margin-top: 6px; font-style: italic; min-height: 16px; }
-.webring .ring { display: flex; justify-content: center; gap: 2px; font: 32px/36px "TrollTerminal", monospace; }
+.webring .ring { display: flex; justify-content: center; gap: 2px; font: 32px/36px var(--px); }
 .webring .ring span { display: inline-block; animation: ring-wave 2s ease-in-out infinite; animation-delay: calc(var(--i) * 0.12s); }
 .webring .ring span:nth-child(1) { --i: 0; } .webring .ring span:nth-child(2) { --i: 1; } .webring .ring span:nth-child(3) { --i: 2; } .webring .ring span:nth-child(4) { --i: 3; } .webring .ring span:nth-child(5) { --i: 4; }
 @keyframes ring-wave { 0%, 60%, 100% { transform: none; } 30% { transform: translateY(-5px); } }
@@ -709,7 +712,7 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 	padding: 16px; background: linear-gradient(180deg, var(--panel2), var(--panel));
 	border-top: 1px solid var(--border-hi);
 }
-.hero .ver { font: 16px/22px "TrollTerminal", monospace; }
+.hero .ver { font: 16px/22px var(--px); }
 
 .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 8px; }
 .fact {
@@ -717,7 +720,7 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 	background: var(--lcd-bg); color: var(--lcd-on);
 	border: 1px solid var(--border-hi); border-radius: 4px;
 	box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
-	font-family: "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font-family: var(--px); -webkit-font-smoothing: none;
 	overflow: hidden;
 }
 .fact::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 45%), radial-gradient(circle, transparent 55%, var(--lcd-bg) 60%) 0 0 / 2px 2px; pointer-events: none; }
@@ -739,7 +742,7 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 	overflow: hidden;
 }
 .feature-skin .stage-wrap { position: relative; height: 300px; }
-.feature-skin .kicker { display: inline-flex; align-items: center; gap: 8px; font: 16px/24px "TrollTerminal", monospace; color: var(--dim); }
+.feature-skin .kicker { display: inline-flex; align-items: center; gap: 8px; font: 16px/24px var(--px); color: var(--dim); }
 .feature-skin h2 { font-size: 40px; line-height: 44px; margin: 4px 0 8px; }
 .feature-skin h2::after { display: none; }
 .feature-skin ul { list-style: none; padding: 0; margin: 0 0 14px; }
@@ -775,10 +778,10 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 .s3d-scene .s3d-tag {
 	left: 0; top: 0;
 	padding: 0 6px; background: rgba(0, 0, 0, 0.45); color: #fff;
-	font: 16px/22px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/22px var(--px); -webkit-font-smoothing: none;
 	white-space: nowrap; pointer-events: none;
 }
-.s3d-hint { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font: 8px/12px "TrollTerminal", monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); pointer-events: none; animation: hint 3s ease-in-out infinite; }
+.s3d-hint { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font: 8px/12px var(--px); letter-spacing: 1px; text-transform: uppercase; color: var(--dim); pointer-events: none; animation: hint 3s ease-in-out infinite; }
 @keyframes hint { 50% { opacity: 0.35; } }
 
 /* ---------------------------------------------------------------- skin animation lab */
@@ -805,7 +808,7 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 .lab-stage .osd {
 	position: absolute; left: 10px; top: 8px; right: 10px; z-index: 2;
 	display: flex; justify-content: space-between; gap: 10px;
-	font: 16px/20px "TrollTerminal", monospace; color: var(--dim); pointer-events: none;
+	font: 16px/20px var(--px); color: var(--dim); pointer-events: none;
 }
 .lab-stage .osd b { color: var(--text); font-weight: normal; }
 .lab-stage .osd .rec::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text); margin-right: 6px; animation: blink 1s steps(1) infinite; }
@@ -831,17 +834,17 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 	flex: 1; min-width: 0; height: 30px; padding: 0 8px;
 	background: var(--panel2); color: var(--text);
 	border: 1px solid var(--border-hi); border-radius: 4px; box-shadow: inset 0 2px 3px var(--shadow);
-	font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/24px var(--px); -webkit-font-smoothing: none;
 }
 .userskin .msg { font-size: 11px; color: var(--dim); }
 .timeline-wrap { padding: 10px 14px 12px; border-top: 1px solid var(--border-hi); background: var(--bg); grid-column: 1 / -1; }
-.timeline-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; font: 16px/22px "TrollTerminal", monospace; color: var(--dim); margin-bottom: 6px; }
+.timeline-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; font: 16px/22px var(--px); color: var(--dim); margin-bottom: 6px; }
 .timeline-head b { color: var(--text); font-weight: normal; }
 .timeline { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 0 8px; align-items: center; }
-.timeline .rows { font: 16px/12px "TrollTerminal", monospace; color: var(--dim); display: grid; gap: 0; }
+.timeline .rows { font: 16px/12px var(--px); color: var(--dim); display: grid; gap: 0; }
 .timeline .rows span { height: 14px; line-height: 14px; font-size: 8px; text-align: right; }
 .timeline canvas { width: 100%; height: 98px; display: block; image-rendering: pixelated; background: var(--panel2); border: 1px solid var(--border); border-radius: 3px; }
-.wire { position: relative; height: 22px; margin-top: 8px; display: flex; align-items: center; gap: 8px; font: 16px/22px "TrollTerminal", monospace; color: var(--dim); }
+.wire { position: relative; height: 22px; margin-top: 8px; display: flex; align-items: center; gap: 8px; font: 16px/22px var(--px); color: var(--dim); }
 .wire .track { position: relative; flex: 1; height: 2px; background: repeating-linear-gradient(90deg, var(--border-hi) 0 4px, transparent 4px 8px); }
 .wire .pkt { position: absolute; top: -3px; left: 0; width: 8px; height: 8px; background: var(--text); box-shadow: 0 0 6px var(--lcd-glow); animation: pkt 0.9s linear forwards; }
 @keyframes pkt { to { left: calc(100% - 8px); opacity: 0.2; } }
@@ -858,13 +861,13 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 .pattern h3 { margin: 0; }
 .pattern p { font-size: 11px; color: var(--dim); margin: 0; }
 .triggers { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 18px; }
-.triggers span { padding: 2px 10px; border: 1px solid var(--border-hi); border-radius: 12px; background: var(--panel); font: 16px/22px "TrollTerminal", monospace; transition: transform 0.2s cubic-bezier(.3, 1.8, .5, 1); }
+.triggers span { padding: 2px 10px; border: 1px solid var(--border-hi); border-radius: 12px; background: var(--panel); font: 16px/22px var(--px); transition: transform 0.2s cubic-bezier(.3, 1.8, .5, 1); }
 .triggers span:hover { transform: translateY(-2px) rotate(-2deg); background: var(--accent); color: var(--on-accent); }
 .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: center; margin: 12px 0 22px; text-align: center; }
 .flow .node { padding: 12px 8px; }
-.flow .node b { display: block; font: 16px/22px "TrollTerminal", monospace; font-weight: normal; }
+.flow .node b { display: block; font: 16px/22px var(--px); font-weight: normal; }
 .flow .node span { font-size: 11px; color: var(--dim); }
-.flow .arrow { font: 32px/1 "TrollTerminal", monospace; animation: nudge-r 0.6s ease-in-out infinite alternate; }
+.flow .arrow { font: 32px/1 var(--px); animation: nudge-r 0.6s ease-in-out infinite alternate; }
 
 /* ---------------------------------------------------------------- TROLL-VISION */
 .tv {
@@ -888,7 +891,7 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 .tv canvas.static.on { opacity: 1; }
 .tv .osd {
 	position: absolute; right: 22px; top: 14px; z-index: 3;
-	font: 32px/36px "TrollTerminal", monospace; color: #fff; text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255, 255, 255, 0.6);
+	font: 32px/36px var(--px); color: #fff; text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255, 255, 255, 0.6);
 	opacity: 0; transition: opacity 0.2s; pointer-events: none;
 }
 .tv .osd.show { opacity: 1; }
@@ -909,12 +912,12 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 @keyframes tv-line { 0% { transform: scaleX(0); opacity: 1; } 40% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1) scaleY(200); opacity: 0; } }
 @keyframes tv-mask { 0%, 40% { background: #000; } 100% { background: transparent; } }
 @keyframes tv-off { 0% { background: transparent; clip-path: inset(0); } 60% { background: #fff; clip-path: inset(49% 0); } 100% { background: #fff; clip-path: inset(49.5% 49.5%); } }
-.tv .knobs { display: flex; align-items: center; gap: 10px; padding: 12px 6px 0; color: #9a9a9a; font: 16px/20px "TrollTerminal", monospace; -webkit-font-smoothing: none; flex-wrap: wrap; }
+.tv .knobs { display: flex; align-items: center; gap: 10px; padding: 12px 6px 0; color: #9a9a9a; font: 16px/20px var(--px); -webkit-font-smoothing: none; flex-wrap: wrap; }
 .tv .brand { letter-spacing: 3px; flex: 1; min-width: 150px; }
 .tv .chans { display: flex; gap: 4px; flex-wrap: wrap; }
 .tv .chan {
 	min-width: 30px; height: 24px; padding: 0 6px;
-	font: 16px/20px "TrollTerminal", monospace;
+	font: 16px/20px var(--px);
 	color: #ccc; background: linear-gradient(180deg, #444, #1c1c1c);
 	border: 1px solid #555; border-radius: 3px;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 0 #000;
@@ -931,12 +934,12 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
 .tv .power img { width: 14px; height: 14px; filter: invert(1); opacity: 0.8; }
 
 .stills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; }
-.stills figure { margin: 0; text-align: center; color: var(--dim); font: 16px/22px "TrollTerminal", monospace; }
+.stills figure { margin: 0; text-align: center; color: var(--dim); font: 16px/22px var(--px); }
 .stills img { width: 100%; display: block; image-rendering: auto; border: 1px solid var(--border-hi); border-radius: 3px; transition: transform 0.25s cubic-bezier(.3, 1.6, .5, 1), box-shadow 0.25s; }
 .stills figure:hover img { transform: translateY(-4px) scale(1.04); box-shadow: 3px 5px 0 var(--shadow); }
 
 .skins { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
-.skins figure { margin: 0; text-align: center; color: var(--dim); font: 16px/22px "TrollTerminal", monospace; }
+.skins figure { margin: 0; text-align: center; color: var(--dim); font: 16px/22px var(--px); }
 .skins .mini-stage { width: 100%; height: 150px; }
 .skins figure:hover { color: var(--text); }
 
@@ -953,7 +956,7 @@ html.js .changelog .line.on { opacity: 1; }
 .theme-card.pressed { box-shadow: 0 0 0 2px var(--accent); }
 .theme-card .mini { display: block; height: 58px; padding: 0; position: relative; }
 .theme-card .mini i { position: absolute; display: block; }
-.theme-card .name { display: block; padding: 2px 8px; background: var(--panel); font: 16px/22px "TrollTerminal", monospace; color: var(--text); border-top: 1px solid var(--border); }
+.theme-card .name { display: block; padding: 2px 8px; background: var(--panel); font: 16px/22px var(--px); color: var(--text); border-top: 1px solid var(--border); }
 
 /* ---------------------------------------------------------------- the menu demo (mirrors ClickGuiScreen) */
 .gui {
@@ -1049,15 +1052,15 @@ html.js .changelog .line.on { opacity: 1; }
 	flex: 1; min-width: 180px; height: 32px; padding: 0 10px;
 	background: var(--panel2); color: var(--text);
 	border: 1px solid var(--border-hi); border-radius: 16px; box-shadow: inset 0 2px 3px var(--shadow);
-	font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/24px var(--px); -webkit-font-smoothing: none;
 }
-.chip { padding: 2px 10px; border: 1px solid var(--border-hi); border-radius: 14px; background: var(--panel); color: var(--dim); font: 16px/22px "TrollTerminal", monospace; transition: transform 0.15s; }
+.chip { padding: 2px 10px; border: 1px solid var(--border-hi); border-radius: 14px; background: var(--panel); color: var(--dim); font: 16px/22px var(--px); transition: transform 0.15s; }
 .chip:hover { color: var(--text); transform: translateY(-1px); }
 .chip.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.filters .count { color: var(--dim); font: 16px/22px "TrollTerminal", monospace; }
+.filters .count { color: var(--dim); font: 16px/22px var(--px); }
 .mod-row.hidden, .mod-group.hidden { display: none; }
 .mod-row mark { background: var(--accent); color: var(--on-accent); }
-.mod-row .star-badge { display: inline-block; margin-left: 6px; padding: 0 5px; font: 8px/14px "TrollTerminal", monospace; background: var(--accent); color: var(--on-accent); border-radius: 2px; vertical-align: 2px; animation: wobble 1.8s ease-in-out infinite; }
+.mod-row .star-badge { display: inline-block; margin-left: 6px; padding: 0 5px; font: 8px/14px var(--px); background: var(--accent); color: var(--on-accent); border-radius: 2px; vertical-align: 2px; animation: wobble 1.8s ease-in-out infinite; }
 .mod-row.featured td { background: linear-gradient(90deg, var(--panel2), transparent) !important; }
 
 /* ---------------------------------------------------------------- gallery + lightbox */
@@ -1077,19 +1080,19 @@ html.js .changelog .line.on { opacity: 1; }
 /* ---------------------------------------------------------------- download page + dialog */
 .dl-panel { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
 .dl-panel .meta { font-size: 11px; color: var(--dim); }
-.dl-panel .meta b { color: var(--text); font: 16px/22px "TrollTerminal", monospace; font-weight: normal; }
-.dl-count { font: 16px/22px "TrollTerminal", monospace; }
+.dl-panel .meta b { color: var(--text); font: 16px/22px var(--px); font-weight: normal; }
+.dl-count { font: 16px/22px var(--px); }
 .steps { counter-reset: step; list-style: none; padding: 0; display: grid; gap: 10px; }
 .steps li { counter-increment: step; position: relative; padding: 10px 12px 10px 52px; }
 .steps li::before {
 	content: counter(step); position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
 	width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
-	font: 16px/1 "TrollTerminal", monospace; color: var(--on-accent);
+	font: 16px/1 var(--px); color: var(--on-accent);
 	background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0 50%, transparent 50%), var(--accent);
 	box-shadow: 0 2px 0 var(--shadow);
 }
 details.group { padding: 0; margin: 10px 0; }
-details.group summary { padding: 8px 14px; list-style: none; font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none; }
+details.group summary { padding: 8px 14px; list-style: none; font: 16px/24px var(--px); -webkit-font-smoothing: none; }
 details.group summary::-webkit-details-marker { display: none; }
 details.group summary::before { content: "+"; display: inline-block; width: 18px; transition: transform 0.2s; }
 details.group[open] summary::before { transform: rotate(45deg); }
@@ -1129,38 +1132,113 @@ details.group[open]::details-content { height: auto; }
 .progress { height: 18px; padding: 2px; border: 1px solid var(--border-hi); background: var(--panel2); border-radius: 3px; box-shadow: inset 0 1px 3px var(--shadow); }
 .progress i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, var(--text) 0 9px, transparent 9px 11px); transition: width 0.2s linear; }
 
-/* ---------------------------------------------------------------- guestbook */
-.guestbook-form { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
-.guestbook-form .full { grid-column: 1 / -1; }
-.guestbook-form label { display: block; font: 16px/22px "TrollTerminal", monospace; -webkit-font-smoothing: none; }
-.guestbook-form input, .guestbook-form textarea {
+/* ---------------------------------------------------------------- forum (it used to be a guestbook) */
+.post-form { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+.post-form[hidden] { display: none; }
+.post-form .full { grid-column: 1 / -1; }
+.post-form label { display: block; font: 16px/22px var(--px); -webkit-font-smoothing: none; }
+.post-form input, .post-form textarea, .post textarea, .forum-search input {
 	width: 100%; font: 13px/1.5 Verdana, Tahoma, sans-serif; color: var(--text);
 	background: var(--panel2); border: 1px solid var(--border-hi); border-radius: 3px;
 	box-shadow: inset 0 2px 3px var(--shadow); padding: 5px 8px;
 }
-.guestbook-form textarea { height: 110px; resize: vertical; }
-.guestbook-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.post-form textarea, .post textarea { height: 130px; resize: vertical; }
+.post-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .avatars { display: flex; gap: 6px; flex-wrap: wrap; }
 .avatars label { position: relative; }
-.avatars input { position: absolute; opacity: 0; pointer-events: none; }
+.avatars input { position: absolute; opacity: 0; pointer-events: none; width: auto; }
 .avatars canvas { width: 32px; height: 32px; display: block; image-rendering: pixelated; border: 1px solid var(--border); border-radius: 3px; padding: 2px; background: var(--panel2); transition: transform 0.2s cubic-bezier(.3, 1.8, .5, 1); }
 .avatars input:checked + canvas { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); transform: scale(1.12); }
 .avatars input:focus-visible + canvas { outline: 1px dashed var(--accent); outline-offset: 2px; }
-.lcd-count { display: inline-block; min-width: 46px; padding: 0 6px; text-align: right; background: var(--lcd-bg); color: var(--lcd-on); border: 1px solid var(--border-hi); border-radius: 2px; font: 16px/20px "TrollTerminal", monospace; text-shadow: 0 0 5px var(--lcd-glow); }
+.lcd-count { display: inline-block; min-width: 46px; padding: 0 6px; text-align: right; background: var(--lcd-bg); color: var(--lcd-on); border: 1px solid var(--border-hi); border-radius: 2px; font: 16px/20px var(--px); text-shadow: 0 0 5px var(--lcd-glow); }
 .lcd-count.low { animation: blink 0.5s steps(1) infinite; }
 .form-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .form-msg { font-size: 11px; color: var(--dim); }
 .form-msg.err { color: var(--text); font-weight: bold; }
-.guest-entry { position: relative; display: grid; grid-template-columns: 40px 1fr; gap: 12px; margin: 0 0 12px; padding: 10px 12px; }
-.guest-entry canvas { width: 40px; height: 40px; image-rendering: pixelated; border: 1px solid var(--border-hi); border-radius: 3px; }
-.guest-entry .meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; color: var(--dim); border-bottom: 1px dotted var(--border-hi); margin: 0 0 6px; padding: 0 0 4px; font-size: 11px; }
-.guest-entry .meta b { color: var(--text); font: 16px/20px "TrollTerminal", monospace; font-weight: normal; }
-.guest-entry .msg { overflow-wrap: anywhere; }
-.guest-entry .num { margin-left: auto; font: 16px/20px "TrollTerminal", monospace; }
-.guest-entry.fresh { animation: entry-in 0.6s cubic-bezier(.2, 1.3, .4, 1); }
-.guest-entry.fresh::after { content: "NEW"; position: absolute; right: 8px; top: -8px; font: 8px/1 "TrollTerminal", monospace; padding: 3px 4px; background: var(--accent); color: var(--on-accent); border-radius: 2px; }
+
+.forum-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
+.crumbs { flex: 1; min-width: 0; font: 16px/24px var(--px); -webkit-font-smoothing: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crumbs .sep { color: var(--dim); }
+.forum-search { flex: none; display: flex; align-items: center; gap: 6px; width: 220px; max-width: 100%; }
+.forum-search input { padding: 3px 8px; border-radius: 12px; }
+#forum { min-height: 240px; transition: opacity 0.15s; }
+#forum.busy { opacity: 0.55; }
+.forum-table td { vertical-align: middle; }
+.forum-table .f-ico { width: 34px; text-align: center; }
+.forum-table .f-ico .icon { width: 24px; height: 24px; }
+.forum-table .f-title { font: 16px/22px var(--px); -webkit-font-smoothing: none; }
+.forum-table .f-num { width: 72px; text-align: right; font: 16px/22px var(--px); -webkit-font-smoothing: none; white-space: nowrap; }
+.forum-table th.f-num { text-align: right; }
+.forum-table .f-last { width: 34%; overflow-wrap: anywhere; }
+.forum-totals { text-align: right; margin-top: -8px; }
+.forum-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
+.flag { display: inline-block; margin-left: 8px; padding: 1px 5px; font: 8px/1.2 var(--px); letter-spacing: 1px; text-transform: uppercase; vertical-align: 3px; background: var(--accent); color: var(--on-accent); border-radius: 2px; }
+.thread-title { font-size: 24px; line-height: 30px; overflow-wrap: anywhere; margin-bottom: 2px; }
+.thread-meta { margin: 0 0 10px; }
+.mod-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 10px; }
+.mod-tools .flag { margin-left: 0; }
+.forum-mod { text-align: right; margin: 14px 0 0; }
+.forum-mod button { border: 0; background: none; padding: 0; color: var(--dim); font-size: 11px; text-decoration: underline dotted; }
+.forum-mod button:hover { color: var(--text); }
+.dialog input.mod-key { width: 100%; font: 13px/1.5 Verdana, Tahoma, sans-serif; color: var(--text); background: var(--panel2); border: 1px solid var(--border-hi); border-radius: 3px; padding: 5px 8px; }
+
+.pager { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 10px 0 14px; font: 16px/22px var(--px); -webkit-font-smoothing: none; }
+.pager a, .pager b { min-width: 26px; padding: 0 7px; text-align: center; text-decoration: none; border: 1px solid var(--border-hi); border-radius: 3px; background: var(--panel); font-weight: normal; }
+.pager b { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.pager i { color: var(--dim); font-style: normal; }
+
+.post { position: relative; display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; margin: 0 0 12px; padding: 10px 12px; scroll-margin-top: 20px; }
+.post .p-who { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; overflow-wrap: anywhere; border-right: 1px dotted var(--border-hi); padding-right: 12px; }
+.post .p-who canvas { width: 48px; height: 48px; image-rendering: pixelated; border: 1px solid var(--border-hi); border-radius: 3px; background: var(--panel2); }
+.post .p-who b, .recent-row b { font: 16px/20px var(--px); font-weight: normal; -webkit-font-smoothing: none; }
+.trip { display: block; font-size: 10px; color: var(--dim); letter-spacing: 0.5px; }
+.recent-row .trip { display: inline; margin-left: 4px; }
+.post .op { font: 8px/1.2 var(--px); padding: 1px 4px; border: 1px solid var(--border-hi); border-radius: 2px; color: var(--dim); }
+.post .meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; color: var(--dim); border-bottom: 1px dotted var(--border-hi); margin: 0 0 6px; padding: 0 0 4px; font-size: 11px; }
+.post .meta .acts { margin-left: auto; display: flex; gap: 8px; opacity: 0.55; transition: opacity 0.15s; }
+.post:hover .meta .acts, .post:focus-within .meta .acts { opacity: 1; }
+.post .meta .acts button { border: 0; background: none; padding: 0; font-size: 11px; color: var(--dim); text-decoration: underline dotted; }
+.post .meta .acts button:hover { color: var(--text); }
+.post .meta .num { font: 16px/20px var(--px); -webkit-font-smoothing: none; text-decoration: none; color: var(--dim); }
+.post .msg { overflow-wrap: anywhere; }
+.post .msg .quote { color: var(--dim); border-left: 2px solid var(--border-hi); padding-left: 8px; display: inline-block; }
+.post .msg .ref { font: 16px/18px var(--px); -webkit-font-smoothing: none; }
+.post.removed { opacity: 0.6; }
+.post.target { box-shadow: inset 1px 1px 0 var(--edge), 3px 3px 0 var(--shadow), 0 0 0 2px var(--accent); }
+.post.fresh { animation: entry-in 0.6s cubic-bezier(.2, 1.3, .4, 1); }
+.post.fresh::after { content: "NEW"; position: absolute; right: 8px; top: -8px; font: 8px/1 var(--px); padding: 3px 4px; background: var(--accent); color: var(--on-accent); border-radius: 2px; }
 @keyframes entry-in { from { opacity: 0; transform: translateY(-12px) scale(0.98); clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
-.more-btn { display: block; margin: 0 auto; }
+
+.recent { display: grid; gap: 6px; margin: 0 0 22px; }
+.recent-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 10px; text-decoration: none; }
+.recent-row:hover { background: var(--panel2); color: var(--text); }
+.recent-row canvas { width: 28px; height: 28px; image-rendering: pixelated; border: 1px solid var(--border-hi); border-radius: 3px; }
+.recent-row .r-body { min-width: 0; display: grid; }
+.recent-row .r-head, .recent-row .r-msg { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-row .r-msg { font-size: 11px; }
+
+/* the in-game chatroom, read from the web */
+.room-log { height: 190px; overflow-y: auto; padding: 8px 10px; background: var(--lcd-bg); color: var(--lcd-on); border: 1px solid var(--border-hi); border-radius: 3px; box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5); font: 16px/22px var(--px); -webkit-font-smoothing: none; overflow-wrap: anywhere; }
+.room-log .dim { color: var(--lcd-on); opacity: 0.55; }
+.room-log p { margin: 0; }
+.room-line b { font-weight: normal; text-shadow: 0 0 6px var(--lcd-glow); }
+.room-line { animation: fade-in 0.3s; }
+.room-foot { margin: 8px 0 0; }
+
+/* the theme button twinkles until someone has tried it */
+.theme-btn { position: relative; }
+.sparkles { position: absolute; inset: 0; pointer-events: none; display: none; }
+.theme-btn.hint .sparkles { display: block; }
+.sparkles i {
+	position: absolute; width: 11px; height: 11px; background: var(--text); opacity: 0;
+	clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+	animation: twinkle 2.6s ease-in-out infinite;
+}
+.sparkles i:nth-child(1) { left: 0; top: -1px; }
+.sparkles i:nth-child(2) { right: 0; top: 2px; width: 9px; height: 9px; animation-delay: 0.9s; }
+.sparkles i:nth-child(3) { left: 46%; bottom: -1px; width: 7px; height: 7px; animation-delay: 1.7s; }
+.theme-btn.hint { animation: hot-glow 2.6s ease-in-out infinite; }
+@keyframes twinkle { 0%, 70%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); } 30% { opacity: 1; transform: scale(1) rotate(45deg); } 45% { opacity: 0.85; transform: scale(0.7) rotate(70deg); } }
 
 /* ---------------------------------------------------------------- taskbar, start menu, balloons */
 .taskbar {
@@ -1178,7 +1256,7 @@ details.group[open]::details-content { height: auto; }
 	border: 0; border-radius: 0 16px 16px 0;
 	background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0 45%, transparent 45%), linear-gradient(180deg, var(--accent), var(--dim));
 	color: var(--on-accent);
-	font: italic 24px/1 "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: italic 24px/1 var(--px); -webkit-font-smoothing: none;
 	box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.3), 2px 0 6px rgba(0, 0, 0, 0.3);
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
 	transition: filter 0.15s;
@@ -1196,7 +1274,7 @@ details.group[open]::details-content { height: auto; }
 	border: 1px solid var(--border-hi); border-radius: 3px;
 	background: linear-gradient(180deg, var(--gloss) 0 45%, transparent 45%), var(--panel2);
 	color: var(--text);
-	font: 16px/24px "TrollTerminal", monospace;
+	font: 16px/24px var(--px);
 	box-shadow: inset 0 1px 0 var(--edge);
 }
 .task span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1237,7 +1315,7 @@ details.group[open]::details-content { height: auto; }
 	display: flex; align-items: center; gap: 8px; width: 100%;
 	padding: 3px 8px; border: 0; border-radius: 3px;
 	background: none; color: var(--text); text-decoration: none; text-align: left;
-	font: 16px/22px "TrollTerminal", monospace; -webkit-font-smoothing: none;
+	font: 16px/22px var(--px); -webkit-font-smoothing: none;
 	white-space: nowrap;
 }
 .sm-cols a small { display: block; font: 11px/1.2 Verdana, sans-serif; color: var(--dim); }
@@ -1263,7 +1341,7 @@ details.group[open]::details-content { height: auto; }
 .balloon b { display: flex; align-items: center; gap: 6px; font-weight: normal; margin-bottom: 2px; }
 .balloon b img { width: 16px; height: 16px; filter: var(--icon); }
 .balloon p { margin: 0; font: 11px/1.45 Verdana, Tahoma, sans-serif; color: var(--dim); }
-.balloon .x { position: absolute; right: 6px; top: 6px; width: 16px; height: 16px; border: 1px solid var(--border-hi); border-radius: 3px; background: var(--panel); padding: 0; font: 8px/1 "TrollTerminal", monospace; color: var(--dim); }
+.balloon .x { position: absolute; right: 6px; top: 6px; width: 16px; height: 16px; border: 1px solid var(--border-hi); border-radius: 3px; background: var(--panel); padding: 0; font: 8px/1 var(--px); color: var(--dim); }
 .balloon .x:hover { background: var(--accent); color: var(--on-accent); }
 .balloon.out { animation: balloon-out 0.25s ease-in forwards; }
 @keyframes balloon-in { from { opacity: 0; transform: translateY(16px) scale(0.9); } }
@@ -1311,7 +1389,7 @@ html.theme-swap .chrome, html.theme-swap .content, html.theme-swap .sidebar, htm
 .trail::after { left: 0; top: 3px; width: 7px; height: 1px; }
 @keyframes trail { 0% { transform: scale(1) rotate(0); } 100% { transform: translate(var(--dx), 26px) scale(0.2) rotate(90deg); opacity: 0; } }
 
-.boot { position: fixed; inset: 0; z-index: 220; background: #000; color: #e0e0e0; padding: 24px; white-space: pre-wrap; font: 16px/24px "TrollTerminal", monospace; -webkit-font-smoothing: none; transition: opacity 0.3s; }
+.boot { position: fixed; inset: 0; z-index: 220; background: #000; color: #e0e0e0; padding: 24px; white-space: pre-wrap; font: 16px/24px var(--px); -webkit-font-smoothing: none; transition: opacity 0.3s; }
 .boot.done { opacity: 0; pointer-events: none; }
 .boot .bar { display: inline-block; width: 160px; height: 14px; border: 2px solid #ccc; padding: 2px; vertical-align: -2px; }
 .boot .bar i { display: block; height: 100%; width: 0; background: #e0e0e0; }
@@ -1329,7 +1407,7 @@ html.theme-swap .chrome, html.theme-swap .content, html.theme-swap .sidebar, htm
 @keyframes crt-shut { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes crt-dot { 0% { opacity: 0; } 40% { opacity: 1; transform: scaleX(1); } 75% { transform: scaleX(0.004) scaleY(3); opacity: 1; } 100% { transform: scaleX(0.004) scaleY(3); opacity: 0; } }
 @keyframes crt-line-on { 0% { transform: scaleX(0.004) scaleY(3); opacity: 1; } 35% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
-.safe-off { position: fixed; inset: 0; z-index: 225; background: #000; color: #d8d8d8; display: grid; place-items: center; text-align: center; font: 24px/34px "TrollTerminal", monospace; -webkit-font-smoothing: none; padding: 20px; }
+.safe-off { position: fixed; inset: 0; z-index: 225; background: #000; color: #d8d8d8; display: grid; place-items: center; text-align: center; font: 24px/34px var(--px); -webkit-font-smoothing: none; padding: 20px; }
 .safe-off small { display: block; font-size: 16px; color: #777; margin-top: 18px; animation: hint 2s ease-in-out infinite; }
 
 body.twerk .browser { animation: twerk 0.35s ease-in-out infinite alternate; transform-origin: 50% 100%; }
@@ -1391,7 +1469,11 @@ body.skinblinked .content > * { animation: page-blink 0.8s steps(1) 4; animation
 	.stills { grid-template-columns: repeat(3, 1fr); }
 	.skins { grid-template-columns: repeat(3, 1fr); }
 	.dl-panel { grid-template-columns: 1fr; text-align: center; }
-	.guestbook-form { grid-template-columns: 1fr; }
+	.post-form { grid-template-columns: 1fr; }
+	.post { grid-template-columns: 1fr; }
+	.post .p-who { flex-direction: row; border-right: 0; border-bottom: 1px dotted var(--border-hi); padding: 0 0 6px; text-align: left; }
+	.post .p-who canvas { width: 28px; height: 28px; }
+	.forum-table .f-last, .forum-table th:last-child { display: none; }
 	table.data { table-layout: fixed; overflow-wrap: anywhere; }
 	table.data td.name { white-space: normal; width: 34%; }
 	table.data th, table.data td { padding: 5px 6px; }
@@ -1412,7 +1494,7 @@ h2 .live-dot { display: inline-block; vertical-align: middle; margin-left: 6px; 
 button.chip { cursor: pointer; }
 .an-kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 16px 0 4px; }
 .an-kpi { padding: 8px 10px; min-width: 0; }
-.an-kpi-n { font: 32px/38px "TrollTerminal", monospace; -webkit-font-smoothing: none; color: var(--text); overflow-wrap: anywhere; }
+.an-kpi-n { font: 32px/38px var(--px); -webkit-font-smoothing: none; color: var(--text); overflow-wrap: anywhere; }
 .an-kpi-n.long { font-size: 24px; }
 .an-alltime { grid-column: 1 / -1; margin: 0; }
 .an-single { padding: 20px 0; text-align: center; }
@@ -1433,14 +1515,14 @@ button.chip { cursor: pointer; }
 .an-bars li { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; padding: 2px 0 5px; font-size: 11px; line-height: 15px; border-radius: 2px; }
 .an-bars li:hover, .an-bars li:focus-visible { background: var(--panel2); outline: none; }
 .an-bar-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.an-bar-num { font: 16px/15px "TrollTerminal", monospace; -webkit-font-smoothing: none; color: var(--text); }
+.an-bar-num { font: 16px/15px var(--px); -webkit-font-smoothing: none; color: var(--text); }
 .an-bar { grid-column: 1 / -1; display: block; height: 6px; margin-top: 2px; background: var(--panel2); border-radius: 0 3px 3px 0; overflow: hidden; }
 .an-bar i { display: block; height: 100%; background: var(--text); border-radius: 0 3px 3px 0; transform-origin: left; animation: an-grow 0.6s cubic-bezier(.3, 1.1, .5, 1) both; }
 @keyframes an-grow { from { transform: scaleX(0); } }
 .an-cols-chart { display: flex; align-items: stretch; gap: 3px; height: 140px; padding-top: 16px; }
 .an-col { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; text-align: center; border-radius: 2px; }
 .an-col:hover, .an-col:focus-visible { background: var(--panel2); outline: none; }
-.an-col-n { font: 16px/16px "TrollTerminal", monospace; -webkit-font-smoothing: none; color: var(--text); }
+.an-col-n { font: 16px/16px var(--px); -webkit-font-smoothing: none; color: var(--text); }
 .an-col-bar { display: block; margin: 2px 2px 0; background: var(--text); border-radius: 3px 3px 0 0; transform-origin: bottom; animation: grow 0.6s cubic-bezier(.3, 1.2, .5, 1) both; }
 .an-col-k { display: block; padding-top: 3px; border-top: 1px solid var(--border-hi); font-size: 10px; line-height: 11px; min-height: 22px; color: var(--dim); overflow-wrap: anywhere; }
 .an-heat { display: grid; grid-template-columns: 34px repeat(24, minmax(0, 1fr)); gap: 2px; font-size: 10px; color: var(--dim); }
@@ -1455,7 +1537,7 @@ table.data.an-table th { padding: 0; white-space: nowrap; }
 .an-table th button { all: unset; display: block; padding: 7px 10px; cursor: pointer; }
 .an-table th button:focus-visible { outline: 1px dashed var(--on-accent); outline-offset: -3px; }
 .an-table th.num button { text-align: right; }
-.an-table td.num { text-align: right; white-space: nowrap; font: 16px/22px "TrollTerminal", monospace; -webkit-font-smoothing: none; }
+.an-table td.num { text-align: right; white-space: nowrap; font: 16px/22px var(--px); -webkit-font-smoothing: none; }
 .an-table td.name a { color: inherit; }
 .an-inline { display: inline-block; width: 46px; height: 6px; margin-right: 8px; vertical-align: 2px; background: var(--panel2); border-radius: 0 3px 3px 0; overflow: hidden; }
 .an-inline i { display: block; height: 100%; background: var(--text); }
@@ -1484,5 +1566,163 @@ table.data.an-table th { padding: 0; white-space: nowrap; }
 	*, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; scroll-behavior: auto !important; }
 	html.js [data-reveal] { opacity: 1; transform: none; }
 	.ticker-track { animation: none; }
+	.sparkles i { opacity: 0.85; animation: none; }
 	@view-transition { navigation: none; }
 }
+
+/* ---------------------------------------------------------------- Frutiger Aero
+   The client's Frutiger Aero preset (same palette as Theme.java), and the only one here in colour.
+   Circa 2007: blue sky, green grass, glass you can see the wallpaper through, and gloss on anything
+   that holds still. Mostly it's the variables; the rules under them are where plain variables
+   can't reach (glass, the green button, a real font). */
+body.theme-aero {
+	--bg: #f6fcff; --panel: #e2f3fd; --panel2: #d0ebfa; --border: #9ccfec; --border-hi: #3e9fd8;
+	--text: #0a3150; --dim: #5785a3; --accent: #0c9bdc; --on-accent: #ffffff;
+	--icon-accent: none; --icon: brightness(0) invert(17%) sepia(71%) saturate(1800%) hue-rotate(186deg) brightness(96%);
+	--shadow: rgba(12, 80, 140, 0.2);
+	--chrome-hi: #f6fcff; --chrome-lo: #bfe1fa; --gloss: rgba(255, 255, 255, 0.8); --edge: rgba(255, 255, 255, 0.95);
+	--desk: #5dbdf0; --desk-ink: #8fd0fa;
+	--lcd-bg: #06304f; --lcd-on: #d6f6ff; --lcd-off: rgba(255, 255, 255, 0.06); --lcd-glow: rgba(110, 215, 255, 0.85);
+	--tile: none;
+	--px: "Segoe UI", "Frutiger", "Frutiger Linotype", "Myriad Pro", "Lucida Grande", "Helvetica Neue", Arial, sans-serif;
+	--grass-hi: #c8f68d; --grass: #7fd13b; --grass-lo: #4dab12; --grass-edge: #2f7d0c;
+	font-family: var(--px);
+}
+body.theme-aero, body.theme-aero * { -webkit-font-smoothing: antialiased; font-smooth: auto; }
+body.theme-aero h2 { font-weight: 300; letter-spacing: 0; color: #0d62ab; text-shadow: 0 1px 0 #fff; }
+body.theme-aero h2::after { height: 3px; border-radius: 3px; opacity: 0.9; background: linear-gradient(90deg, var(--accent), var(--grass) 55%, transparent); }
+body.theme-aero h3 { font-weight: 600; }
+body.theme-aero a { text-decoration-style: solid; color: #0b65b5; }
+body.theme-aero a:hover { color: var(--on-accent); }
+body.theme-aero .site-foot p { color: #fff; text-shadow: 0 1px 3px rgba(0, 50, 100, 0.7); }
+body.theme-aero .site-foot a { color: #fff; }
+body.theme-aero .desk-icon .lbl { color: #fff; background: none; text-shadow: 0 1px 3px rgba(0, 40, 90, 0.9); }
+body.theme-aero .desk-icon .ico img, body.theme-aero .desk-icon .ico { filter: none; color: #fff; }
+body.theme-aero .desk-icon .ico { filter: drop-shadow(0 2px 3px rgba(0, 40, 90, 0.6)); }
+
+/* a few glossy bubbles drifting over the wallpaper */
+body.theme-aero .desktop::after {
+	content: ""; position: absolute; inset: 0; pointer-events: none;
+	background:
+		radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0.08) 58%, rgba(255, 255, 255, 0.5) 66%, transparent 68%) 6% 72% / 120px 120px no-repeat,
+		radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0.08) 58%, rgba(255, 255, 255, 0.5) 66%, transparent 68%) 93% 18% / 84px 84px no-repeat,
+		radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0.08) 58%, rgba(255, 255, 255, 0.5) 66%, transparent 68%) 86% 84% / 52px 52px no-repeat,
+		radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0 5%, rgba(255, 255, 255, 0.12) 22%, rgba(255, 255, 255, 0.08) 58%, rgba(255, 255, 255, 0.5) 66%, transparent 68%) 3% 22% / 44px 44px no-repeat;
+	animation: aero-float 9s ease-in-out infinite alternate;
+}
+@keyframes aero-float { to { transform: translateY(-26px); } }
+
+/* the window: a glass frame with the page set into it */
+body.theme-aero .browser {
+	background: none; border-color: rgba(255, 255, 255, 0.8); border-radius: 12px 12px 9px 9px; padding: 0 7px 7px;
+	box-shadow: 0 0 0 1px rgba(8, 60, 115, 0.5), 0 30px 70px -14px rgba(0, 45, 100, 0.6);
+}
+/* the blur lives on a layer behind, so it can't become the containing block for anything fixed inside */
+body.theme-aero .browser::before {
+	content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(170, 220, 255, 0.28) 120px, rgba(140, 205, 250, 0.3));
+	-webkit-backdrop-filter: blur(14px) saturate(1.5); backdrop-filter: blur(14px) saturate(1.5);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+body.theme-aero .chrome { border-radius: 11px 11px 0 0; }
+body.theme-aero .titlebar { height: 34px; margin: 0 -7px; padding: 0 12px 0 16px; border-radius: 11px 11px 0 0; background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.08) 50%, rgba(60, 150, 230, 0.12) 51%, rgba(255, 255, 255, 0.18)); }
+body.theme-aero .titlebar::before { display: none; }
+body.theme-aero .titlebar .title { font-size: 14px; text-shadow: 0 0 9px #fff, 0 0 4px #fff, 0 0 2px #fff; }
+body.theme-aero .titlebar .t-app { color: #1d4d74; }
+body.theme-aero .titlebar .app-icon { filter: brightness(0) invert(20%) sepia(60%) saturate(1500%) hue-rotate(186deg); }
+body.theme-aero .winbtn { width: 30px; height: 20px; border-radius: 4px; border-color: rgba(10, 60, 110, 0.6); color: #123f66; background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0 46%, rgba(170, 214, 248, 0.75) 50%, rgba(226, 244, 255, 0.9)); }
+body.theme-aero .winbtn.close { width: 42px; color: #fff; border-color: #6f1d14; background: linear-gradient(180deg, #f8c4b8 0, #e67360 46%, #c9321d 50%, #ee8a5c); }
+body.theme-aero .winbtn.close:hover { box-shadow: 0 0 12px #ff7a5c; }
+body.theme-aero .tabs { background: linear-gradient(180deg, rgba(214, 238, 255, 0.85), var(--panel)); border-radius: 4px 4px 0 0; }
+body.theme-aero .tab { font-size: 13px; border-radius: 7px 7px 0 0; }
+body.theme-aero .tab.here { background: linear-gradient(180deg, #fff, var(--panel)); }
+body.theme-aero .tab.here::before { background: linear-gradient(90deg, var(--accent), var(--grass)); height: 3px; }
+body.theme-aero .bookmarks, body.theme-aero .statusbar, body.theme-aero .address, body.theme-aero .searchbox input { font-size: 13px; }
+body.theme-aero .address, body.theme-aero .searchbox { background: #fff; }
+body.theme-aero .statusbar { border-radius: 0 0 4px 4px; }
+body.theme-aero .navbtn {
+	color: #fff; border-color: #17609f;
+	background: radial-gradient(ellipse 70% 46% at 50% 14%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 100%), radial-gradient(circle at 50% 110%, #7ee3ff, transparent 58%), linear-gradient(180deg, #58b6f6, #1378d0 52%, #0a5cb0);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0, 50, 100, 0.45);
+}
+body.theme-aero .navbtn:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 12px var(--lcd-glow); color: #fff; }
+body.theme-aero .throbber { filter: none; }
+
+/* the page */
+body.theme-aero .page { background: var(--bg); border: 1px solid rgba(10, 70, 125, 0.45); border-top: 0; }
+body.theme-aero .content {
+	box-shadow: none;
+	background:
+		radial-gradient(circle at 8% 0, rgba(120, 208, 255, 0.4), transparent 34%),
+		radial-gradient(circle at 96% 22%, rgba(168, 236, 120, 0.28), transparent 36%),
+		linear-gradient(180deg, #ffffff, #eef9ff 55%, #e2f3fd);
+}
+body.theme-aero .sidebar { box-shadow: none; background: linear-gradient(180deg, #dff1fc, #c9e6f8); }
+body.theme-aero .bevel, body.theme-aero .group, body.theme-aero .widget { border-radius: 9px; box-shadow: inset 0 1px 0 #fff, 0 4px 12px rgba(12, 80, 140, 0.16); }
+body.theme-aero .group { background: linear-gradient(180deg, #ffffff, var(--panel)); }
+body.theme-aero .group > .legend { background: linear-gradient(180deg, #fff, #dff1fd); border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 1px 3px rgba(12, 80, 140, 0.2); }
+body.theme-aero .widget { background: #fff; }
+body.theme-aero .w-head { font-size: 13px; font-weight: 600; text-shadow: 0 1px 0 #fff; background: linear-gradient(180deg, #ffffff 0 48%, #cfe8fb 50%, #e4f4ff); }
+body.theme-aero .card.tilting { box-shadow: inset 0 1px 0 #fff, 0 12px 26px rgba(12, 80, 140, 0.28); }
+body.theme-aero .post.target { box-shadow: inset 0 1px 0 #fff, 0 4px 12px rgba(12, 80, 140, 0.16), 0 0 0 2px var(--accent); }
+body.theme-aero .tip, body.theme-aero .balloon { box-shadow: 0 6px 18px rgba(12, 80, 140, 0.3); background: linear-gradient(180deg, #fff, #e2f3ff); }
+body.theme-aero .tip::before, body.theme-aero .balloon::after { background: #e2f3ff; }
+body.theme-aero .tip.up::before { background: #e2f3ff; }
+body.theme-aero kbd, body.theme-aero code { font-family: Consolas, "Lucida Console", Menlo, monospace; font-size: 12px; background: #fff; }
+body.theme-aero .statlist dd, body.theme-aero .forum-table .f-num, body.theme-aero .forum-table .f-title, body.theme-aero .crumbs, body.theme-aero .pager { font-size: 13px; }
+body.theme-aero .forum-table .f-title { font-weight: 600; }
+body.theme-aero table.data th { font-size: 13px; font-weight: 600; text-shadow: 0 -1px 0 rgba(0, 50, 110, 0.5); background: linear-gradient(180deg, #6cc0fb 0 48%, #1f8fe4 50%, #3ea6f0); }
+body.theme-aero table.data td.name { font-size: 13px; font-weight: 600; }
+body.theme-aero .led, body.theme-aero .live-dot { background: #6fe03a; box-shadow: 0 0 6px #7dff45; }
+body.theme-aero .spark i { background: linear-gradient(180deg, var(--grass), var(--grass-lo)); opacity: 1; }
+body.theme-aero .poll-bar .bar i { background: repeating-linear-gradient(-45deg, var(--grass) 0 4px, var(--grass-lo) 4px 8px); }
+body.theme-aero .statusbar .meter i { background: linear-gradient(180deg, var(--grass-hi), var(--grass-lo)); opacity: 1; }
+body.theme-aero .burst::before, body.theme-aero .mini-burst { background: linear-gradient(180deg, #ffe45c, #ff9d1c); }
+body.theme-aero .burst, body.theme-aero .mini-burst { color: #5a2a00; }
+body.theme-aero .flag { background: linear-gradient(180deg, var(--grass), var(--grass-lo)); }
+
+/* buttons: white-to-sky gloss, and the big ones are grass green */
+body.theme-aero .button {
+	font-size: 14px; font-weight: 600; color: #0a3150; border-color: #5fa2d2; border-radius: 6px; text-shadow: 0 1px 0 #fff;
+	background: linear-gradient(180deg, #ffffff 0, #e4f3ff 48%, #c2e1fa 50%, #e3f5ff);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85), 0 1px 4px rgba(12, 80, 140, 0.3);
+}
+body.theme-aero .button:hover { color: #0a3150; filter: brightness(1.05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 12px var(--lcd-glow); }
+body.theme-aero .button:active, body.theme-aero .button.pressed { box-shadow: inset 0 2px 5px rgba(12, 80, 140, 0.4); }
+body.theme-aero .button.primary {
+	color: #fff; border-color: var(--grass-edge); text-shadow: 0 -1px 0 rgba(20, 80, 0, 0.65);
+	background: linear-gradient(180deg, var(--grass-hi) 0, var(--grass) 46%, var(--grass-lo) 50%, #8fde4a);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 2px 7px rgba(40, 120, 0, 0.45);
+}
+body.theme-aero .button.primary:hover { color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 0 16px #9cf05a; }
+body.theme-aero .button.huge { font-size: 26px; font-weight: 600; border-radius: 12px; }
+body.theme-aero .button.small { font-size: 12px; }
+body.theme-aero .pulse-ring::before { border-color: var(--grass); border-radius: 16px; }
+
+/* the taskbar: dark glass, a green start button */
+body.theme-aero .taskbar {
+	height: 38px; color: #fff; border-top-color: rgba(255, 255, 255, 0.5); font-size: 13px;
+	background: linear-gradient(180deg, rgba(150, 205, 245, 0.55) 0 1px, rgba(34, 92, 140, 0.72) 1px 50%, rgba(8, 40, 74, 0.85) 50%);
+	-webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
+}
+body.theme-aero .start {
+	height: 38px; font: italic 600 17px/1 var(--px); color: #fff; text-shadow: 0 1px 2px rgba(10, 60, 0, 0.8);
+	background: radial-gradient(ellipse 90% 60% at 40% 0, rgba(255, 255, 255, 0.75), transparent 70%), linear-gradient(180deg, #8ee04b, #3f9c13 55%, #2b7c08);
+}
+body.theme-aero .start img, body.theme-aero .quick img, body.theme-aero .task img { filter: none; }
+body.theme-aero .task, body.theme-aero .tray { color: #fff; font-size: 13px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0 48%, rgba(255, 255, 255, 0.08) 50%); border-color: rgba(255, 255, 255, 0.4); box-shadow: none; }
+body.theme-aero .task.on { background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0 48%, rgba(120, 200, 255, 0.25) 50%); box-shadow: 0 0 8px rgba(120, 210, 255, 0.6); }
+body.theme-aero .quick { border-color: rgba(255, 255, 255, 0.25); }
+body.theme-aero .quick a:hover { background: rgba(255, 255, 255, 0.25); }
+body.theme-aero .tray-btn { color: rgba(255, 255, 255, 0.6); }
+body.theme-aero .tray-btn.on { color: #fff; }
+body.theme-aero .startmenu { bottom: 38px; font-size: 13px; border-radius: 10px 10px 0 0; box-shadow: 0 -8px 30px rgba(0, 45, 100, 0.5); }
+body.theme-aero .sm-cols a, body.theme-aero .sm-cols button, body.theme-aero .sm-foot button { font-size: 13px; border-radius: 5px; }
+body.theme-aero .sm-cols a:hover, body.theme-aero .sm-cols button:hover, body.theme-aero .sm-foot button:hover { background: linear-gradient(180deg, #6cc0fb, #1f8fe4); }
+body.theme-aero .sm-head b { font-size: 18px; font-weight: 300; }
+body.theme-aero .to-top { border-radius: 10px; }
+
+/* no scanlines on glass: the CRT switch turns into a soft glare from the top of the screen */
+body.theme-aero.crt::before { background: none; animation: none; }
+body.theme-aero.crt::after { background: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(255, 255, 255, 0.22), transparent 70%); }
+body.theme-aero .sparkles i { background: #fff; filter: drop-shadow(0 0 3px #7fd8ff) drop-shadow(0 0 1px #0b65b5); }

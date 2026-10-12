@@ -2,8 +2,9 @@
 
 A mid-2000s homepage for the client, kept in good repair, running as a Cloudflare Worker. The static
 files in `public/` are served straight from Workers static assets; a small Worker (`src/worker.js`)
-handles the parts that have to be real: the hit counter, who's online, download counts, the guestbook,
-the poll, and skins for the skin animation lab.
+handles the parts that have to be real: the hit counter, who's online, download counts, the forum,
+the poll, skins for the skin animation lab, and three things the client itself talks to: usage stats,
+the updater and the chatroom.
 
 ```bash
 cd website
@@ -12,10 +13,10 @@ npm run dev        # http://localhost:8642, with a local Durable Object
 npm run deploy     # wrangler deploy (log in first with npx wrangler login)
 ```
 
-Optional secrets: `npx wrangler secret put ADMIN_TOKEN` lets you hide guestbook entries
-(`curl -X DELETE -H "authorization: Bearer $TOKEN" https://<site>/api/guestbook/<id>`), and
-`npx wrangler secret put SALT` salts the daily visitor hashes. Durable Objects with SQLite storage
-work on the Workers free plan.
+There are no secrets to set. The salt behind visitor hashes and forum tripcodes is made up by the Worker the first
+time it runs and kept in its Durable Object storage. Moderators aren't a password either: they are Minecraft accounts
+listed in `MODERATORS` in `wrangler.jsonc` (see "Moderating" below). Durable Objects with SQLite storage work on the
+Workers free plan.
 
 ## Pages
 
@@ -26,8 +27,9 @@ work on the Workers free plan.
 | `modules.html` | every module and its settings, generated from the Java source, with live filtering (`?q=` works) |
 | `gallery.html` | stills from the showcase recording, with a lightbox that zooms out of the thumbnail |
 | `download.html` | the jar, its size and SHA-256, the live download count, install steps, controls, commands, FAQ |
-| `guestbook.html` | a real guestbook: entries are stored by the Worker and new ones show up live |
-| `analytics.html` | anonymous usage from the client itself: active installs over time, every module's users and time on, setups (OS, GPU, Java, versions, mods...), when people play, servers, commands, settings, errors, plus what's collected and how to turn it off |
+| `forum.html` | the forum the guestbook grew into: boards, threads, replies, search, and the in-game chatroom read live. One page, drawn by `js/forum.js`; `/guestbook` redirects here (`public/_redirects`) |
+| `analytics.html` | anonymous usage from the client itself: active installs over time, every module's users and time on, setups (OS, GPU, Java, versions, mods...), when people play, servers, commands, settings, errors, plus what's collected |
+| `privacy.html` | what the site and the client collect, in plain words. It describes the code, so change it when the code changes |
 | `404.html` | served for anything that doesn't exist |
 
 The window chrome (title bar, tabs, toolbar, ticker, sidebar, status bar, taskbar, start menu) lives in
@@ -41,8 +43,23 @@ The window chrome (title bar, tabs, toolbar, ticker, sidebar, status bar, taskba
   (`/api/live`), so they roll when someone else arrives.
 - **Online now**: the number of open WebSockets. They use the hibernation API, so idle tabs cost nothing.
 - **Downloads**: the Worker counts every `GET` of `/downloads/*.jar` that succeeds.
-- **Guestbook**: `GET/POST /api/guestbook`, 500 characters, one entry per 45 seconds per visitor, a honeypot
-  field for bots.
+- **Forum** (`src/forum.js`): five fixed boards, threads and posts in TrollHQ's SQLite. No accounts: a post has a name, and
+  `name#secret` becomes a tripcode (a salted hash of the secret; the secret isn't kept). Posting returns a random key
+  that the browser keeps, which lets that browser edit the post for 30 minutes and remove it whenever (`x-post-key`).
+  `GET /api/forum` (boards + latest posts), `/api/forum/board/<id>?page=`, `/api/forum/thread/<id>?page=N|last`,
+  `/api/forum/find/<post>` (for `>>123` links), `/api/forum/search?q=`; `POST /api/forum/thread` and
+  `/api/forum/thread/<id>/reply`; `PATCH`/`DELETE /api/forum/post/<id>`. One thread per two minutes and one reply per
+  20 seconds per visitor, 4000 characters, a honeypot field for bots. The old guestbook's entries were copied into a
+  pinned thread on the Guestbook board the first time the forum ran; the `guestbook` table itself is left alone.
+- **Chatroom** (`src/chat.js`, the `TrollChat` object): `/api/chat` is a WebSocket every running client holds open
+  (`?role=game`); `.chat <message>` in game talks into it and the forum page listens (`?role=web`, read only).
+  Listening needs nothing. Talking needs the player's Minecraft name, proven like a server login: the client "joins"
+  a one-off id (a hash of the room's challenge and its own nonce) with Mojang's session server, and the Worker asks
+  `hasJoined`. No token comes here. Accounts Mojang doesn't vouch for can still talk, marked unverified. 200
+  characters, one message per 1.5 s and eight a minute, the last 500 kept. `GET /api/chat/history` is the scrollback.
+- **Updates**: `GET /api/update?version=1.0.0&minecraft=26.2` answers from `src/releases.json` with the newest release
+  built for that Minecraft version, or `update: false`. The jar itself comes from `GET /api/update/<file>.jar`, which
+  serves the same file as `/downloads/` but bumps an `updates` counter instead of the download count.
 - **Poll**: `GET/POST /api/poll`, one vote per visitor per day.
 - **Tallies**: modules toggled in the menu demo and layer changes played in the skin lab, batched by the
   page into `POST /api/bump` every few seconds.
@@ -51,22 +68,66 @@ The window chrome (title bar, tabs, toolbar, ticker, sidebar, status bar, taskba
   Each report carries running totals for the session; a second Durable Object, `TrollTelemetry` (`src/telemetry.js`),
   keeps the last totals per session and adds only the difference to per-day tables, so lost or repeated reports never
   double-count. `GET /api/analytics?days=1|7|30|90|all` is what the analytics page draws (public, aggregates only);
-  `GET /api/analytics/sessions` (with `authorization: Bearer $ADMIN_TOKEN`) returns the newest raw sessions, and the
+  `GET /api/analytics/sessions` (moderators only, see "Moderating") returns the newest raw sessions, and the
   page unlocks that view too. Clients are told apart by a random install id; location is the country, continent and
   region from Cloudflare, never the IP.
 
 The client finds the endpoint in `telemetry_url` in `gradle.properties` (baked into `fabric.mod.json` at build time;
-empty means a build that never reports). Dev runs (`./gradlew runClient`) report to `http://localhost:8642` instead, and
-`-Dtrollclient.telemetry.url=...` or `-Dtrollclient.telemetry=false` override both.
+empty means a build that never talks to the site at all: no reports, no updates, no chatroom). Dev runs
+(`./gradlew runClient`) use `http://localhost:8642` instead. `-Dtrollclient.telemetry.url=...` or
+`-Dtrollclient.telemetry=false` override the reports, `-Dtrollclient.site=...` moves the updater and the chatroom,
+and `-Dtrollclient.update=false` / `-Dtrollclient.chatroom=false` switch those off.
 
-Visitors are told apart by a SHA-256 of their IP and a salt that changes every day. No IP is stored.
+## Releasing an update
+
+The client's updater installs whatever `src/releases.json` describes, so that file has to match the jars in
+`public/downloads/`. `tools/gen_site.py` writes it:
+
+```bash
+# bump `version` in gradle.properties first
+./gradlew build
+python3 tools/gen_site.py --pages    # copies the jar, records its size, SHA-256 and Minecraft version
+npm --prefix website run deploy
+```
+
+Every client on that Minecraft version picks it up on its next launch. Older entries stay in the list for as long
+as their jar is still in `public/downloads/`, so after moving to a new Minecraft version, clients on the old one
+keep getting the last build made for them and are never offered the new one. The client checks again on its side
+before installing: checksum, size, the jar's own `fabric.mod.json` (mod id, version, and every `depends` entry
+against what's actually running).
+
+## Moderating
+
+Moderators are Minecraft accounts, listed in the `MODERATORS` var in `wrangler.jsonc`: UUIDs (best, they survive a
+name change) or names, comma separated. It's public configuration, not a secret, and empty means nobody moderates.
+The chatroom already proves which account a client belongs to (the Mojang check described above), and that proof is
+the only authority there is. Don't know your UUID? Type `.mod` in game and the answer includes it. Then:
+
+```
+.mod mute <player> [hours]     can't talk in the chatroom (a day at most; ~name for someone unverified)
+.mod unmute <player>
+.mod unsay <player>            take down what they said in the last hour
+.mod post <id>                 remove a forum post (the number after its #)
+.mod thread <id> lock|unlock|pin|unpin|hide|show
+.mod web                       a key for the website, good for 12 hours (click it in chat to copy)
+```
+
+Paste the key under "moderator?" at the bottom of the forum and every post gets a remove button and every thread
+gets lock, pin and hide; on the analytics page it unlocks the raw sessions. The same key works as
+`authorization: Bearer <key>` on `DELETE /api/forum/post/<id>`, `PATCH /api/forum/thread/<id>`,
+`DELETE /api/chat/<id>`, `POST /api/chat/<id>/mute` and `GET /api/analytics/sessions`. Keys stop working after 12
+hours or as soon as their account leaves `MODERATORS`, and every `.mod` action is logged with who did it.
+
+Visitors are told apart by a SHA-256 of their IP, the site's salt and the date, so it changes every day. No IP is stored.
 If the site is served without the Worker (any plain static host), everything still works except the live
 parts, which fall back to a counter that only counts you.
 
 ## The look
 
-Same seven palettes as the client (remembered per visitor, applied before first paint) and the client's 5x7
-terminal font. Things to find: a desktop with a 1-bit dithered wallpaper and icons you can drag, a window
+Seven of the client's black and white palettes plus its Frutiger Aero preset in colour (glass window, a Bliss-ish
+wallpaper, a green start button; it also swaps the pixel font for Segoe UI through the `--px` CSS variable). The
+pick is remembered per visitor and applied before first paint, and the theme button sparkles until it's been
+clicked once. Everything else is in the client's 5x7 terminal font. Things to find: a desktop with a 1-bit dithered wallpaper and icons you can drag, a window
 that springs back when you drag its title bar, minimize to the taskbar, a close button whose "Yes" runs away,
 a start menu with "turn off computer", tray balloons for live events, an LCD ticker, a mechanical odometer,
 tabs that decrypt when hovered, theme changes that wipe in from where you clicked, view transitions between
@@ -83,7 +144,7 @@ Most of `public/` comes from the repo:
 ./gradlew runShowcase               # records the showcase video's frames (about 2 minutes, in a real client)
 python3 tools/make_video.py         # frames + generated chiptune -> public/video/showcase.mp4, poster, stills
 python3 tools/make_video.py --encode   # just re-encode the existing frames
-python3 tools/gen_site.py           # page chrome, js/data.js, modules table, gallery, jar + checksum, skins, pixel art
+python3 tools/gen_site.py           # page chrome, js/data.js, modules table, gallery, jar + checksum, release list, skins, pixel art
 python3 tools/gen_site.py --pages   # the same without redrawing the pixel art
 python3 tools/gen_webfont.py        # fonts/troll-terminal.woff2 from the client's bitmap font
 ```

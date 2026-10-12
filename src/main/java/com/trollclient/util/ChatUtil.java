@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 public final class ChatUtil {
 	private static final int MAX_LENGTH = 256;
 	private static boolean sending;
+	private static boolean printing;
 	private static String lastLine;
 	/** Vanilla's own layout, which may have a rank inside the brackets: "<[VIP] Steve> hi". */
 	private static final Pattern VANILLA = Pattern.compile("^<([^<>]{1,48})> (.+)$");
@@ -65,14 +66,37 @@ public final class ChatUtil {
 			return;
 		}
 		String raw = StringUtil.stripColor(message.getString()).trim();
-		if (raw.startsWith("[troll]")) {
-			return; // our own command feedback
+		if (printing || raw.startsWith("[troll]")) {
+			return; // our own command feedback, or the chatroom
 		}
 		lastLine = raw;
 		String[] parsed = parse(raw);
 		if (parsed != null) {
 			dispatch(parsed[0], parsed[1]);
 		}
+	}
+
+	/**
+	 * Shows a line of our own in chat (the chatroom's, mostly) without anything mistaking it for
+	 * something a player on this server said: modules that answer chat and macros waiting on a
+	 * line never see it. Otherwise anyone in the chatroom could set those off from anywhere.
+	 */
+	public static void print(Component line) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) {
+			return;
+		}
+		printing = true;
+		try {
+			mc.player.sendSystemMessage(line);
+		} finally {
+			printing = false;
+		}
+	}
+
+	/** True while {@link #print} is putting a line of ours into chat. */
+	public static boolean isPrinting() {
+		return printing;
 	}
 
 	/** The last line the server sent that wasn't our own feedback, for testing formats. */

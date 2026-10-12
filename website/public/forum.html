@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Troll Client :: guestbook</title>
-<meta name="description" content="Troll Client: a black &amp; white Fabric client for Minecraft 26.2. 35 modules for being mildly annoying, and skin animation everyone on the server can see.">
+<title>Troll Client :: forum</title>
+<meta name="description" content="The Troll Client forum: boards, threads and replies, no account needed. Plus the in-game chatroom, live.">
 <meta name="theme-color" content="#090909">
 <link rel="icon" href="img/favicon.png">
-<link rel="stylesheet" href="css/style.css?v=7">
+<link rel="stylesheet" href="css/style.css?v=8">
 <script>document.documentElement.className = "js";</script>
 </head>
-<body class="theme-noir crt" data-page="guestbook">
-<script>try{var t=localStorage.getItem("troll-theme"),b=document.body;if(t&&/^[a-z]+$/.test(t)){b.className=b.className.replace(/theme-[a-z]+/,"theme-"+t);if(/^(paper|newsprint|ink|fog)$/.test(t))b.classList.add("light")}if(localStorage.getItem("troll-crt")==="0")b.classList.remove("crt")}catch(e){}</script>
+<body class="theme-noir crt" data-page="forum">
+<script>try{var t=localStorage.getItem("troll-theme"),b=document.body;if(t&&/^[a-z]+$/.test(t)){b.className=b.className.replace(/theme-[a-z]+/,"theme-"+t);if(/^(aero|paper|newsprint|ink|fog)$/.test(t))b.classList.add("light")}if(localStorage.getItem("troll-crt")==="0")b.classList.remove("crt")}catch(e){}</script>
 <!-- chrome:top:start -->
 <div class="desktop" aria-hidden="true">
 	<canvas id="wallpaper"></canvas>
@@ -21,14 +21,14 @@
 	<button class="desk-icon" data-open="/skin-animation" style="--x:0;--y:1"><span class="ico"><img src="img/icons/player.png" alt=""><b class="mini-burst">NEW</b></span><span class="lbl">skin_animation.exe</span></button>
 	<button class="desk-icon" data-act="twerk" style="--x:0;--y:2"><span class="ico"><img src="img/icons/troll.png" alt=""></span><span class="lbl">twerk.exe</span></button>
 	<button class="desk-icon" data-act="bin" style="--x:0;--y:3"><span class="ico"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill="currentColor" d="M5 1h6v1h4v2H1V2h4zM2 5h12v10H2zm2 2v6h1V7zm3 0v6h2V7zm4 0v6h1V7z"/></svg></span><span class="lbl">Recycle Bin</span></button>
-	<button class="desk-icon" data-open="/guestbook" style="--x:0;--y:4"><span class="ico"><img src="img/icons/chat.png" alt=""></span><span class="lbl">guestbook.txt</span></button>
+	<button class="desk-icon" data-open="/forum" style="--x:0;--y:4"><span class="ico"><img src="img/icons/chat.png" alt=""></span><span class="lbl">forum.url</span></button>
 </div>
 
 <div class="browser" id="browser">
 	<header class="chrome">
 		<div class="titlebar" id="titlebar">
 			<img class="app-icon" src="img/logo-small.png" alt="">
-			<span class="title"><span class="t-page">Troll Client - Guestbook</span><span class="t-app"> - Troll Navigator 2.0</span></span>
+			<span class="title"><span class="t-page">Troll Client - Forum</span><span class="t-app"> - Troll Navigator 2.0</span></span>
 			<span class="winbtns">
 				<button class="winbtn" data-win="min" aria-label="Minimize" title="Minimize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 7h8v2H1z"/></svg></button>
 				<button class="winbtn" data-win="max" aria-label="Maximize" title="Maximize"><svg viewBox="0 0 10 10" shape-rendering="crispEdges"><path fill="currentColor" d="M1 1h8v8H1zm1 2v5h6V3z"/></svg></button>
@@ -41,7 +41,7 @@
 			<a class="tab" data-tab="modules" href="/modules"><img src="img/icons/gear.png" alt=""><span class="lbl">modules</span></a>
 			<a class="tab" data-tab="gallery" href="/gallery"><img src="img/icons/radar.png" alt=""><span class="lbl">gallery</span></a>
 			<a class="tab" data-tab="download" href="/download"><img src="img/icons/cube.png" alt=""><span class="lbl">download</span></a>
-			<a class="tab here" aria-current="page" data-tab="guestbook" href="/guestbook"><img src="img/icons/chat.png" alt=""><span class="lbl">guestbook</span></a>
+			<a class="tab here" aria-current="page" data-tab="forum" href="/forum"><img src="img/icons/chat.png" alt=""><span class="lbl">forum</span></a>
 			<a class="tab" data-tab="analytics" href="/analytics"><img src="img/icons/eye.png" alt=""><span class="lbl">analytics</span></a>
 			<button class="tab-new" type="button" aria-label="Open a random page" data-tip="new tab: somewhere random">+</button>
 		</nav>
@@ -70,48 +70,30 @@
 			<a class="bm" href="/#demo">try the menu</a>
 			<a class="bm" href="/download">get v1.0</a>
 			<span class="grow"></span>
-			<button class="bm" type="button" id="theme-cycle" data-tip="cycle theme (right click goes back)"><img class="icon" src="img/icons/palette.png" alt=""> <span id="theme-name">Noir</span></button>
+			<button class="bm theme-btn" type="button" id="theme-cycle" data-tip="cycle theme (right click goes back)"><img class="icon" src="img/icons/palette.png" alt=""> <span id="theme-name">Noir</span><span class="sparkles" aria-hidden="true"><i></i><i></i><i></i></span></button>
 			<button class="bm" type="button" id="crt-toggle" data-tip="scanlines + vignette">CRT: ON</button>
 			<button class="bm" type="button" id="sound-toggle" data-tip="chiptune bleeps for buttons">sound: off</button>
 		</div>
 		<div class="ticker" aria-label="news ticker">
-			<div class="ticker-track"><span class="ticker-text">*** NEW: SKIN ANIMATION! YOUR SKIN, ANIMATED, AND EVERYONE ON THE SERVER SEES IT *** BLINK / WAVE / RANDOM / STROBE *** <b data-stat="visits">1,337</b> VISITORS SO FAR *** <b data-stat="online">1</b> ONLINE RIGHT NOW *** VERSION 1.0 IS OUT *** 35 MODULES *** 5 SHADERS *** 7 THEMES *** SIGN THE GUESTBOOK. IT'S REAL NOW *** </span></div>
+			<div class="ticker-track"><span class="ticker-text">*** NEW: SKIN ANIMATION! YOUR SKIN, ANIMATED, AND EVERYONE ON THE SERVER SEES IT *** BLINK / WAVE / RANDOM / STROBE *** <b data-stat="visits">1,337</b> VISITORS SO FAR *** <b data-stat="online">1</b> ONLINE RIGHT NOW *** VERSION 1.0 IS OUT *** 35 MODULES *** 5 SHADERS *** 7 THEMES *** THE GUESTBOOK IS A FORUM NOW. COME ARGUE *** NEW SITE THEME: FRUTIGER AERO *** </span></div>
 		</div>
 	</header>
 
 	<div class="page">
 		<main class="content" id="content">
 <!-- chrome:top:end -->
-			<h2>guestbook</h2>
-			<p class="dim">Thanks for stopping by! Leave a message. <img src="img/new.gif" width="34" height="13" alt="new!"> It's a real guestbook now: everyone who visits can read it, and new entries pop up live.</p>
-			<form id="guestbook-form" class="group guestbook-form" novalidate>
-				<span class="legend"><img class="icon" src="img/icons/chat.png" alt=""> sign it</span>
-				<div>
-					<label for="gb-name">your name</label>
-					<input id="gb-name" name="name" maxlength="32" placeholder="anonymous coward" autocomplete="nickname">
-				</div>
-				<div>
-					<label for="gb-site">your homepage <span class="dim">(optional)</span></label>
-					<input id="gb-site" name="site" maxlength="120" placeholder="http://www.geocities.com/..." inputmode="url">
-				</div>
-				<div class="full">
-					<label>pick a face</label>
-					<div class="avatars" id="gb-avatars" role="radiogroup" aria-label="avatar"></div>
-				</div>
-				<div class="full">
-					<label for="gb-msg">message <span class="lcd-count" id="gb-left" aria-live="off">500</span></label>
-					<textarea id="gb-msg" name="msg" maxlength="500" required placeholder="cool site!!"></textarea>
-				</div>
-				<div class="hp" aria-hidden="true"><label for="gb-hp">leave this empty</label><input id="gb-hp" name="homepage2" tabindex="-1" autocomplete="off"></div>
-				<div class="full form-foot">
-					<button class="button primary" type="submit">sign the guestbook</button>
-					<button class="button" type="reset">clear</button>
-					<span class="form-msg" id="gb-status" role="status"></span>
-				</div>
-			</form>
-			<h2>entries <span class="dim">(<span data-stat="guestbook">1</span>)</span></h2>
-			<div id="guestbook-entries" aria-live="polite"><p class="dim">opening the guestbook...</p></div>
-			<button class="button more-btn" id="gb-more" type="button" hidden>older entries &raquo;</button>
+			<h2>forum</h2>
+			<p class="dim" id="forum-intro">The guestbook grew up. <img src="img/new.gif" width="34" height="13" alt="new!"> Boards, threads, replies, and no accounts: pick a name and post. New posts show up live.</p>
+			<div class="forum-bar">
+				<nav class="crumbs" id="forum-crumbs" aria-label="you are here"><a href="/forum" data-forum>forum</a></nav>
+				<form class="forum-search" id="forum-search" role="search">
+					<img class="icon" src="img/icons/search.png" alt="">
+					<input name="q" type="search" maxlength="60" placeholder="search the forum" aria-label="Search the forum" autocomplete="off">
+				</form>
+			</div>
+			<div id="forum" aria-live="polite"><p class="dim">dialling the forum...</p></div>
+			<p class="forum-mod dim small"><button type="button" id="forum-mod" data-tip="moderators get a key by typing .mod web in game">moderator?</button></p>
+			<noscript><p class="dim">The forum needs JavaScript. Sorry about that.</p></noscript>
 <!-- chrome:bottom:start -->
 		</main>
 
@@ -127,7 +109,7 @@
 						<dt>visits today</dt><dd data-stat="today">0</dd>
 						<dt>page views</dt><dd data-stat="views">0</dd>
 						<dt>downloads</dt><dd data-stat="downloads">0</dd>
-						<dt>guestbook</dt><dd data-stat="guestbook">1</dd>
+						<dt>forum posts</dt><dd data-stat="posts">0</dd>
 					</dl>
 					<div class="spark" id="spark" aria-label="visits over the last two weeks" data-tip="visits, last 14 days"></div>
 					<dl class="statlist tally">
@@ -157,10 +139,11 @@
 			</section>
 
 			<section class="widget" data-reveal>
-				<h4 class="w-head"><img class="icon" src="img/icons/chat.png" alt="">guestbook</h4>
+				<h4 class="w-head"><img class="icon" src="img/icons/chat.png" alt="">forum</h4>
 				<div class="w-body center">
-					<a href="/guestbook"><img src="img/mail.gif" width="32" height="24" alt=""></a>
-					<div><a href="/guestbook">sign my guestbook!</a></div>
+					<a href="/forum"><img src="img/mail.gif" width="32" height="24" alt=""></a>
+					<div><a href="/forum">come post on the forum!</a></div>
+					<div class="dim small"><span data-stat="threads">0</span> threads &middot; <span data-stat="posts">0</span> posts</div>
 					<div class="latest-entry dim small" id="latest-entry"></div>
 				</div>
 			</section>
@@ -203,7 +186,7 @@
 		<img src="img/badges/nofl.png" alt="no flash">
 	</div>
 	<p class="dim small">&copy; 2026 Troll Client &middot; not affiliated with Mojang or Microsoft &middot; Minecraft is a trademark of Mojang AB<br>
-	served by a Cloudflare Worker &middot; use it where this kind of thing is welcome</p>
+	served by a Cloudflare Worker &middot; use it where this kind of thing is welcome &middot; <a href="/privacy">privacy</a></p>
 </footer>
 
 <button class="to-top" id="to-top" type="button" aria-label="Back to top"><svg viewBox="0 0 12 16" shape-rendering="crispEdges"><path fill="currentColor" d="M5 0h2v1h1v2h1v6h1v1h1v3h-1v-1H9v1H3v-1H2v1H1v-3h1V9h1V3h1V1h1zm0 4v2h2V4z"/><path class="flame" fill="currentColor" d="M4 14h1v1h2v-1h1v1H7v1H5v-1H4z"/></svg></button>
@@ -233,7 +216,7 @@
 			<li><a href="/modules"><img src="img/icons/gear.png" alt="">modules</a></li>
 			<li><a href="/gallery"><img src="img/icons/radar.png" alt="">gallery</a></li>
 			<li><a href="/download"><img src="img/icons/cube.png" alt="">download</a></li>
-			<li><a href="/guestbook"><img src="img/icons/chat.png" alt="">guestbook</a></li>
+			<li><a href="/forum"><img src="img/icons/chat.png" alt="">forum</a></li>
 			<li><a href="/analytics"><img src="img/icons/eye.png" alt="">analytics</a></li>
 		</ul>
 		<ul class="sm-right">
@@ -252,7 +235,8 @@
 
 <div class="balloons" id="balloons" aria-live="polite"></div>
 <!-- chrome:bottom:end -->
-<script src="js/site.js?v=7"></script>
-<script src="js/skin3d.js?v=7"></script>
+<script src="js/site.js?v=8"></script>
+<script src="js/skin3d.js?v=8"></script>
+<script src="js/forum.js?v=8"></script>
 </body>
 </html>

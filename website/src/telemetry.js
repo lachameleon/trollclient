@@ -404,7 +404,7 @@ export class TrollTelemetry extends DurableObject {
 		};
 	}
 
-	/** The newest sessions, everything included. Only for the site owner (ADMIN_TOKEN). */
+	/** The newest sessions, everything included. Only for moderators (checked in the Worker). */
 	latestSessions(limit) {
 		return this.sql.exec(`SELECT id, install, day, started, last_seen, ended, ms, ingame_ms, fps_avg, fps_min, fps_max, modules_used, reports,
 			country, continent, region, env, state FROM sessions ORDER BY last_seen DESC LIMIT ?`, Math.max(1, Math.min(200, limit || 50)))

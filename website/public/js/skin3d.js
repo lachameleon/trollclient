@@ -92,7 +92,7 @@
 		});
 	}
 
-	/** Draws a skin's face (with its hat layer) onto a canvas: guestbook avatars, the start menu... */
+	/** Draws a skin's face (with its hat layer) onto a canvas: forum avatars, the start menu... */
 	function head(name, canvas) {
 		var src = name.indexOf("/") >= 0 || name.indexOf("data:") === 0 ? name : TEX + name + ".png";
 		canvas.width = 8;

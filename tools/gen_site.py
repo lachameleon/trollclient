@@ -9,6 +9,8 @@
   "blink", a demo skin with every outer layer painted for the skin animation lab.
 - the shared page chrome (website/partials) stamped into every page, the modules
   table, the gallery and the jar's size and checksum.
+- website/src/releases.json: what the Worker tells the client's updater (version,
+  the Minecraft version it was built for, size, checksum).
 
 Needs Pillow. Run after changing modules or art (--pages skips the pixel art):
     python3 tools/gen_site.py [--pages]
@@ -41,8 +43,9 @@ PAGES = {
     "modules.html": ("modules", "Modules"),
     "gallery.html": ("gallery", "Gallery"),
     "download.html": ("download", "Download"),
-    "guestbook.html": ("guestbook", "Guestbook"),
+    "forum.html": ("forum", "Forum"),
     "analytics.html": ("analytics", "Analytics"),
+    "privacy.html": ("privacy", "Privacy"),
 }
 
 WHITE = (240, 240, 240, 255)
@@ -511,16 +514,56 @@ def stamp_chrome():
         fill(page, "chrome:bottom", bottom.rstrip("\n"))
 
 
+def gradle_properties():
+    props = {}
+    for line in open(os.path.join(REPO, "gradle.properties"), encoding="utf-8"):
+        if "=" in line and not line.lstrip().startswith("#"):
+            key, value = line.split("=", 1)
+            props[key.strip()] = value.strip()
+    return props
+
+
+def write_releases(downloads, name, version, minecraft, data):
+    """The release list the Worker answers the client's updater from (website/src/releases.json).
+
+    Older entries stay for as long as their jar is still in public/downloads, so a client on an
+    older Minecraft keeps getting the newest release that was built for it and nothing newer."""
+    import datetime
+    import hashlib
+    path = os.path.join(REPO, "website", "src", "releases.json")
+    releases = []
+    if os.path.exists(path):
+        releases = json.load(open(path, encoding="utf-8")).get("releases", [])
+    sha = hashlib.sha256(data).hexdigest()
+    old = next((r for r in releases if r.get("version") == version), None)
+    date = old["date"] if old and old.get("sha256") == sha else datetime.date.today().isoformat()
+    entry = {"version": version, "minecraft": [minecraft], "file": name, "size": len(data), "sha256": sha, "date": date}
+    releases = [r for r in releases if r.get("version") != version and os.path.exists(os.path.join(downloads, r.get("file", "")))]
+    releases.insert(0, entry)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"releases": releases}, f, indent=1)
+        f.write("\n")
+    print("release list:", ", ".join("%s (mc %s)" % (r["version"], "/".join(r["minecraft"])) for r in releases))
+
+
 def jar_info():
-    jar = os.path.join(REPO, "build", "libs", "troll-client-1.0.0.jar")
+    props = gradle_properties()
+    name = "troll-client-%s.jar" % props["version"]
+    jar = os.path.join(REPO, "build", "libs", name)
     if not os.path.exists(jar):
         return
     import hashlib
-    import shutil
+    import zipfile
+    data = open(jar, "rb").read()
+    # the updater installs what this list says, so it has to describe the jar that's really there
+    with zipfile.ZipFile(jar) as z:
+        built = json.loads(z.read("fabric.mod.json").decode("utf-8")).get("version")
+    if built != props["version"]:
+        sys.exit("%s says it is version %s; run ./gradlew build first" % (name, built))
     dest = os.path.join(SITE, "downloads")
     os.makedirs(dest, exist_ok=True)
-    shutil.copyfile(jar, os.path.join(dest, "troll-client-1.0.0.jar"))
-    data = open(jar, "rb").read()
+    shutil.copyfile(jar, os.path.join(dest, name))
+    write_releases(dest, name, props["version"], props["minecraft_version"], data)
     seconds = len(data) * 8 / 28800
     fill("download.html", "jar:size", "%d KB" % round(len(data) / 1024))
     fill("download.html", "jar:sha", hashlib.sha256(data).hexdigest())

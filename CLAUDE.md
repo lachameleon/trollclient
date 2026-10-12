@@ -24,7 +24,7 @@ python3 tools/gen_webfont.py          # website woff2 from the bitmap font (need
 python3 tools/make_video.py [--encode]  # showcase frames -> website video (needs numpy, Pillow, ffmpeg)
 ```
 
-`website/README.md` documents the Worker endpoints, Durable Objects and page generation in detail.
+`website/README.md` documents the Worker endpoints, Durable Objects, page generation, releasing an update and moderating in detail.
 
 ## Architecture
 
@@ -42,13 +42,16 @@ Entry point `TrollClient.onInitializeClient` wires everything to Fabric events; 
 
 **Packet gate** (`packet/PacketGate`, `GuiTools`, `ConnectionMixin`): every serverbound packet passes `PacketGate.intercept`, which can drop or queue GUI-related packets (container clicks, chat, etc.) while the GUI Tools module is enabled; keep-alives, movement and container-close always pass. Used by the GUI tools panel and the macro packet steps for de-sync tricks.
 
-**Commands** (`command/Commands`): chat messages starting with a prefix (default `.`, configurable on `ClickGuiModule`) are intercepted in `ALLOW_CHAT` and never sent.
+**Commands** (`command/Commands`): chat messages starting with a prefix (default `.`, configurable on `ClickGuiModule`) are intercepted in `ALLOW_CHAT` and never sent. Each command has a `Spec` in `Commands.SPECS` (name, aliases, argument text, description, completer); `.help` and the chat tips (`command/CommandTips`, drawn and fed keys by `ChatScreenMixin`) are both generated from that list, so a new command needs a `Spec` as well as its `case` in `handle`.
 
 **GUI** (`gui/`): all drawing goes through `Theme` (palette fields recomputed each frame from `ThemeModule`; never hard-code colors) and `Draw`/`Anim`/`Motion`. `clickgui/ClickGuiScreen` is a large single-file window system; setting rows live in `clickgui/components/`. `TitleScreenGuard` replaces any main menu with `TrollTitleScreen` using three redundant mechanisms so other mods can't win.
 
 **Mixins** (`mixin/`): must be listed in `src/main/resources/trollclient.mixins.json` (`client` array). `injectors.defaultRequire = 1`, so a target that disappears in a Minecraft update fails at startup instead of silently doing nothing. Injected members use the `troll$` prefix; `*Accessor` interfaces expose private vanilla fields.
 
-**Telemetry** (`telemetry/Telemetry`): anonymous running-total reports to the website Worker (`website/src/worker.js`, `telemetry.js`); the Worker diffs totals per session. Privacy rules the code holds to: counts only, never chat text, command arguments, coordinates or IPs; identity is a random install id. `telemetry_url` in `gradle.properties` is baked into `fabric.mod.json` at build time (empty = never reports). Override at runtime with `-Dtrollclient.telemetry.url=...` / `-Dtrollclient.telemetry=false`. It is automatically off under Showcase/DevShots.
+**Talking to the website** (`util/Site`): three things reach the Worker, all at the origin of `telemetry_url` in `gradle.properties` (baked into `fabric.mod.json` at build time; empty = a build that talks to nothing; dev runs use `http://localhost:8642`). All three are off under Showcase/DevShots. `website/public/privacy.html` describes exactly what each one sends, so keep it in step with the code.
+- **Telemetry** (`telemetry/Telemetry`): anonymous running-total reports (`website/src/telemetry.js` diffs totals per session). Privacy rules the code holds to: counts only, never chat text, command arguments, coordinates or IPs; identity is a random install id. There is no in-game switch (`TelemetryModule` is settings-only: Copy Report, Reset ID); `-Dtrollclient.telemetry=false` and `-Dtrollclient.telemetry.url=...` still work.
+- **Updater** (`update/Updater`, `UpdaterModule`): on launch asks `/api/update` for the newest release for the running Minecraft version, verifies the jar (SHA-256, size, its own `fabric.mod.json` id/version, every `depends` entry against the running game) and drops it next to the current jar. Nothing is swapped in place: Fabric Loader loads the newest of two same-id jars, and the new version deletes older copies of itself at its next launch. Inert when the mod isn't a jar in a mods folder (dev runs). `-Dtrollclient.update=false` disables it.
+- **Chatroom** (`chat/Chatroom`, `ChatroomModule`): a WebSocket to `/api/chat` (`website/src/chat.js`). Socket callbacks only queue work; all state is touched on the client thread in `Chatroom.tick`. The Minecraft name is sent (and proven through Mojang's session service) only when the player first talks. Room lines are printed with `ChatUtil.print`, which keeps them away from `onChatMessage` hooks and macro Wait Chat steps: strangers in the room must never be able to trigger either. That Mojang proof is also the site's only notion of authority: moderators are Minecraft accounts listed in the `MODERATORS` var in `website/wrangler.jsonc`, and `.mod ...` acts through the same socket (`.mod web` issues a 12-hour key for the website).
 
 **Dev harnesses** (`dev/`: `DevShots`, `Showcase`, `CameraRig`, `FrameRecorder`, `Captions`): inert unless the JVM gets `-Dtrollclient.devshots=true` / `-Dtrollclient.showcase=true` (set by the Gradle run configs). A few mixins (`GameRendererMixin`, `LevelExtractorMixin`, `CameraMixin`, `AbstractClientPlayerMixin`) exist mainly for the showcase recorder and stand-in players.
 
@@ -62,7 +65,7 @@ Entry point `TrollClient.onInitializeClient` wires everything to Fabric events; 
 
 After adding or changing modules, run `python3 tools/gen_site.py --pages`.
 
-Other website rules: the shared window chrome in `website/partials/` is stamped into every page by `gen_site.py`, so **edit the partials, not the page copies**. `gen_site.py` copies `build/libs/troll-client-1.0.0.jar` (version hard-coded) into `website/public/downloads/` and fills in size/SHA-256, so bumping `version` in `gradle.properties` means updating `gen_site.py` and the download page too. Workers static assets are capped at 25 MiB per file (the showcase video is encoded to fit).
+Other website rules: the shared window chrome in `website/partials/` is stamped into every page by `gen_site.py`, so **edit the partials, not the page copies**. `gen_site.py` reads `version` and `minecraft_version` from `gradle.properties`, copies `build/libs/troll-client-<version>.jar` into `website/public/downloads/`, fills in size/SHA-256 on the download page and rewrites `website/src/releases.json`, which is what the Worker tells the client's updater. So a release is: bump `version`, `./gradlew build`, `gen_site.py --pages`, deploy; the download page, the partials and the install steps still have the jar name written out and need the new version by hand. The Worker's own pieces: `worker.js` (routes, `TrollHQ`), `forum.js`, `chat.js` (`TrollChat`), `telemetry.js` (`TrollTelemetry`), `util.js`; a new Durable Object class needs a binding and a migration tag in `wrangler.jsonc`. **The Worker uses no secrets and must keep working without any**: the salt is generated and stored by `TrollHQ`, and anything that needs an admin goes through `moderator()` in `util.js`, never a token in the environment. Workers static assets are capped at 25 MiB per file (the showcase video is encoded to fit).
 
 ## Conventions
 

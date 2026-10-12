@@ -2,6 +2,7 @@ package com.trollclient.module;
 
 import com.trollclient.TrollClient;
 import com.trollclient.module.client.ChatFormatModule;
+import com.trollclient.module.client.ChatroomModule;
 import com.trollclient.module.client.ClickGuiModule;
 import com.trollclient.module.client.GuiToolsModule;
 import com.trollclient.module.client.MacrosModule;
@@ -11,6 +12,7 @@ import com.trollclient.module.client.ShadersModule;
 import com.trollclient.module.client.TelemetryModule;
 import com.trollclient.module.client.ThemeModule;
 import com.trollclient.module.client.TitleScreenModule;
+import com.trollclient.module.client.UpdaterModule;
 import com.trollclient.module.combat.ArrowDodge;
 import com.trollclient.module.combat.CrystalCancel;
 import com.trollclient.module.combat.Grudge;
@@ -137,6 +139,8 @@ public final class ModuleManager {
 		register(new TitleScreenModule());
 		register(new GuiToolsModule());
 		register(new MacrosModule());
+		register(new ChatroomModule());
+		register(new UpdaterModule());
 		register(new TelemetryModule());
 		TrollClient.LOGGER.info("Registered {} modules", MODULES.size());
 	}

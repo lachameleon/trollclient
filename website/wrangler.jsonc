@@ -15,14 +15,23 @@
 		"bindings": [
 			{ "name": "HQ", "class_name": "TrollHQ" },
 			// anonymous usage reports from the client, for /analytics
-			{ "name": "TELEMETRY", "class_name": "TrollTelemetry" }
+			{ "name": "TELEMETRY", "class_name": "TrollTelemetry" },
+			// the chatroom every running client is in (.chat in game)
+			{ "name": "CHAT", "class_name": "TrollChat" }
 		]
 	},
 	"migrations": [
 		{ "tag": "v1", "new_sqlite_classes": ["TrollHQ"] },
-		{ "tag": "v2", "new_sqlite_classes": ["TrollTelemetry"] }
+		{ "tag": "v2", "new_sqlite_classes": ["TrollTelemetry"] },
+		{ "tag": "v3", "new_sqlite_classes": ["TrollChat"] }
 	],
+	"vars": {
+		// Who may moderate the forum and the chatroom and see raw telemetry sessions: Minecraft accounts, comma separated,
+		// as UUIDs (best: they survive a name change) or names. Not a secret. An account proves itself in the chatroom the
+		// same way it logs in to a server, then uses `.mod ...` in game. Empty = nobody moderates.
+		// Don't know your UUID? Type `.mod` in game and it tells you.
+		"MODERATORS": ""
+	},
 	"observability": { "enabled": true }
-	// optional secrets: `npx wrangler secret put ADMIN_TOKEN` (lets you hide guestbook entries and see raw telemetry sessions)
-	// and `npx wrangler secret put SALT` (salts the daily visitor hashes)
+	// no secrets to set: the salt for visitor hashes and tripcodes is made up by the Worker on its first run and kept in its storage
 }

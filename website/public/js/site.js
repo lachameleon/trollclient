@@ -1,12 +1,14 @@
 /* TROLL CLIENT HOMEPAGE - shared scripts.
    Themes, the window and its desktop, the taskbar, live stats over a WebSocket (hit counter,
-   who's online, downloads, guestbook, poll), tooltips, reveals, sounds, and a few things that
-   happen if you know where to look. */
+   who's online, downloads, forum posts, poll), tooltips, reveals, sounds, and a few things that
+   happen if you know where to look. The forum itself is in forum.js. */
 (function () {
 	"use strict";
 
 	var THEMES = [
 		{ id: "noir", name: "Noir", light: false, c: ["#090909", "#101010", "#ededed", "#ffffff", "#3c3c3c"] },
+		// the client's Frutiger Aero preset, and the only one here in colour. Second, so one click on the theme button lands on it
+		{ id: "aero", name: "Frutiger Aero", light: true, c: ["#5dbdf0", "#f6fcff", "#0a3150", "#6cc523", "#3e9fd8"] },
 		{ id: "paper", name: "Paper", light: true, c: ["#e9e9e9", "#f7f7f7", "#101010", "#000000", "#9c9c9c"] },
 		{ id: "graphite", name: "Graphite", light: false, c: ["#19191b", "#212123", "#d8d8d8", "#c4c4c4", "#56565b"] },
 		{ id: "terminal", name: "Terminal", light: false, c: ["#000000", "#000000", "#ffffff", "#ffffff", "#ffffff"] },
@@ -14,7 +16,7 @@
 		{ id: "ink", name: "Ink", light: true, c: ["#ffffff", "#ffffff", "#000000", "#000000", "#000000"] },
 		{ id: "fog", name: "Fog", light: true, c: ["#7e7e7e", "#8b8b8b", "#101010", "#0a0a0a", "#555555"] }
 	];
-	var PAGES = [["/", "home"], ["/skin-animation", "skin animation"], ["/modules", "modules"], ["/gallery", "gallery"], ["/download", "download"], ["/guestbook", "guestbook"], ["/analytics", "analytics"]];
+	var PAGES = [["/", "home"], ["/skin-animation", "skin animation"], ["/modules", "modules"], ["/gallery", "gallery"], ["/download", "download"], ["/forum", "forum"], ["/analytics", "analytics"]];
 	var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 	var fine = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
 
@@ -122,6 +124,8 @@
 	function setTheme(id, from) {
 		var t = THEMES[themeIndex(id)];
 		store("troll-theme", t.id);
+		store("troll-theme-tried", "1");
+		$$(".theme-btn").forEach(function (b) { b.classList.remove("hint"); });
 		var root = document.documentElement;
 		if (from && document.startViewTransition && !reduced) {
 			var x = from.x, y = from.y;
@@ -682,7 +686,7 @@
 		var g = c.getContext("2d");
 		var BAYER = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22,
 			3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21];
-		var PX = 3, W = 0, H = 0, img, buf, hill, cloud, paper = 0, ink = 0, light = false, last = 0;
+		var PX = 3, W = 0, H = 0, img, buf, hill, cloud, paper = 0, ink = 0, light = false, colour = false, last = 0;
 		var clouds = [];
 		for (var i = 0; i < 6; i++) {
 			clouds.push({ x: Math.random(), y: 0.08 + Math.random() * 0.34, s: 0.6 + Math.random() * 0.8, v: 0.004 + Math.random() * 0.006, seed: Math.random() * 10 });
@@ -698,6 +702,8 @@
 			paper = rgba(cs.getPropertyValue("--desk") || "#060606");
 			ink = rgba(cs.getPropertyValue("--desk-ink") || "#222222");
 			light = document.body.classList.contains("light");
+			// Frutiger Aero is the one theme with colours: blue sky, white clouds, a green hill
+			colour = document.body.classList.contains("theme-aero");
 			draw(performance.now(), true);
 		}
 		function resize() {
@@ -736,6 +742,7 @@
 					}
 				}
 			});
+			if (colour) { bliss(); return; }
 			for (var y = 0; y < H; y++) {
 				var row = (y & 7) << 3, off = y * W;
 				for (var x = 0; x < W; x++) {
@@ -748,6 +755,33 @@
 					}
 					var thr = (BAYER[row + (x & 7)] + 0.5) / 64;
 					buf[off + x] = (light ? L < thr : L > thr) ? ink : paper;
+				}
+			}
+			g.putImageData(img, 0, 0);
+		}
+		/** The same hill and clouds, in colour. Pixels are written as ABGR (little-endian RGBA). */
+		function bliss() {
+			function mix(a, b, t) { return a + (b - a) * (t < 0 ? 0 : t > 1 ? 1 : t); }
+			for (var y = 0; y < H; y++) {
+				var off = y * W;
+				for (var x = 0; x < W; x++) {
+					var hy = hill[x], r, g2, b;
+					if (y > hy) {
+						// grass: bright along the ridge, deeper towards the bottom, with soft bands of light
+						var depth = (y - hy) / (H - hy);
+						var lit = 0.5 + 0.5 * Math.sin(x * 0.035 + depth * 7);
+						r = mix(150, 46, depth) + 26 * lit * (1 - depth);
+						g2 = mix(222, 132, depth) + 18 * lit;
+						b = mix(58, 24, depth);
+						if (y - hy < 1.5) { r = 214; g2 = 246; b = 150; }
+					} else {
+						// sky: deep blue up top, pale at the horizon, clouds on top
+						var up = Math.pow(y / hy, 1.25), c = Math.min(1, cloud[off + x] * 1.7);
+						r = mix(mix(28, 176, up), 255, c);
+						g2 = mix(mix(126, 226, up), 255, c);
+						b = mix(mix(226, 255, up), 255, c);
+					}
+					buf[off + x] = (255 << 24 | (b & 255) << 16 | (g2 & 255) << 8 | (r & 255)) >>> 0;
 				}
 			}
 			g.putImageData(img, 0, 0);
@@ -927,7 +961,7 @@
 		});
 	}
 
-	// ------------------------------------------------------------ live: counter, online, downloads, guestbook, poll
+	// ------------------------------------------------------------ live: counter, online, downloads, forum, poll
 	var Live = {
 		stats: null,
 		ws: null,
@@ -961,7 +995,7 @@
 		offline: function () {
 			var hits = parseInt(store("troll-hits") || "0", 10) + 1;
 			store("troll-hits", String(hits));
-			this.render({ visits: 1337 + hits, views: 4200 + hits, online: 1, today: 1, downloads: 0, guestbook: 1, toggles: 0, blinks: 0, days: [] });
+			this.render({ visits: 1337 + hits, views: 4200 + hits, online: 1, today: 1, downloads: 0, posts: 0, threads: 0, toggles: 0, blinks: 0, days: [] });
 			$$(".live-dot").forEach(function (d) { d.classList.add("off"); d.setAttribute("data-tip", "offline: this copy of the site has no server"); });
 		},
 
@@ -1000,9 +1034,10 @@
 			if (msg.type === "stats") this.render(msg.stats);
 			else if (msg.type === "visit" && Date.now() - this.ownHit > 3000) this.plusOne();
 			else if (msg.type === "download" && Date.now() - this.ownDownload > 10000) notify("Someone just downloaded Troll Client", "That's " + fmt(msg.downloads) + " downloads now.", "cube");
-			else if (msg.type === "guestbook" && msg.entry) {
-				if (!this.mine(msg.entry.id)) notify("New guestbook entry", msg.entry.name + ": " + msg.entry.msg.slice(0, 70), "chat");
-				this.latest(msg.entry);
+			else if (msg.type === "forum" && msg.post && (msg.event === "thread" || msg.event === "reply")) {
+				var where = msg.thread ? msg.thread.title : "the forum";
+				if (!this.mine(msg.post.id)) notify(msg.event === "thread" ? "New thread on the forum" : "New reply in " + where, msg.post.name + ": " + (msg.event === "thread" ? where : msg.post.msg.slice(0, 70)), "chat");
+				this.latest({ name: msg.post.name, at: msg.post.at, title: where });
 			}
 			this.listeners.forEach(function (fn) { fn(msg); });
 		},
@@ -1032,7 +1067,7 @@
 
 		latest: function (e) {
 			var box = $("#latest-entry");
-			if (box && e && e.name) box.textContent = "last signed by " + e.name + ", " + ago(e.at);
+			if (box && e && e.name) box.textContent = "last post by " + e.name + (e.title ? " in " + e.title : "") + ", " + ago(e.at);
 		},
 
 		you: function (counted) {
@@ -1205,108 +1240,6 @@
 			var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); load(); } });
 			io.observe(form);
 		} else load();
-	}
-
-	// ------------------------------------------------------------ the guestbook page
-	function guestbook() {
-		var form = $("#guestbook-form"), list = $("#guestbook-entries");
-		if (!form || !list) return;
-		var more = $("#gb-more"), status = $("#gb-status"), left = $("#gb-left"), msg = form.msg;
-		var oldest = 0, seen = {};
-		var avatars = $("#gb-avatars");
-		var skins = window.TrollSkin ? window.TrollSkin.SKINS : ["troll"];
-		var pick = store("troll-avatar") || "troll";
-		skins.forEach(function (name) {
-			var label = document.createElement("label");
-			label.setAttribute("data-tip", name);
-			label.innerHTML = '<input type="radio" name="avatar" value="' + name + '"' + (name === pick ? " checked" : "") + ' aria-label="' + name + '"><canvas></canvas>';
-			avatars.appendChild(label);
-			if (window.TrollSkin) window.TrollSkin.head(name, label.querySelector("canvas"));
-		});
-
-		function entry(e, fresh) {
-			var div = document.createElement("div");
-			div.className = "guest-entry bevel" + (fresh ? " fresh" : "");
-			div.setAttribute("data-id", e.id);
-			var who = e.site ? '<a href="' + esc(e.site) + '" rel="nofollow noopener ugc" target="_blank">' + esc(e.name) + "</a>" : esc(e.name);
-			div.innerHTML = '<canvas aria-hidden="true"></canvas><div><div class="meta"><b>' + who + '</b><span title="' + esc(new Date(e.at).toLocaleString()) + '">' + esc(ago(e.at)) +
-				'</span><span class="num">#' + e.id + '</span></div><div class="msg">' + esc(e.msg).replace(/\n/g, "<br>") + "</div></div>";
-			if (window.TrollSkin) window.TrollSkin.head(e.avatar || "troll", div.querySelector("canvas"));
-			return div;
-		}
-		function page(before) {
-			var url = "/api/guestbook" + (before ? "?before=" + before : "");
-			return fetch(url).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (data) {
-				if (!before) list.innerHTML = "";
-				data.entries.forEach(function (e) {
-					if (seen[e.id]) return;
-					seen[e.id] = true;
-					list.appendChild(entry(e, false));
-					oldest = e.id;
-				});
-				more.hidden = !data.more;
-			}).catch(function () {
-				list.innerHTML = '<p class="dim">The guestbook server is taking a nap (this copy of the site might not have one). Try again later.</p>';
-			});
-		}
-		function count() {
-			var n = 500 - Array.from(msg.value).length;
-			left.textContent = n;
-			left.classList.toggle("low", n < 25);
-		}
-		msg.addEventListener("input", count);
-		form.addEventListener("reset", function () { setTimeout(count, 0); });
-		more.addEventListener("click", function () { more.disabled = true; page(oldest).then(function () { more.disabled = false; }); });
-		form.addEventListener("submit", function (e) {
-			e.preventDefault();
-			var data = {
-				name: form.name.value, site: form.site.value, msg: msg.value,
-				avatar: (form.querySelector("input[name=avatar]:checked") || {}).value || "troll",
-				homepage2: form.homepage2.value
-			};
-			if (msg.value.trim().length < 2) { say("say a bit more than that", true); return; }
-			store("troll-avatar", data.avatar);
-			var btn = form.querySelector("button[type=submit]");
-			btn.disabled = true;
-			say("sending...", false);
-			fetch("/api/guestbook", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) })
-				.then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-				.then(function (res) {
-					btn.disabled = false;
-					if (!res.ok || res.j.error) { say(res.j.error || "that didn't work", true); return; }
-					var en = res.j.entry;
-					session("troll-signed", ((session("troll-signed") || "") + "," + en.id).replace(/^,/, ""));
-					if (en.id && !seen[en.id]) {
-						seen[en.id] = true;
-						list.insertBefore(entry(en, true), list.firstChild);
-					}
-					form.msg.value = "";
-					count();
-					say("thanks for signing!", false);
-					Sound.chime();
-				})
-				.catch(function () { btn.disabled = false; say("couldn't reach the guestbook server", true); });
-		});
-		function say(text, err) {
-			status.textContent = text;
-			status.classList.toggle("err", err);
-			if (err) {
-				form.animate([{ transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "none" }], { duration: 240 });
-				Sound.error();
-			}
-		}
-		Live.on(function (m) {
-			if (m.type === "guestbook" && m.entry && !seen[m.entry.id]) {
-				seen[m.entry.id] = true;
-				list.insertBefore(entry(m.entry, true), list.firstChild);
-			}
-			if (m.type === "unsign") {
-				var gone = list.querySelector('[data-id="' + m.id + '"]');
-				if (gone) gone.remove();
-			}
-		});
-		count();
-		page(0);
 	}
 
 	// ------------------------------------------------------------ downloads: the classic "file download" dialog
@@ -1526,11 +1459,13 @@
 		if (sndBtn) sndBtn.addEventListener("click", function () { setSound(!Sound.on); });
 		var pal = $("#theme-cycle");
 		if (pal) {
+			// a few sparkles until they've tried it once
+			pal.classList.toggle("hint", !store("troll-theme-tried"));
 			pal.addEventListener("click", function (e) { cycleTheme(1, pointOf(e, pal)); });
 			pal.addEventListener("contextmenu", function (e) { e.preventDefault(); cycleTheme(-1, pointOf(e, pal)); });
 		}
 		// each piece on its own, so one hiccup can't take the rest of the page down with it
-		[letters, tooltips, windowControls, taskbar, wallpaper, desktopIcons, reveals, tilt, trail, poll, guestbook,
+		[letters, tooltips, windowControls, taskbar, wallpaper, desktopIcons, reveals, tilt, trail, poll,
 			downloads, lightbox, moduleFilter, webring, secrets, soundHooks, function () { Live.start(); }].forEach(function (fn) {
 			try { fn(); } catch (e) { if (window.console) console.error(e); }
 		});
@@ -1545,7 +1480,7 @@
 			if (booted) {
 				setTimeout(function () {
 					var s = Live.stats;
-					notify("Welcome to Troll Client!", s && s.online > 1 ? s.online + " people are on the site right now. Say hi in the guestbook." : "New here? Have a look at the skin animation.", "star", 7000);
+					notify("Welcome to Troll Client!", s && s.online > 1 ? s.online + " people are on the site right now. Say hi on the forum." : "New here? Have a look at the skin animation.", "star", 7000);
 				}, 1400);
 			}
 		});
@@ -1553,7 +1488,8 @@
 
 	window.TrollSite = {
 		setTheme: setTheme, cycleTheme: cycleTheme, themes: THEMES,
-		notify: notify, sound: Sound, bump: function (k, n) { Live.bump(k, n); }, live: Live
+		notify: notify, sound: Sound, bump: function (k, n) { Live.bump(k, n); }, live: Live,
+		esc: esc, ago: ago, fmt: fmt, store: store, session: session, dialog: dialog
 	};
 	if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
 	else init();
