@@ -1,0 +1,14 @@
+# What changed in each version, newest first. The title screen's [ update notes ] button shows this file.
+# "= version" starts a version; every other line is one note, with an optional yyyy-mm-dd in front.
+= 1.0.0
+2026-10-13  troll centre on the title screen: discord, the chatroom, the forum and these notes
+2026-10-13  fixed: a cycled setting no longer leaves its old and new value smeared over each other
+2026-10-12  updates itself, chat tips for . commands, and a chatroom for everyone
+2026-10-05  SkinBlink triggers: blink only in the air, sneaking, hurt, eating...
+2026-10-05  GUI tools on every container, and a macro editor
+2026-10-04  shaders: noir, crt, dither, halftone, ink
+2026-10-04  SkinChanger with 5 skins and the Troll Client cape
+2026-10-04  new Chat category: ChatStyle, Spammer, Announcer, Parrot
+2026-10-04  Trapper, Stalker, Pelter, Confetti, SkinBlink
+2026-10-03  Mimic, Morse, Taunt, Racket, Gifter, Orbit, ItemFlex, PopCounter
+2026-10-03  the original nine. twerk was first. obviously.

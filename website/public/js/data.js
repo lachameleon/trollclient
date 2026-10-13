@@ -3748,6 +3748,12 @@ window.TROLL = {
      "name": "Theme Button",
      "desc": "A [ theme ] button in the corner that cycles presets (or press T)",
      "value": true
+    },
+    {
+     "type": "bool",
+     "name": "Centre Buttons",
+     "desc": "Discord, chatroom, forum and update notes buttons in the corner",
+     "value": true
     }
    ],
    "toggleable": true

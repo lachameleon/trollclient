@@ -24,6 +24,8 @@ public class ModeRow extends Row {
 	private final Anim highlightX = new Anim(18);
 	private final Anim highlightW = new Anim(18);
 	private final Anim slide = new Anim(1, 14);
+	/** The value on show, and the one sliding out from under it. */
+	private String current;
 	private String previous;
 	private int direction = 1;
 	private boolean initialised;
@@ -31,7 +33,8 @@ public class ModeRow extends Row {
 	public ModeRow(ModeSetting setting) {
 		super(setting.getName(), setting.getDescription(), setting::isVisible);
 		this.setting = setting;
-		this.previous = setting.get();
+		this.current = setting.get();
+		this.previous = current;
 	}
 
 	private boolean segmented() {
@@ -107,14 +110,21 @@ public class ModeRow extends Row {
 	}
 
 	private void renderCycler(GuiGraphicsExtractor g, float dt, float hv) {
-		if (!setting.get().equals(previous)) {
+		// compare with what's on show, not with what's leaving: restarting the slide on every frame the two
+		// differed left it stuck part-way, with both values drawn half faded on top of each other
+		if (!setting.get().equals(current)) {
+			previous = current;
+			current = setting.get();
 			slide.snap(0);
 			slide.target(1);
 		}
 		float s = slide.update(dt);
+		float e = Motion.outCubic(s);
 		float right = x + w - 12;
-		float valueW = Theme.width(setting.get());
-		float boxW = valueW + 12;
+		float currentW = Theme.width(current);
+		float previousW = Theme.width(previous);
+		// the box grows or shrinks with the slide, so the left chevron never jumps between two widths
+		float boxW = previousW + (currentW - previousW) * e + 12;
 		float boxX = right - boxW;
 
 		Draw.icon(g, Icon.CHEVRON, right + 1, y + 4, 8, ColorUtil.fade(Theme.text, 0.4f + hv * 0.6f));
@@ -127,12 +137,10 @@ public class ModeRow extends Row {
 		pose.popMatrix();
 
 		g.enableScissor(Math.round(boxX), Math.round(y), Math.round(right), Math.round(y + 16));
-		float e = Motion.outCubic(s);
-		Draw.text(g, setting.get(), boxX + 6 + (1 - e) * 10 * direction, y + 4, ColorUtil.fade(Theme.accent(), e));
+		// both values hang off the right edge, whatever their widths
+		Draw.text(g, current, right - 6 - currentW + (1 - e) * 10 * direction, y + 4, ColorUtil.fade(Theme.accent(), e));
 		if (s < 1) {
-			Draw.text(g, previous, boxX + 6 - e * 10 * direction, y + 4, ColorUtil.fade(Theme.textDim, 1 - e));
-		} else {
-			previous = setting.get();
+			Draw.text(g, previous, right - 6 - previousW - e * 10 * direction, y + 4, ColorUtil.fade(Theme.textDim, 1 - e));
 		}
 		g.disableScissor();
 	}
@@ -169,7 +177,6 @@ public class ModeRow extends Row {
 	}
 
 	private void cycle(int dir) {
-		previous = setting.get();
 		direction = dir;
 		setting.cycle(dir);
 		Sounds.click();

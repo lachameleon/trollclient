@@ -1,6 +1,8 @@
 package com.trollclient.dev;
 
 import com.trollclient.TrollClient;
+import com.trollclient.chat.Chatroom;
+import com.trollclient.gui.centre.TrollCentreScreen;
 import com.trollclient.gui.clickgui.ClickGuiScreen;
 import com.trollclient.gui.clickgui.GuiState;
 import com.trollclient.gui.title.TrollTitleScreen;
@@ -9,6 +11,7 @@ import com.trollclient.module.Module;
 import com.trollclient.module.ModuleManager;
 import com.trollclient.module.client.ClickGuiModule;
 import com.trollclient.module.client.ThemeModule;
+import com.trollclient.module.client.TitleScreenModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -73,6 +76,41 @@ public final class DevShots {
 			}
 		});
 		step("title", () -> mc.gui.screen() instanceof TrollTitleScreen, 110, () -> shot("01_title"));
+		// the centre buttons in the corner: hover one for its hint, then a real click on "[ update notes ]"
+		step("centre buttons", () -> true, 1, () -> hoverAt(((TrollTitleScreen) mc.gui.screen()).centreButtonCenter(1)));
+		step("", () -> true, 15, () -> {
+			shot("01c_centre_buttons");
+			hoverAt(((TrollTitleScreen) mc.gui.screen()).centreButtonCenter(3));
+		});
+		step("", () -> true, 3, () -> clickAt(0));
+		step("", () -> true, 25, () -> {
+			TrollClient.LOGGER.info("[devshots] centre: after clicking update notes, screen = {}", screenName());
+			shot("01d_centre_notes");
+			// nothing talks to the site in a scripted run, so the room gets a few stand-in lines
+			roomLines(new Chatroom.Line("Steve", "anyone else getting walled in on spawn", true),
+					new Chatroom.Line("Dev", "that would be me. sorry (not sorry)", true),
+					new Chatroom.Line("xX_guest_Xx", "a long one to see the wrap: " + "twerk responsibly, ".repeat(9) + "and drink water", false),
+					new Chatroom.Line("", "You're talking as Dev. Everyone running Troll Client can read the room.", false));
+			mc.gui.setScreen(new TrollCentreScreen(new TrollTitleScreen(), TrollCentreScreen.Tab.CHATROOM));
+		});
+		step("", () -> true, 25, () -> {
+			shot("01e_centre_chatroom");
+			roomLines();
+			mc.gui.screen().onClose();
+		});
+		step("", () -> true, 20, () -> TrollClient.LOGGER.info("[devshots] centre: after closing it, screen = {}", screenName()));
+		// a long mode list is a "< value >" cycler: one mid-slide, then settled with only the new value left
+		step("cycler", () -> true, 1, () -> openGui(Category.CLIENT, "TitleScreen"));
+		step("", () -> true, 45, () -> hoverAt(((ClickGuiScreen) mc.gui.screen()).settingsRow("Background", 0.9f)));
+		step("", () -> true, 3, () -> clickAt(0));
+		step("", () -> true, 1, () -> shot("01f_cycler_sliding"));
+		step("", () -> true, 20, () -> {
+			TrollClient.LOGGER.info("[devshots] cycler: background = {}", ModuleManager.get(TitleScreenModule.class).background.get());
+			shot("01g_cycler_settled");
+			ModuleManager.get(TitleScreenModule.class).background.reset();
+			hoverAt(new double[]{1, 1});
+			mc.gui.setScreen(new TrollTitleScreen());
+		});
 		// the title screen under every other preset: its background, logo and chrome should follow the theme
 		for (String preset : new String[]{"Graphite", "Terminal", "Paper", "Newsprint", "Ink", "Fog", "Frutiger Aero", "Vaporwave",
 				"Amber", "Phosphor", "Classic", "Sakura", "Ocean", "Dracula", "Nord", "Solarized", "Crimson", "Aurora", "Handheld"}) {
@@ -1120,6 +1158,23 @@ public final class DevShots {
 		GuiState.selectedModule = module;
 		Minecraft mc = Minecraft.getInstance();
 		mc.gui.setScreen(new ClickGuiScreen(mc.level == null ? new TrollTitleScreen() : null));
+	}
+
+	/** Replaces what the chatroom has logged, for a screenshot of the centre without a room to connect to. */
+	@SuppressWarnings("unchecked")
+	private static void roomLines(Chatroom.Line... lines) {
+		try {
+			java.lang.reflect.Field log = Chatroom.class.getDeclaredField("LOG");
+			log.setAccessible(true);
+			java.util.Deque<Chatroom.Line> deque = (java.util.Deque<Chatroom.Line>) log.get(null);
+			deque.clear();
+			deque.addAll(List.of(lines));
+			java.lang.reflect.Field logged = Chatroom.class.getDeclaredField("logged");
+			logged.setAccessible(true);
+			logged.setInt(null, logged.getInt(null) + 1);
+		} catch (ReflectiveOperationException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	private static Module module(String name) {

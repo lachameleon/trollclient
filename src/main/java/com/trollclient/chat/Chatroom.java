@@ -31,8 +31,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -58,6 +60,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public final class Chatroom {
 	private static final int MAX_LENGTH = 200;
 	private static final int BACKLOG = 20;
+	private static final int LOG_SIZE = 200;
 	private static final long PING_MS = 30_000;
 	private static final long RETRY_MIN_MS = 5_000;
 	private static final long RETRY_MAX_MS = 300_000;
@@ -67,6 +70,19 @@ public final class Chatroom {
 	private static final Queue<Runnable> INBOX = new ConcurrentLinkedQueue<>();
 	/** What was said lately, for {@code .chat} with nothing after it. */
 	private static final Deque<Component> RECENT = new ArrayDeque<>();
+	/**
+	 * The same lines (and our own notes) as plain text, for the title screen's centre: there is no chat
+	 * to print into without a world. {@code name} is empty on a note.
+	 */
+	public record Line(String name, String text, boolean verified) {
+		public boolean note() {
+			return name.isEmpty();
+		}
+	}
+
+	private static final Deque<Line> LOG = new ArrayDeque<>();
+	/** Goes up with every line logged, so a screen showing the log knows when to follow it down. */
+	private static int logged;
 	/** Frames from before the name was proven; sent as soon as it is. */
 	private static final Deque<String> OUTBOX = new ArrayDeque<>();
 
@@ -104,6 +120,35 @@ public final class Chatroom {
 
 	public static int online() {
 		return online;
+	}
+
+	/** One word for where the room is at: "off", "connecting" or "connected". */
+	public static String state() {
+		return !wanted() ? "off" : connected() ? "connected" : "connecting";
+	}
+
+	/** What a screen should show of the room, oldest first: the lines chat would have printed, and our notes. */
+	public static List<Line> log() {
+		boolean verifiedOnly = ModuleManager.get(ChatroomModule.class).verifiedOnly.get();
+		List<Line> out = new ArrayList<>(LOG.size());
+		for (Line line : LOG) {
+			if (line.note() || line.verified() || !verifiedOnly || line.name().equalsIgnoreCase(name)) {
+				out.add(line);
+			}
+		}
+		return out;
+	}
+
+	public static int logged() {
+		return logged;
+	}
+
+	private static void log(Line line) {
+		LOG.add(line);
+		while (LOG.size() > LOG_SIZE) {
+			LOG.poll();
+		}
+		logged++;
 	}
 
 	/** End of every client tick: apply what the socket heard, keep it open, bring it back. */
@@ -398,9 +443,12 @@ public final class Chatroom {
 					challenge = string(msg, "challenge");
 					online = msg.has("online") ? msg.get("online").getAsInt() : 0;
 					RECENT.clear();
+					// the room sends its scrollback again on every connection, so the old copy goes
+					LOG.removeIf(l -> !l.note());
 					if (msg.has("history") && msg.get("history").isJsonArray()) {
 						for (JsonElement e : msg.getAsJsonArray("history")) {
 							remember(line(e.getAsJsonObject()));
+							log(plain(e.getAsJsonObject()));
 						}
 					}
 				}
@@ -416,6 +464,7 @@ public final class Chatroom {
 					JsonObject m = msg.getAsJsonObject("message");
 					Component line = line(m);
 					remember(line);
+					log(plain(m));
 					boolean verified = m.has("verified") && m.get("verified").getAsBoolean();
 					if (verified || !ModuleManager.get(ChatroomModule.class).verifiedOnly.get() || string(m, "name").equalsIgnoreCase(name)) {
 						print(line);
@@ -458,6 +507,11 @@ public final class Chatroom {
 				.append(Component.literal(": " + text).withStyle(ChatFormatting.GRAY));
 	}
 
+	private static Line plain(JsonObject m) {
+		String who = ChatUtil.sanitize(string(m, "name"));
+		return new Line(who.isEmpty() ? "?" : who, ChatUtil.sanitize(string(m, "text")), m.has("verified") && m.get("verified").getAsBoolean());
+	}
+
 	private static void remember(Component line) {
 		RECENT.add(line);
 		while (RECENT.size() > BACKLOG) {
@@ -476,6 +530,7 @@ public final class Chatroom {
 	}
 
 	private static void note(String text) {
+		log(new Line("", text, false));
 		print(Component.literal(text).withStyle(ChatFormatting.GRAY));
 	}
 }

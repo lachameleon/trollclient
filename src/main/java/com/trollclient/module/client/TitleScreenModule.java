@@ -29,6 +29,7 @@ public class TitleScreenModule extends Module {
 	public final BoolSetting glitch = add(new BoolSetting("Logo Glitch", "Occasional glitches on the logo", true));
 	public final BoolSetting splash = add(new BoolSetting("Splash Text", "Show the yellow-ish splash, in monochrome", true));
 	public final BoolSetting themeButton = add(new BoolSetting("Theme Button", "A [ theme ] button in the corner that cycles presets (or press T)", true));
+	public final BoolSetting centreButtons = add(new BoolSetting("Centre Buttons", "Discord, chatroom, forum and update notes buttons in the corner", true));
 
 	public TitleScreenModule() {
 		super("TitleScreen", "Replaces the main menu with the Troll Client title screen.", Category.CLIENT);

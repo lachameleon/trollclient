@@ -3,6 +3,7 @@ package com.trollclient.gui.title;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.mojang.realmsclient.RealmsMainScreen;
 import com.trollclient.TrollClient;
+import com.trollclient.chat.Chatroom;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Backdrop;
 import com.trollclient.gui.Draw;
@@ -10,6 +11,7 @@ import com.trollclient.gui.Motion;
 import com.trollclient.gui.ScreenFx;
 import com.trollclient.gui.Sounds;
 import com.trollclient.gui.Theme;
+import com.trollclient.gui.centre.TrollCentreScreen;
 import com.trollclient.gui.clickgui.ClickGuiScreen;
 import com.trollclient.gui.clickgui.TerminalLog;
 import com.trollclient.module.ModuleManager;
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
  * Demoscene-flavoured main menu: chunky 3D pixel logo, sine scroller, and a
@@ -67,6 +70,10 @@ public class TrollTitleScreen extends Screen {
 	private record Ring(float x, float y, float born) {
 	}
 
+	/** A corner button of the Troll Client centre; {@code hint} shows under the buttons while it's hovered. */
+	private record Chip(String label, Supplier<String> hint, BooleanSupplier enabled, Runnable action) {
+	}
+
 	private final List<Item> items = new ArrayList<>();
 	private final List<PixelFont.Pixel> logoPixels = PixelFont.layout(LOGO);
 	private final int logoWidth = PixelFont.width(LOGO);
@@ -86,6 +93,12 @@ public class TrollTitleScreen extends Screen {
 	private int lastSelected = -1;
 	private final Anim vanillaHover = new Anim(16);
 	private final Anim themeHover = new Anim(16);
+	private final List<Chip> centre = new ArrayList<>();
+	private final Anim[] centreHover;
+	/** What the last centre button did ("opened in your browser"), shown in place of its hint for a moment. */
+	private String centreNote = "";
+	private int centreNoteChip = -1;
+	private float centreNoteAt = -10;
 	private final Backdrop backdrop = new Backdrop();
 	private final float openedAt = Motion.time();
 	private final boolean playIntro;
@@ -123,6 +136,18 @@ public class TrollTitleScreen extends Screen {
 		for (int i = 0; i < itemHover.length; i++) {
 			itemHover[i] = new Anim(16);
 		}
+		centre.add(new Chip("[ discord ]", () -> "the troll client discord, in your browser", () -> true,
+				() -> browse(TrollCentreScreen.DISCORD, "discord.gg")));
+		centre.add(new Chip("[ chatroom ]", this::chatroomHint, () -> true,
+				() -> minecraft.gui.setScreen(new TrollCentreScreen(this, TrollCentreScreen.Tab.CHATROOM))));
+		centre.add(new Chip("[ forum ]", () -> TrollCentreScreen.forumUrl().isEmpty() ? "this build has no website" : "the forum, in your browser",
+				() -> !TrollCentreScreen.forumUrl().isEmpty(), () -> browse(TrollCentreScreen.forumUrl(), "the forum")));
+		centre.add(new Chip("[ update notes ]", () -> "what changed, version by version", () -> true,
+				() -> minecraft.gui.setScreen(new TrollCentreScreen(this, TrollCentreScreen.Tab.NOTES))));
+		centreHover = new Anim[centre.size()];
+		for (int i = 0; i < centreHover.length; i++) {
+			centreHover[i] = new Anim(16);
+		}
 		playIntro = !introPlayed;
 		introPlayed = true;
 	}
@@ -130,6 +155,16 @@ public class TrollTitleScreen extends Screen {
 	/** Centre of a menu item in GUI coordinates (used by the showcase recorder's cursor). */
 	public double[] itemCenter(int index) {
 		return new double[]{menuX() + menuW() / 2f, menuTop() + index * itemH() + itemH() / 2f - 1};
+	}
+
+	/** Centre of a centre button in GUI coordinates, or null when they're switched off (used by the dev smoke test). */
+	public double[] centreButtonCenter(int index) {
+		List<float[]> boxes = centreBoxes();
+		if (index >= boxes.size()) {
+			return null;
+		}
+		float[] b = boxes.get(index);
+		return new double[]{b[0] + b[2] / 2f, b[1] + b[3] / 2f};
 	}
 
 	private void openModMenu() {
@@ -215,6 +250,52 @@ public class TrollTitleScreen extends Screen {
 		}
 		float[] vb = vanillaBox();
 		return new float[]{vb[0] + vb[2] + 6, vb[1], Theme.width(themeLabel()) + 4, vb[3]};
+	}
+
+	/**
+	 * The centre buttons, in a row under the vanilla and theme ones (the top row has the name and
+	 * clock at its other end, so it can't take four more). Wraps on a very narrow window; empty when
+	 * the Centre Buttons setting is off.
+	 */
+	private List<float[]> centreBoxes() {
+		List<float[]> boxes = new ArrayList<>();
+		if (!settings().centreButtons.get()) {
+			return boxes;
+		}
+		float[] vb = vanillaBox();
+		float x = vb[0];
+		float y = vb[1] + vb[3] + 2;
+		for (Chip chip : centre) {
+			float w = Theme.width(chip.label()) + 4;
+			if (x > vb[0] && x + w > width - 6) {
+				x = vb[0];
+				y += vb[3] + 2;
+			}
+			boxes.add(new float[]{x, y, w, vb[3]});
+			x += w + 6;
+		}
+		return boxes;
+	}
+
+	/** Where a hovered corner button explains itself: just under the lowest row of them. */
+	private float hintY() {
+		float[] vb = vanillaBox();
+		List<float[]> boxes = centreBoxes();
+		float bottom = boxes.isEmpty() ? vb[1] + vb[3] : boxes.get(boxes.size() - 1)[1] + vb[3];
+		return bottom + 3;
+	}
+
+	private String chatroomHint() {
+		return switch (Chatroom.state()) {
+			case "connected" -> Chatroom.online() + " online. talk to everyone running the client";
+			case "connecting" -> "talk to everyone running the client";
+			default -> "the chatroom is off. it can be switched on in here";
+		};
+	}
+
+	private void browse(String url, String what) {
+		centreNote = TrollCentreScreen.browse(url) ? "opened " + what + " in your browser" : "couldn't open " + what;
+		centreNoteAt = Motion.time();
 	}
 
 	private static boolean inBox(double mx, double my, float[] b) {
@@ -661,7 +742,8 @@ public class TrollTitleScreen extends Screen {
 				"ready."
 		};
 		float fade = 1f - Motion.range(t, 3.2f, 4.2f);
-		float y = 22;
+		// clear of the corner buttons and their hint line
+		float y = hintY() + (settings().centreButtons.get() ? 13 : 1);
 		for (int i = 0; i < lines.length; i++) {
 			float at = i * 0.16f;
 			if (t < at) {
@@ -720,15 +802,44 @@ public class TrollTitleScreen extends Screen {
 		if (tb != null) {
 			chip(g, tb, themeLabel(), themeHover, mouseX, mouseY);
 			if (inBox(mouseX, mouseY, tb)) {
-				Draw.text(g, "click: next / right click: back / t", tb[0] + 2, tb[1] + tb[3] + 3, ColorUtil.fade(Theme.textDim, themeHover.get()));
+				hint(g, "click: next / right click: back / t", tb[0] + 2, themeHover.get());
+			}
+		}
+		List<float[]> boxes = centreBoxes();
+		for (int i = 0; i < boxes.size(); i++) {
+			Chip chip = centre.get(i);
+			float[] box = boxes.get(i);
+			boolean enabled = chip.enabled().getAsBoolean();
+			chip(g, box, chip.label(), centreHover[i], mouseX, mouseY, enabled);
+			if (inBox(mouseX, mouseY, box)) {
+				boolean noted = centreNoteChip == i && time - centreNoteAt < 3f;
+				hint(g, noted ? centreNote : chip.hint().get(), boxes.get(0)[0] + 2, centreHover[i].get());
 			}
 		}
 	}
 
-	/** A "[ label ]" button in the corner that fills with the accent when hovered. */
+	/**
+	 * A hovered corner button's one-line explanation. On a small window the logo reaches up to this
+	 * line, so the text gets a patch of background to sit on.
+	 */
+	private void hint(GuiGraphicsExtractor g, String text, float x, float shown) {
+		float y = hintY();
+		Draw.rect(g, x - 3, y - 2, Theme.width(text) + 6, 12, ColorUtil.fade(0xFF000000 | Theme.screenAt(y / height), 0.85f * shown));
+		Draw.text(g, text, x, y, ColorUtil.fade(Theme.textDim, shown));
+	}
+
 	private void chip(GuiGraphicsExtractor g, float[] box, String label, Anim hover, int mouseX, int mouseY) {
+		chip(g, box, label, hover, mouseX, mouseY, true);
+	}
+
+	/** A "[ label ]" button in the corner that fills with the accent when hovered; a disabled one only greys out. */
+	private void chip(GuiGraphicsExtractor g, float[] box, String label, Anim hover, int mouseX, int mouseY, boolean enabled) {
 		boolean over = inBox(mouseX, mouseY, box);
 		float hv = hover.target(over).update(dt);
+		if (!enabled) {
+			Draw.text(g, label, box[0] + 2, box[1] + 2, ColorUtil.fade(Theme.textDim, 0.45f));
+			return;
+		}
 		if (hv > 0.01f) {
 			Draw.rect(g, box[0], box[1], box[2] * Motion.outCubic(hv), box[3], ColorUtil.fade(Theme.accent(), hv));
 		}
@@ -797,6 +908,21 @@ public class TrollTitleScreen extends Screen {
 			TitleScreenGuard.requestVanilla();
 			minecraft.gui.setScreen(new TitleScreen());
 			return true;
+		}
+		List<float[]> boxes = centreBoxes();
+		for (int i = 0; i < boxes.size(); i++) {
+			if (inBox(event.x(), event.y(), boxes.get(i))) {
+				Chip chip = centre.get(i);
+				if (chip.enabled().getAsBoolean()) {
+					Sounds.click();
+					centreNoteChip = i;
+					centreNoteAt = -10;
+					chip.action().run();
+				} else {
+					Sounds.toggle(false);
+				}
+				return true;
+			}
 		}
 		int index = itemAt(event.x(), event.y());
 		if (index >= 0) {
