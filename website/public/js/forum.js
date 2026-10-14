@@ -5,7 +5,9 @@
    each post you write stays in this browser, which is what lets you edit or remove it later.
    Moderators are Minecraft accounts, not passwords: one of them types `.mod web` in game, pastes
    the key it gets under "moderator?" here, and for 12 hours every post has a remove button and
-   every thread can be locked, pinned or hidden. The board list also listens in on the in-game chatroom. */
+   every thread can be locked, pinned or hidden. The board list also listens in on the in-game chatroom.
+   Search engines get told about each view as it's drawn (describe, below): forum.html has no canonical
+   link of its own for that reason. */
 (function () {
 	"use strict";
 	var root = document.getElementById("forum");
@@ -18,6 +20,11 @@
 	var EDIT_MS = 30 * 60000, MAX = 4000;
 	var view = { kind: "" };
 	var refreshTimer = 0;
+	// what the page said about itself before any view changed it, and the site's real origin (gen_site.py wrote it into og:url)
+	var metaDesc = document.querySelector('meta[name="description"]'), metaRobots = document.querySelector('meta[name="robots"]'), ogUrl = document.querySelector('meta[property="og:url"]');
+	var pageTitle = document.title, pageDesc = metaDesc ? metaDesc.content : "", pageRobots = metaRobots ? metaRobots.content : "";
+	var SITE = location.origin;
+	try { SITE = new URL(ogUrl.content).origin; } catch (e) { /* a copy of the page without the tag: wherever it's being served from */ }
 
 	// ------------------------------------------------------------ helpers
 	function el(tag, cls, html) {
@@ -94,15 +101,76 @@
 		return out + "</nav>";
 	}
 
-	function setCrumbs(parts) {
+	function setCrumbs(parts, page) {
 		crumbs.innerHTML = '<a href="/forum" data-forum>forum</a>' + parts.map(function (p) {
 			return ' <span class="sep">&raquo;</span> ' + (p.href ? '<a href="' + p.href + '" data-forum>' + esc(p.label) + "</a>" : "<span>" + esc(p.label) + "</span>");
 		}).join("");
 		if (intro) intro.hidden = parts.length > 0;
-		document.title = "Troll Client :: " + (parts.length ? parts[parts.length - 1].label + " :: " : "") + "forum";
+		document.title = parts.length ? parts[parts.length - 1].label + (page > 1 ? " (page " + page + ")" : "") + " :: forum :: Troll Client" : pageTitle;
+	}
+
+	// ------------------------------------------------------------ what search engines are told
+	/**
+	 * Describes the view on screen to search engines: its own address (path), a description, and structured data
+	 * if there is any. With no path the view asks to be left out of the results: a search, or something that failed.
+	 */
+	function describe(path, desc, data) {
+		var head = document.head, canon = head.querySelector('link[rel="canonical"]'), old = document.getElementById("forum-ld");
+		if (path) {
+			if (!canon) { canon = el("link"); canon.rel = "canonical"; head.appendChild(canon); }
+			canon.href = SITE + path;
+		} else if (canon) {
+			canon.remove();
+		}
+		if (metaRobots) metaRobots.content = path ? pageRobots : "noindex, follow";
+		if (metaDesc) metaDesc.content = desc || pageDesc;
+		if (old) old.remove();
+		if (data) {
+			var ld = el("script");
+			ld.type = "application/ld+json";
+			ld.id = "forum-ld";
+			ld.textContent = JSON.stringify(data);
+			head.appendChild(ld);
+		}
+	}
+
+	/** The start of a post, short enough for a description. */
+	function snippet(msg) {
+		var text = String(msg).replace(/\s+/g, " ").trim();
+		return text.length > 155 ? text.slice(0, 152).replace(/\s+\S*$/, "") + "..." : text;
+	}
+
+	/**
+	 * A thread the way schema.org's DiscussionForumPosting wants one: the opening post, with the replies on this
+	 * page as its comments. Later pages don't have the opening post on them, so they point back at page one for it.
+	 */
+	function threadData(d) {
+		var t = d.thread, start = SITE + "/forum?thread=" + t.id, here = start + (d.page > 1 ? "&page=" + d.page : "");
+		var iso = function (ms) { return new Date(ms).toISOString(); };
+		var person = function (name) { return { "@type": "Person", name: name }; };
+		var first = d.posts.filter(function (p) { return p.id === d.first && !p.removed; })[0];
+		var data = {
+			"@context": "https://schema.org", "@type": "DiscussionForumPosting",
+			url: start, headline: t.title, datePublished: iso(t.at), author: person(t.name),
+			isPartOf: { "@type": "WebPage", url: SITE + "/forum?board=" + d.board.id, name: d.board.name },
+			interactionStatistic: [
+				{ "@type": "InteractionCounter", interactionType: "https://schema.org/ViewAction", userInteractionCount: t.views },
+				{ "@type": "InteractionCounter", interactionType: "https://schema.org/ReplyAction", userInteractionCount: t.replies }
+			],
+			comment: d.posts.filter(function (p) { return p.id !== d.first && !p.removed; }).map(function (p) {
+				return { "@type": "Comment", url: here + "#p" + p.id, text: p.msg, datePublished: iso(p.at), author: person(p.name) };
+			})
+		};
+		if (first) {
+			data.mainEntityOfPage = start;
+			data.text = first.msg;
+			if (first.edited) data.dateModified = iso(first.edited);
+		}
+		return data;
 	}
 
 	function fail(err) {
+		describe(null);
 		root.innerHTML = "";
 		root.appendChild(el("p", "dim", esc(err && err.message ? err.message : "that didn't work") + '. <a href="/forum" data-forum>back to the forum</a>'));
 	}
@@ -205,6 +273,7 @@
 		api("").then(function (d) {
 			view = { kind: "index" };
 			setCrumbs([]);
+			describe("/forum");
 			var box = el("div");
 			var rows = d.boards.map(function (b) {
 				var last = b.last ? '<a href="/forum?thread=' + b.last.id + '&amp;page=last" data-forum>' + esc(b.last.title) + '</a><div class="dim small">by ' + esc(b.last.name) + ", " + esc(ago(b.last.at)) + "</div>" : '<span class="dim small">nothing yet. be first.</span>';
@@ -241,7 +310,8 @@
 		loading();
 		api("/board/" + encodeURIComponent(id) + "?page=" + page).then(function (d) {
 			view = { kind: "board", board: d.board.id, page: d.page };
-			setCrumbs([{ label: d.board.name }]);
+			setCrumbs([{ label: d.board.name }], d.page);
+			describe("/forum?board=" + d.board.id + (d.page > 1 ? "&page=" + d.page : ""), d.board.name + ": " + d.board.blurb + ". A board on the Troll Client forum.");
 			var box = el("div");
 			var href = function (n) { return "/forum?board=" + d.board.id + (n > 1 ? "&amp;page=" + n : ""); };
 			var bar = el("div", "forum-tools", '<span class="dim">' + esc(d.board.blurb) + " &middot; " + fmt(d.total) + " thread" + (d.total === 1 ? "" : "s") + "</span>");
@@ -309,7 +379,10 @@
 		api("/thread/" + id + "?page=" + encodeURIComponent(page)).then(function (d) {
 			var t = d.thread;
 			view = { kind: "thread", thread: t.id, page: d.page, pages: d.pages, seen: {} };
-			setCrumbs([{ label: d.board.name, href: "/forum?board=" + d.board.id }, { label: t.title }]);
+			setCrumbs([{ label: d.board.name, href: "/forum?board=" + d.board.id }, { label: t.title }], d.page);
+			var firstPost = d.posts.filter(function (p) { return p.id === d.first && !p.removed; })[0];
+			describe("/forum?thread=" + t.id + (d.page > 1 ? "&page=" + d.page : ""),
+				firstPost ? snippet(firstPost.msg) : t.title + ": page " + d.page + " of " + d.pages + " of a thread on the Troll Client forum.", threadData(d));
 			var href = function (n) { return "/forum?thread=" + t.id + (n > 1 ? "&amp;page=" + n : ""); };
 			var box = el("div");
 			box.appendChild(el("h3", "thread-title", esc(t.title) + (t.pinned ? '<span class="flag">pinned</span>' : "") + (t.locked ? '<span class="flag">locked</span>' : "")));
@@ -429,6 +502,7 @@
 		api("/search?q=" + encodeURIComponent(q)).then(function (d) {
 			view = { kind: "search" };
 			setCrumbs([{ label: "search: " + d.query }]);
+			describe(null);
 			var box = el("div");
 			box.appendChild(el("p", "dim", d.results.length ? fmt(d.results.length) + (d.results.length === 30 ? "+" : "") + " post" + (d.results.length === 1 ? "" : "s") + " mention it." : "nothing found. it's a small forum."));
 			var list = el("div", "recent");

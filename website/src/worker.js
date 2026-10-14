@@ -1,6 +1,6 @@
 /* TROLL CLIENT HOMEPAGE - the Cloudflare Worker.
    Static files come straight from ./public (the assets binding). The Worker only runs for
-   /api/* and /downloads/*, and everything that has to be remembered lives in Durable Objects:
+   /api/*, /downloads/* and /sitemap-forum.xml, and everything that has to be remembered lives in Durable Objects:
    TrollHQ has the hit counter, downloads, the forum (forum.js), the poll, a couple of fun global
    tallies, and live WebSockets that push all of it to every open tab. TrollTelemetry (telemetry.js)
    holds anonymous usage stats from the client for the analytics page, and TrollChat (chat.js) is
@@ -21,7 +21,7 @@ const POLL = [
 	["honk", "Honk"]
 ];
 const BUMPABLE = { toggles: 100, blinks: 400 };
-const FORUM_OPS = ["index", "board", "thread", "find", "create", "reply", "edit", "remove", "moderate", "search"];
+const FORUM_OPS = ["index", "board", "thread", "find", "create", "reply", "edit", "remove", "moderate", "search", "sitemap"];
 
 export class TrollHQ extends DurableObject {
 	constructor(ctx, env) {
@@ -356,9 +356,31 @@ async function api(request, env, ctx, url) {
 	return json({ error: "no such endpoint" }, 404);
 }
 
+/**
+ * The forum's boards and threads for search engines. They only exist as links once js/forum.js has drawn
+ * them, so this is how a crawler finds them without running the page. The rest of the site is in
+ * /sitemap.xml, a plain file (tools/gen_site.py writes it).
+ */
+async function forumSitemap(env, url) {
+	const { boards, threads } = await env.HQ.get(env.HQ.idFromName("global")).forum("sitemap");
+	const entry = (query, at) => `\t<url><loc>${url.origin}/forum?${query}</loc>${at ? `<lastmod>${new Date(at).toISOString().slice(0, 10)}</lastmod>` : ""}</url>`;
+	const lines = [...boards.map((id) => entry("board=" + id)), ...threads.map((t) => entry("thread=" + t.id, t.bumped))];
+	return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${lines.join("\n")}\n</urlset>\n`, {
+		headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" }
+	});
+}
+
 export default {
 	async fetch(request, env, ctx) {
 		const url = new URL(request.url);
+		if (url.pathname === "/sitemap-forum.xml") {
+			try {
+				return await forumSitemap(env, url);
+			} catch (e) {
+				console.error(e);
+				return new Response("the sitemap tripped over something", { status: 500 });
+			}
+		}
 		if (url.pathname.startsWith("/api/")) {
 			try {
 				return await api(request, env, ctx, url);

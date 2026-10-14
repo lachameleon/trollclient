@@ -36,6 +36,30 @@ The window chrome (title bar, tabs, toolbar, ticker, sidebar, status bar, taskba
 `partials/` and is stamped into every page by `tools/gen_site.py`, between the `chrome:top` and
 `chrome:bottom` markers. Edit the partials, not the copies.
 
+## Search engines
+
+Everything a search engine or a link preview reads is generated too, so none of it is written in the pages:
+
+- **`<head>` tags**: `partials/head.html` is stamped between the `head` markers of every page, filled in from the
+  `SEO` table at the top of `tools/gen_site.py`: title, description, canonical link, Open Graph/Twitter preview
+  (a screenshot from `img/shots`), and schema.org structured data (the site and page, breadcrumbs, the client as a
+  `SoftwareApplication`, the showcase video, the gallery's images, and each FAQ read off the page it's on). The
+  module count, version and Minecraft version in them come from the source and `gradle.properties`. To change what a
+  page says about itself, edit `SEO` and run `gen_site.py --pages`; a new page needs an entry there as well as in `PAGES`.
+- **`sitemap.xml`** lists every page with the date it last changed (its last commit), its screenshots and the video;
+  **`robots.txt`** points at it and keeps crawlers off the addresses that count something when fetched (the jar, the
+  hit counter) or go on to Mojang (`ROBOTS_DISALLOW`). The rest of `/api/` stays open, because the forum and the
+  analytics page are drawn from it; the Worker marks every JSON answer `x-robots-tag: noindex` instead.
+- **The forum** is one file that draws every board and thread, so `forum.html` has no canonical link of its own:
+  `js/forum.js` sets the canonical address, description and title for whatever view is on screen, adds
+  `DiscussionForumPosting` structured data to threads, and marks searches and missing threads `noindex`. Thread links
+  only exist once that script has run, so the Worker also serves **`/sitemap-forum.xml`** (every board and visible
+  thread, straight from the Durable Object).
+- The site's address in all of this is the origin of `telemetry_url` in `gradle.properties`.
+
+After a deploy that changes pages, nothing needs submitting again: Search Console re-reads the sitemaps on its own
+(add both there once).
+
 ## What's live
 
 - **Hit counter**: `POST /api/hit` once per page view; a visit counts once per browser session (and at most
@@ -144,7 +168,7 @@ Most of `public/` comes from the repo:
 ./gradlew runShowcase               # records the showcase video's frames (about 2 minutes, in a real client)
 python3 tools/make_video.py         # frames + generated chiptune -> public/video/showcase.mp4, poster, stills
 python3 tools/make_video.py --encode   # just re-encode the existing frames
-python3 tools/gen_site.py           # page chrome, js/data.js, modules table, gallery, jar + checksum, release list, skins, pixel art
+python3 tools/gen_site.py           # page chrome, head tags, sitemap, robots, js/data.js, modules table, gallery, jar + checksum, release list, skins, pixel art
 python3 tools/gen_site.py --pages   # the same without redrawing the pixel art
 python3 tools/gen_webfont.py        # fonts/troll-terminal.woff2 from the client's bitmap font
 ```

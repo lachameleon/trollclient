@@ -8,8 +8,9 @@
 		"directory": "./public",
 		"binding": "ASSETS",
 		"not_found_handling": "404-page",
-		// everything else is served as a plain file without waking the Worker up
-		"run_worker_first": ["/api/*", "/downloads/*"]
+		// everything else is served as a plain file without waking the Worker up. The forum's sitemap is
+		// the Worker's because the threads are: they live in a Durable Object, not in ./public
+		"run_worker_first": ["/api/*", "/downloads/*", "/sitemap-forum.xml"]
 	},
 	"durable_objects": {
 		"bindings": [

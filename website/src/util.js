@@ -2,10 +2,11 @@
 
 export const AVATARS = ["blink", "troll", "mime", "referee", "ghost", "hacker"];
 
+// x-robots-tag: pages fetch these to draw themselves, so crawlers may read them, but raw JSON is never a search result
 export const json = (data, status = 200, headers = {}) =>
 	new Response(JSON.stringify(data), {
 		status,
-		headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...headers }
+		headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex", ...headers }
 	});
 
 export const today = () => new Date().toISOString().slice(0, 10);

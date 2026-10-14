@@ -468,7 +468,7 @@
 			"",
 			"MEMORY TEST ........ 524288K OK",
 			"DETECTING TROLL NAVIGATOR ... OK",
-			"LOADING 35 MODULES ......... OK",
+			"LOADING MODULES ............ OK",
 			"LOADING SKIN ANIMATION ..... OK  (NEW!)",
 			"CONNECTING TO WORKER ....... OK",
 			""
@@ -867,7 +867,7 @@
 	// ------------------------------------------------------------ reveals, counters, typing, tilt
 	function reveals() {
 		var els = $$("[data-reveal]");
-		$$("h2").forEach(function (h) { if (!h.hasAttribute("data-reveal")) els.push(h); });
+		$$("h2, .content > h1").forEach(function (h) { if (!h.hasAttribute("data-reveal")) els.push(h); });
 		if (!("IntersectionObserver" in window) || reduced) {
 			els.forEach(function (el) { el.classList.add("in"); });
 			$$(".changelog .line").forEach(function (l) { l.classList.add("on"); });
@@ -887,7 +887,8 @@
 	}
 
 	function countUp(el) {
-		var to = parseInt(el.getAttribute("data-count"), 10), t0 = performance.now();
+		// an empty data-count counts up to whatever the element already says
+		var to = parseInt(el.getAttribute("data-count") || el.textContent, 10), t0 = performance.now();
 		(function step(now) {
 			var p = Math.min(1, (now - t0) / 900);
 			el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
@@ -901,7 +902,8 @@
 
 	function typewriters() {
 		$$("[data-type]").forEach(function (el) {
-			var text = el.getAttribute("data-type");
+			// an empty data-type types out the text that's already there
+			var text = el.getAttribute("data-type") || el.textContent;
 			if (reduced) { el.textContent = text; return; }
 			var i = 0;
 			el.textContent = "";
@@ -1408,8 +1410,9 @@
 			}
 		});
 		// look away and the tab title begs you to come back, while the favicon blinks
-		var title = document.title, icon = $('link[rel="icon"]'), normal = icon ? icon.href : "", inverted = null, timer;
-		if (icon) {
+		// every size the page offers gets swapped, whichever one the browser picked for the tab
+		var title = document.title, icons = $$('link[rel="icon"]'), normal = icons.map(function (l) { return l.href; }), inverted = null, timer;
+		if (icons.length) {
 			var img = new Image();
 			img.onload = function () {
 				var c = document.createElement("canvas");
@@ -1421,7 +1424,7 @@
 				g.drawImage(img, 0, 0, 32, 32);
 				try { inverted = c.toDataURL(); } catch (e) { inverted = null; }
 			};
-			img.src = normal;
+			img.src = normal[0];
 		}
 		document.addEventListener("visibilitychange", function () {
 			clearInterval(timer);
@@ -1430,11 +1433,11 @@
 				timer = setInterval(function () {
 					i++;
 					document.title = (msg + msg).slice(i % msg.length, i % msg.length + 26);
-					if (icon && inverted) icon.href = i % 2 ? inverted : normal;
+					if (inverted) icons.forEach(function (l, n) { l.href = i % 2 ? inverted : normal[n]; });
 				}, 400);
 			} else {
 				document.title = title;
-				if (icon) icon.href = normal;
+				icons.forEach(function (l, n) { l.href = normal[n]; });
 			}
 		});
 	}

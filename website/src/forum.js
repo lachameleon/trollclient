@@ -17,6 +17,8 @@ export const BOARDS = [
 const THREADS_PER_PAGE = 25;
 const POSTS_PER_PAGE = 20;
 const EDIT_WINDOW_MS = 30 * 60000;
+// a sitemap file holds 50,000 addresses at most; the newest threads are the ones worth finding
+const SITEMAP_THREADS = 20000;
 
 const POST_COLUMNS = "id, thread, name, trip, site, avatar, msg, at, edited, hidden";
 const THREAD_COLUMNS = "id, board, title, name, trip, avatar, at, bumped, replies, views, last_name, last_at, pinned, locked";
@@ -125,6 +127,12 @@ export function thread(hq, id, page, who) {
 		t.views++;
 	}
 	return { thread: t, board: BOARDS.find((b) => b.id === t.board), posts, first, page, pages: last, total };
+}
+
+/** Every board and thread a search engine may list, for /sitemap-forum.xml: newest activity first. */
+export function sitemap(hq) {
+	const threads = hq.sql.exec("SELECT id, bumped FROM threads WHERE hidden = 0 ORDER BY bumped DESC LIMIT ?", SITEMAP_THREADS).toArray();
+	return { boards: BOARDS.map((b) => b.id), threads };
 }
 
 /** Where a post lives, for >>123 links. */

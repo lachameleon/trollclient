@@ -118,14 +118,17 @@ a:hover { background: var(--accent); color: var(--on-accent); text-decoration: n
 ::selection { background: var(--accent); color: var(--on-accent); }
 
 h1, h2, h3, h4 { font-weight: normal; margin: 0 0 10px; line-height: 1.2; }
-h2 { font-size: 32px; line-height: 40px; letter-spacing: 1px; margin-top: 8px; }
-h2::after {
+/* a page's own heading (the h1 at the top of .content) looks like any section heading */
+h2, .content > h1 { font-size: 32px; line-height: 40px; letter-spacing: 1px; margin-top: 8px; }
+h2::after, .content > h1::after {
 	content: ""; display: block; height: 2px; width: 0; margin-top: 6px;
 	background: repeating-linear-gradient(90deg, var(--text) 0 4px, transparent 4px 6px);
 	opacity: 0.45;
 	transition: width 0.9s steps(24);
 }
-h2.in::after, html:not(.js) h2::after { width: 100%; }
+h2.in::after, .content > h1.in::after, html:not(.js) h2::after, html:not(.js) .content > h1::after { width: 100%; }
+/* read out and indexed but not drawn: the name of something that's on screen as a picture */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 h3 { font-size: 16px; line-height: 24px; color: var(--text); }
 p { margin: 0 0 12px; }
 ul, ol { padding-left: 22px; }
@@ -1068,7 +1071,7 @@ html.js .changelog .line.on { opacity: 1; }
 .gallery figure { margin: 0; padding: 7px 7px 4px; transition: transform 0.25s cubic-bezier(.3, 1.6, .5, 1), box-shadow 0.25s; }
 .gallery figure:nth-child(odd):hover { transform: rotate(-1deg) translateY(-3px); }
 .gallery figure:nth-child(even):hover { transform: rotate(1deg) translateY(-3px); }
-.gallery img { width: 100%; display: block; image-rendering: auto; border-radius: 2px; }
+.gallery img { width: 100%; height: auto; display: block; image-rendering: auto; border-radius: 2px; }
 .gallery figcaption { padding: 6px 2px 2px; color: var(--dim); font-size: 11px; }
 .lightbox { position: fixed; inset: 0; z-index: 150; display: none; background: rgba(0, 0, 0, 0.9); }
 .lightbox.open { display: block; animation: fade-in 0.2s ease-out; }
@@ -1452,7 +1455,7 @@ body.skinblinked .content > * { animation: page-blink 0.8s steps(1) 4; animation
 	.searchbox:focus-within { width: 100%; }
 	.bookmarks a.bm:not(.hot) { display: none; }
 	.statusbar .meter, .statusbar .zone { display: none; }
-	h2 { font-size: 24px; line-height: 32px; }
+	h2, .content > h1 { font-size: 24px; line-height: 32px; }
 	.button.huge { font-size: 24px; line-height: 32px; padding: 10px 20px; }
 	.facts { grid-template-columns: repeat(2, 1fr); }
 	.feature-skin { grid-template-columns: 1fr; padding: 14px; }
@@ -1488,7 +1491,7 @@ body.skinblinked .content > * { animation: page-blink 0.8s steps(1) 4; animation
 }
 
 /* ---------------------------------------------------------------- analytics page: one ink, any theme */
-h2 .live-dot { display: inline-block; vertical-align: middle; margin-left: 6px; }
+h1 .live-dot, h2 .live-dot { display: inline-block; vertical-align: middle; margin-left: 6px; }
 .an-controls, .an-chip-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 4px; }
 .an-controls .grow { flex: 1; }
 button.chip { cursor: pointer; }
@@ -1589,8 +1592,8 @@ body.theme-aero {
 	font-family: var(--px);
 }
 body.theme-aero, body.theme-aero * { -webkit-font-smoothing: antialiased; font-smooth: auto; }
-body.theme-aero h2 { font-weight: 300; letter-spacing: 0; color: #0d62ab; text-shadow: 0 1px 0 #fff; }
-body.theme-aero h2::after { height: 3px; border-radius: 3px; opacity: 0.9; background: linear-gradient(90deg, var(--accent), var(--grass) 55%, transparent); }
+body.theme-aero h2, body.theme-aero .content > h1 { font-weight: 300; letter-spacing: 0; color: #0d62ab; text-shadow: 0 1px 0 #fff; }
+body.theme-aero h2::after, body.theme-aero .content > h1::after { height: 3px; border-radius: 3px; opacity: 0.9; background: linear-gradient(90deg, var(--accent), var(--grass) 55%, transparent); }
 body.theme-aero h3 { font-weight: 600; }
 body.theme-aero a { text-decoration-style: solid; color: #0b65b5; }
 body.theme-aero a:hover { color: var(--on-accent); }

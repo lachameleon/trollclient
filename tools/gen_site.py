@@ -9,6 +9,9 @@
   "blink", a demo skin with every outer layer painted for the skin animation lab.
 - the shared page chrome (website/partials) stamped into every page, the modules
   table, the gallery and the jar's size and checksum.
+- what search engines read: every page's title, description, canonical link, link
+  preview and structured data (website/partials/head.html filled in from SEO below),
+  plus sitemap.xml and robots.txt.
 - website/src/releases.json: what the Worker tells the client's updater (version,
   the Minecraft version it was built for, size, checksum).
 
@@ -47,6 +50,73 @@ PAGES = {
     "analytics.html": ("analytics", "Analytics"),
     "privacy.html": ("privacy", "Privacy"),
 }
+
+SITE_NAME = "Troll Client"
+# where the site lives when gradle.properties doesn't say (a build with no telemetry_url)
+DEFAULT_SITE_URL = "https://trollclient.cyou"
+
+# page file -> what search engines and link previews are told about it; stamp_head() turns each entry
+# into that page's <head> tags. {mc}, {version}, {modules}, {categories} and {category_names} are filled
+# in from gradle.properties and the parsed module list, so the numbers can't go stale. Titles want to
+# stay under 60 characters and descriptions under 160, or the results page cuts them off. "shot" is
+# the screenshot (img/shots) a shared link shows; "extras" picks the structured data beyond the basics.
+SEO = {
+    "index.html": {
+        "title": "Troll Client :: a troll client for Minecraft {mc} (Fabric)",
+        "desc": "A free black & white Fabric client for Minecraft {mc}: {modules} modules for being mildly annoying, "
+                "shaders, themes, and skin animation the whole server sees.",
+        "shot": "title.jpg",
+        "extras": ("software", "video"),
+    },
+    "skin-animation.html": {
+        "title": "Minecraft skin animation (SkinBlink) :: Troll Client",
+        "desc": "Animate your Minecraft skin: SkinBlink flickers your hat, jacket, sleeves, trousers and cape in "
+                "patterns everyone on the server sees. Try it on your own skin.",
+        "shot": "twerk.jpg",
+        "extras": ("faq",),
+    },
+    "modules.html": {
+        "title": "All {modules} modules and their settings :: Troll Client",
+        "desc": "Every Troll Client module and what its settings do, straight from the source: {modules} modules in "
+                "{categories} categories ({category_names}).",
+        "shot": "menu.jpg",
+    },
+    "gallery.html": {
+        "title": "Screenshots: the menu, shaders and modules :: Troll Client",
+        "desc": "Screenshots straight out of Troll Client for Minecraft {mc}: the title screen, the menu, the black "
+                "& white shaders, and modules like Twerk, Orbit and Trapper.",
+        "shot": "orbit.jpg",
+        "extras": ("gallery",),
+    },
+    "download.html": {
+        "title": "Download Troll Client {version} for Minecraft {mc} (Fabric)",
+        "desc": "Download Troll Client {version}, a free Fabric mod for Minecraft {mc}. The jar with its size and "
+                "SHA-256, install steps, menu controls, chat commands and an FAQ.",
+        "shot": "title.jpg",
+        "extras": ("software", "faq"),
+    },
+    # no canonical link in the file: one page draws every board and thread, so js/forum.js sets it per view
+    "forum.html": {
+        "title": "Forum and live chatroom :: Troll Client",
+        "desc": "The Troll Client forum: boards, threads and replies, no account needed. Plus the in-game chatroom, live.",
+        "shot": "title.jpg",
+        "canonical": False,
+    },
+    "analytics.html": {
+        "title": "Live usage analytics :: Troll Client",
+        "desc": "How Troll Client actually gets used, live and anonymous: active installs, the most used modules, "
+                "setups, play times and servers, and exactly what's collected.",
+        "shot": "settings.jpg",
+    },
+    "privacy.html": {
+        "title": "Privacy :: Troll Client",
+        "desc": "What the Troll Client website and the client itself collect, what they don't, and what you can do "
+                "about it. Plain words, no lawyer.",
+        "shot": "title.jpg",
+    },
+}
+# what a crawler shouldn't fetch: these count things (downloads, updates, visitors) or go on to Mojang
+ROBOTS_DISALLOW = ["/downloads/", "/api/update/", "/api/skin/", "/api/hit", "/api/bump"]
 
 WHITE = (240, 240, 240, 255)
 BLACK = (10, 10, 10, 255)
@@ -444,6 +514,8 @@ def skin_textures():
 def favicon():
     icon = Image.open(os.path.join(ASSETS, "icon.png")).convert("RGBA")
     save(icon.resize((32, 32), Image.NEAREST), "favicon.png")
+    # Google only takes a favicon whose side is a multiple of 48; three times the icon is one, and stays sharp
+    save(icon.resize((icon.width * 3, icon.height * 3), Image.NEAREST), "favicon-384.png")
     # browsers ask for /favicon.ico whatever the page says
     icon.resize((32, 32), Image.NEAREST).save(os.path.join(SITE, "favicon.ico"), sizes=[(16, 16), (32, 32)])
 
@@ -502,9 +574,9 @@ def modules_table(categories, modules):
     return "\n".join(out)
 
 
-def stamp_chrome():
+def stamp_chrome(modules):
     """Puts the shared window chrome (website/partials) into every page, with that page's tab lit."""
-    top = open(os.path.join(PARTIALS, "top.html"), encoding="utf-8").read()
+    top = open(os.path.join(PARTIALS, "top.html"), encoding="utf-8").read().replace("{{modules}}", str(len(modules)))
     bottom = open(os.path.join(PARTIALS, "bottom.html"), encoding="utf-8").read()
     for page, (tab, title) in PAGES.items():
         html = top.replace("{{title}}", title).replace(
@@ -575,20 +647,271 @@ def gallery():
     if not os.path.exists(manifest):
         return
     shots = json.load(open(manifest, encoding="utf-8"))
-    figs = ['\t\t\t\t\t<figure class="bevel"><img class="clicky" src="img/shots/%s" data-full="img/shots/%s" alt="%s" data-caption="%s" loading="lazy">'
-            '<figcaption>%s</figcaption></figure>' % (s["file"], s["file"], esc(s["caption"]), esc(s["caption"]), esc(s["caption"]))
-            for s in shots]
+    figs = []
+    for s in shots:
+        # the real size, so the page keeps the picture's place while it loads instead of jumping
+        width, height = Image.open(os.path.join(IMG, "shots", s["file"])).size
+        figs.append('\t\t\t\t\t<figure class="bevel"><img class="clicky" src="img/shots/%s" data-full="img/shots/%s" width="%d" height="%d" alt="%s" data-caption="%s" loading="lazy">'
+                    '<figcaption>%s</figcaption></figure>' % (s["file"], s["file"], width, height, esc(s["caption"]), esc(s["caption"]), esc(s["caption"])))
     fill("gallery.html", "gallery", '\t\t\t\t<div class="gallery">\n%s\n\t\t\t\t</div>' % "\n".join(figs))
+
+
+# ------------------------------------------------------------------ search engines
+
+def site_url():
+    """The site's origin: wherever the client is told to report to (telemetry_url in gradle.properties)."""
+    m = re.match(r"https?://[^/]+", gradle_properties().get("telemetry_url", ""))
+    return m.group(0) if m else DEFAULT_SITE_URL
+
+
+def page_url(page):
+    return site_url() + ("/" if page == "index.html" else "/" + page[:-len(".html")])
+
+
+def changed(path, time=False):
+    """When a file last changed, as a date (or a full timestamp): its last commit, or now if it has changes that aren't committed."""
+    import datetime
+    import subprocess
+    try:
+        git = lambda *args: subprocess.run(("git",) + args + ("--", path), cwd=REPO, capture_output=True, text=True, check=True).stdout.strip()
+        when = "" if git("status", "--porcelain") else git("log", "-1", "--format=" + ("%cI" if time else "%cs"))
+        if when:
+            return when
+    except (OSError, subprocess.CalledProcessError):
+        pass  # not a checkout, or no git: today will do
+    now = datetime.datetime.now().astimezone()
+    return now.isoformat(timespec="seconds") if time else now.date().isoformat()
+
+
+def plain(html):
+    """Text of a bit of HTML: tags dropped, entities decoded, whitespace collapsed."""
+    from html import unescape
+    return re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", "", html))).strip()
+
+
+def mp4_seconds(path):
+    """How long an MP4 runs, from its movie header (moov > mvhd). 0 if it has none."""
+    import struct
+
+    def boxes(f, start, end):
+        while start + 8 <= end:
+            f.seek(start)
+            size, kind = struct.unpack(">I4s", f.read(8))
+            header = 8
+            if size == 1:
+                size, header = struct.unpack(">Q", f.read(8))[0], 16
+            elif size == 0:
+                size = end - start
+            if size < header:
+                return
+            yield kind, start + header, start + size
+            start += size
+
+    with open(path, "rb") as f:
+        for kind, start, end in boxes(f, 0, os.path.getsize(path)):
+            if kind != b"moov":
+                continue
+            for kind, start, end in boxes(f, start, end):
+                if kind != b"mvhd":
+                    continue
+                f.seek(start)
+                wide = f.read(1) == b"\x01"  # version 1 keeps its dates and its length in 64 bits
+                f.seek(start + (20 if wide else 12))
+                scale, length = struct.unpack(">IQ" if wide else ">II", f.read(12 if wide else 8))
+                return length / scale if scale else 0
+    return 0
+
+
+def showcase_video(words):
+    """The showcase video as search engines want it described, or None if it hasn't been made."""
+    path = os.path.join(SITE, "video", "showcase.mp4")
+    if not os.path.exists(path):
+        return None
+    return {
+        "name": "%s showcase" % SITE_NAME,
+        "description": "Troll Client recorded straight out of Minecraft %(mc)s: the title screen, the menu and its themes, "
+                       "the skins, and the modules in action under each of the shaders." % words,
+        "thumbnail": site_url() + "/video/poster.jpg",
+        "content": site_url() + "/video/showcase.mp4",
+        "uploaded": changed(path, time=True),
+        "seconds": round(mp4_seconds(path)),
+    }
+
+
+def release(version):
+    """This version's entry in the release list (size, date), or {} before the jar has been built."""
+    path = os.path.join(REPO, "website", "src", "releases.json")
+    if not os.path.exists(path):
+        return {}
+    return next((r for r in json.load(open(path, encoding="utf-8")).get("releases", []) if r.get("version") == version), {})
+
+
+def structured_data(page, url, title, desc, image, words):
+    """schema.org JSON-LD for a page: what it is, where it sits in the site, and whatever SEO[page]["extras"] asks for."""
+    site, props, extras = site_url(), gradle_properties(), SEO[page].get("extras", ())
+    home = page == "index.html"
+    text = open(os.path.join(SITE, page), encoding="utf-8").read()
+    website = {"@type": "WebSite", "@id": site + "/#website", "url": site + "/", "name": SITE_NAME, "inLanguage": "en"}
+    if home:
+        # the home page is where Google takes the site's name from
+        website.update({"alternateName": ["TrollClient", re.sub(r"^https?://", "", site)], "description": desc})
+    webpage = {"@type": "ImageGallery" if "gallery" in extras else "WebPage", "@id": url + "#webpage", "url": url, "name": title,
+               "description": desc, "inLanguage": "en", "isPartOf": {"@id": site + "/#website"}}
+    if image:
+        webpage["primaryImageOfPage"] = {"@type": "ImageObject", "url": image["url"], "width": image["width"], "height": image["height"]}
+    graph = [website, webpage]
+    if not home:
+        webpage["breadcrumb"] = {"@id": url + "#breadcrumb"}
+        graph.append({"@type": "BreadcrumbList", "@id": url + "#breadcrumb", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": site + "/"},
+            {"@type": "ListItem", "position": 2, "name": PAGES[page][1], "item": url}]})
+
+    if "software" in extras:
+        jar = "troll-client-%s.jar" % props["version"]
+        built = release(props["version"])
+        software = {
+            "@type": "SoftwareApplication", "@id": site + "/#software", "name": SITE_NAME, "url": site + "/",
+            "description": SEO["index.html"]["desc"].format(**words),
+            "applicationCategory": "GameApplication", "applicationSubCategory": "Minecraft mod",
+            "operatingSystem": "Windows, macOS, Linux", "softwareVersion": props["version"],
+            "softwareRequirements": "Minecraft %s, Fabric Loader %s or newer, Fabric API %s" % (
+                props["minecraft_version"], props["loader_version"], props["fabric_api_version"]),
+            "downloadUrl": site + "/downloads/" + jar, "installUrl": site + "/download",
+            "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+            "screenshot": [site + "/img/shots/" + s for s in ("title.jpg", "menu.jpg", "settings.jpg", "twerk.jpg")
+                           if os.path.exists(os.path.join(IMG, "shots", s))],
+        }
+        if built:
+            software.update({"fileSize": "%d KB" % round(built["size"] / 1024), "datePublished": built["date"]})
+        webpage["mainEntity"] = {"@id": software["@id"]}
+        graph.append(software)
+
+    video = showcase_video(words) if "video" in extras else None
+    if video:
+        graph.append({"@type": "VideoObject", "@id": site + "/#showcase", "name": video["name"], "description": video["description"],
+                      "thumbnailUrl": video["thumbnail"], "contentUrl": video["content"], "uploadDate": video["uploaded"],
+                      "duration": "PT%dM%dS" % divmod(video["seconds"], 60)})
+
+    if "faq" in extras:
+        # straight off the page, so the answers search engines get are the ones people can read there
+        questions = [{"@type": "Question", "name": plain(q), "acceptedAnswer": {"@type": "Answer", "text": plain(a)}}
+                     for q, a in re.findall(r"<details[^>]*>\s*<summary>(.*?)</summary>(.*?)</details>", text, re.S)]
+        if questions:
+            graph.append({"@type": "FAQPage", "@id": url + "#faq", "mainEntity": questions})
+
+    if "gallery" in extras:
+        webpage["image"] = [{"@type": "ImageObject", "contentUrl": site + "/" + src, "caption": plain(alt),
+                             "width": int(width), "height": int(height)}
+                            for src, width, height, alt in re.findall(r'<img class="clicky" src="([^"]+)"[^>]*? width="(\d+)" height="(\d+)" alt="([^"]*)"', text)]
+
+    # "<" can't end the script element early if it's never written as one
+    return json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False).replace("<", "\\u003c")
+
+
+def stamp(template, values):
+    """Fills {{name}} placeholders. A line that asks for a value there isn't (None) is left out altogether."""
+    out = []
+    for line in template.splitlines():
+        names = re.findall(r"\{\{([\w-]+)\}\}", line)
+        if any(values.get(n) is None for n in names):
+            continue
+        for n in names:
+            line = line.replace("{{%s}}" % n, values[n])
+        out.append(line)
+    return "\n".join(out)
+
+
+def seo_words(categories, modules):
+    props = gradle_properties()
+    names = [c["name"].lower() for c in categories]
+    return {"mc": props["minecraft_version"], "version": props["version"], "modules": len(modules), "categories": len(categories),
+            "category_names": ", ".join(names[:-1]) + " and " + names[-1]}
+
+
+def stamp_head(words):
+    """Puts website/partials/head.html into every page's <head>, filled in from SEO."""
+    template = open(os.path.join(PARTIALS, "head.html"), encoding="utf-8").read()
+    manifest = os.path.join(IMG, "shots", "manifest.json")
+    captions = {s["file"]: s["caption"] for s in json.load(open(manifest, encoding="utf-8"))} if os.path.exists(manifest) else {}
+    for page, meta in SEO.items():
+        url = page_url(page)
+        title, desc = meta["title"].format(**words), meta["desc"].format(**words)
+        for what, text, most in (("title", title, 60), ("description", desc, 160)):
+            if len(text) > most:
+                print("warning: the %s of %s is %d characters; search results cut it off after about %d" % (what, page, len(text), most))
+        image = None
+        shot = os.path.join(IMG, "shots", meta["shot"])
+        if os.path.exists(shot):
+            width, height = Image.open(shot).size
+            image = {"url": site_url() + "/img/shots/" + meta["shot"], "width": width, "height": height,
+                     "alt": captions.get(meta["shot"], SITE_NAME)}
+        fill(page, "head", stamp(template, {
+            "title": esc(title), "description": esc(desc), "url": esc(url),
+            "canonical": esc(url) if meta.get("canonical", True) else None,
+            "image": esc(image["url"]) if image else None,
+            "image-width": str(image["width"]) if image else None,
+            "image-height": str(image["height"]) if image else None,
+            "image-alt": esc(image["alt"]) if image else None,
+            "card": "summary_large_image" if image else "summary",
+            "structured-data": structured_data(page, url, title, desc, image, words),
+        }))
+
+
+def write_sitemap(words):
+    """sitemap.xml: every page, when it last changed, the screenshots on it and the showcase video."""
+    site = site_url()
+    out = ['<?xml version="1.0" encoding="UTF-8"?>',
+           "<!-- generated by tools/gen_site.py; the forum's threads are in /sitemap-forum.xml, which the Worker writes -->",
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" '
+           'xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">']
+    for page, meta in SEO.items():
+        path = os.path.join(SITE, page)
+        text = open(path, encoding="utf-8").read()
+        out += ["\t<url>", "\t\t<loc>%s</loc>" % esc(page_url(page)), "\t\t<lastmod>%s</lastmod>" % changed(path)]
+        for src in dict.fromkeys(re.findall(r'<img[^>]*? src="(img/shots/[\w./-]+)"', text)):
+            out.append("\t\t<image:image><image:loc>%s/%s</image:loc></image:image>" % (site, esc(src)))
+        video = showcase_video(words) if "video" in meta.get("extras", ()) else None
+        if video:
+            out += ["\t\t<video:video>",
+                    "\t\t\t<video:thumbnail_loc>%s</video:thumbnail_loc>" % esc(video["thumbnail"]),
+                    "\t\t\t<video:title>%s</video:title>" % esc(video["name"]),
+                    "\t\t\t<video:description>%s</video:description>" % esc(video["description"]),
+                    "\t\t\t<video:content_loc>%s</video:content_loc>" % esc(video["content"]),
+                    "\t\t\t<video:duration>%d</video:duration>" % video["seconds"],
+                    "\t\t\t<video:publication_date>%s</video:publication_date>" % video["uploaded"],
+                    "\t\t</video:video>"]
+        out.append("\t</url>")
+    out.append("</urlset>")
+    with open(os.path.join(SITE, "sitemap.xml"), "w", encoding="utf-8") as f:
+        f.write("\n".join(out) + "\n")
+
+
+def write_robots():
+    site = site_url()
+    lines = ["# generated by tools/gen_site.py (ROBOTS_DISALLOW). Everything is open to search engines except the",
+             "# addresses that count something when they're fetched, and the skin lookups that go on to Mojang.",
+             "User-agent: *"]
+    lines += ["Disallow: " + path for path in ROBOTS_DISALLOW]
+    lines += ["", "Sitemap: %s/sitemap.xml" % site, "Sitemap: %s/sitemap-forum.xml" % site]
+    with open(os.path.join(SITE, "robots.txt"), "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def main():
     os.makedirs(IMG, exist_ok=True)
     os.makedirs(os.path.join(SITE, "js"), exist_ok=True)
     categories, modules = write_data()
-    stamp_chrome()
+    stamp_chrome(modules)
     fill("modules.html", "modules", modules_table(categories, modules))
+    # how many modules there are, wherever the home page says so
+    fill("index.html", "count:modules", str(len(modules)))
     jar_info()
     gallery()
+    # after everything else on the pages: the structured data quotes them (FAQs, the gallery)
+    words = seo_words(categories, modules)
+    stamp_head(words)
+    write_sitemap(words)
+    write_robots()
     skin_textures()
     if "--pages" in sys.argv:
         print("pages, data and skin textures written to", SITE)

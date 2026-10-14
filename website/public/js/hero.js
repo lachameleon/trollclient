@@ -11,7 +11,7 @@
 	var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 	var LOGO = "TROLL CLIENT";
 	var SCROLL = "greetings to everyone getting walled in by nowayhome ... crystalcancel says no ... twerk responsibly ... " +
-		"35 modules, 5 shaders, 7 themes ... press right shift in game ... best viewed in netscape at 800x600 ...      ";
+		window.TROLL.modules.length + " modules, 5 shaders, 7 themes ... press right shift in game ... best viewed in netscape at 800x600 ...      ";
 
 	var W = 0, H = 0, dpr = 1;
 	var stars = [];
