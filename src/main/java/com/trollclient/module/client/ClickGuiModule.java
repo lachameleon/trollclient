@@ -1,5 +1,6 @@
 package com.trollclient.module.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.clickgui.ClickGuiScreen;
 import com.trollclient.module.Category;
 import com.trollclient.module.Module;
@@ -7,7 +8,6 @@ import com.trollclient.setting.BoolSetting;
 import com.trollclient.setting.ModeSetting;
 import com.trollclient.setting.NumberSetting;
 import com.trollclient.setting.TextSetting;
-import org.lwjgl.glfw.GLFW;
 
 public class ClickGuiModule extends Module {
 	public final NumberSetting scale = add(new NumberSetting("Scale", "Size of the menu window", 1.0, 0.6, 1.6, 0.05).unit("x"));
@@ -30,7 +30,7 @@ public class ClickGuiModule extends Module {
 
 	public ClickGuiModule() {
 		super("ClickGUI", "The menu you're looking at. Bound to Right Shift by default.", Category.CLIENT);
-		setKey(GLFW.GLFW_KEY_RIGHT_SHIFT);
+		setKey(InputConstants.KEY_RSHIFT);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.trollclient.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.tools.GuiToolsPanel;
 import com.trollclient.macro.MacroManager;
 import com.trollclient.module.ModuleManager;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,7 +26,7 @@ public abstract class KeyboardHandlerMixin {
 
 	@Inject(method = "keyPress", at = @At("HEAD"))
 	private void troll$onKey(long window, int action, KeyEvent event, CallbackInfo ci) {
-		if (action != GLFW.GLFW_PRESS || window != minecraft.getWindow().handle()) {
+		if (action != InputConstants.PRESS || window != minecraft.getWindow().handle()) {
 			return;
 		}
 		if (minecraft.player == null) {

@@ -5,6 +5,7 @@ import com.trollclient.module.Module;
 import com.trollclient.setting.BoolSetting;
 import com.trollclient.setting.NumberSetting;
 import com.trollclient.util.InventoryUtil;
+import com.trollclient.util.Swing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
@@ -69,7 +70,7 @@ public class Juggle extends Module {
 		ticks = 0;
 		toss();
 		if (swing.get()) {
-			mc.player.swing(swapped ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+			Swing.visible(swapped ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
 		}
 	}
 

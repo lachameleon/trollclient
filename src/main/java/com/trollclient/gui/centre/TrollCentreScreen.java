@@ -1,5 +1,7 @@
 package com.trollclient.gui.centre;
 
+import com.mojang.blaze3d.Blaze3D;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.trollclient.TrollClient;
 import com.trollclient.chat.Chatroom;
@@ -26,8 +28,6 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
-import org.lwjgl.glfw.GLFW;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -129,7 +129,7 @@ public class TrollCentreScreen extends Screen {
 			return false;
 		}
 		try {
-			Util.getPlatform().openUri(URI.create(url));
+			Blaze3D.openUri(URI.create(url));
 			return true;
 		} catch (IllegalArgumentException e) {
 			TrollClient.LOGGER.warn("Couldn't open {}", url, e);
@@ -574,7 +574,7 @@ public class TrollCentreScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (closing || event.button() != 0) {
+		if (closing || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return true;
 		}
 		double mx = event.x(), my = event.y();
@@ -621,17 +621,17 @@ public class TrollCentreScreen extends Screen {
 			return true;
 		}
 		int key = event.key();
-		if (key == GLFW.GLFW_KEY_ESCAPE) {
+		if (key == InputConstants.KEY_ESCAPE) {
 			onClose();
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_TAB) {
+		if (key == InputConstants.KEY_TAB) {
 			show(Tab.values()[(tab.ordinal() + 1) % Tab.values().length]);
 			Sounds.tick();
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_PAGE_UP || key == GLFW.GLFW_KEY_PAGE_DOWN) {
-			scrollBy((bodyH() - 8 - LINE_H) * (key == GLFW.GLFW_KEY_PAGE_UP ? -1 : 1));
+		if (key == InputConstants.KEY_PAGEUP || key == InputConstants.KEY_PAGEDOWN) {
+			scrollBy((bodyH() - 8 - LINE_H) * (key == InputConstants.KEY_PAGEUP ? -1 : 1));
 			return true;
 		}
 		if (tab == Tab.CHATROOM) {
@@ -641,8 +641,8 @@ public class TrollCentreScreen extends Screen {
 			input.setFocused(true);
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_UP || key == GLFW.GLFW_KEY_DOWN) {
-			scrollBy(LINE_H * 3 * (key == GLFW.GLFW_KEY_UP ? -1 : 1));
+		if (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) {
+			scrollBy(LINE_H * 3 * (key == InputConstants.KEY_UP ? -1 : 1));
 		}
 		return true;
 	}

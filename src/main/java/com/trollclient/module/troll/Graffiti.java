@@ -11,14 +11,15 @@ import com.trollclient.util.ChatUtil;
 import com.trollclient.util.Delay;
 import com.trollclient.util.InventoryUtil;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.HangingSignItem;
-import net.minecraft.world.item.SignItem;
+import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -81,7 +82,7 @@ public class Graffiti extends Module {
 			aim = null;
 			return;
 		}
-		int slot = InventoryUtil.findHotbar(s -> s.getItem() instanceof SignItem && !(s.getItem() instanceof HangingSignItem));
+		int slot = InventoryUtil.findHotbar(s -> s.is(ItemTags.SIGNS));
 		if (slot < 0) {
 			aim = null;
 			return;
@@ -106,7 +107,7 @@ public class Graffiti extends Module {
 		int previous = InventoryUtil.selected();
 		InventoryUtil.select(slot);
 		if (mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND, seen).consumesAction()) {
-			mc.player.swing(InteractionHand.MAIN_HAND);
+			Swing.local(InteractionHand.MAIN_HAND);
 			pending = aim.above();
 			pendingText = text;
 			pendingAt = System.currentTimeMillis();
@@ -130,11 +131,11 @@ public class Graffiti extends Module {
 	 * Mixin hook: the server wants text for a sign. If it's the one we just
 	 * placed, write ours and skip the editor screen.
 	 */
-	public boolean claimEditor(BlockPos pos, boolean front) {
+	public boolean claimEditor(BlockPos pos, SignTextSlot slot) {
 		if (!waitingForEditor() || !pending.equals(pos) || mc.getConnection() == null) {
 			return false;
 		}
-		mc.getConnection().send(new ServerboundSignUpdatePacket(pos, front, pendingText[0], pendingText[1], pendingText[2], pendingText[3]));
+		mc.getConnection().send(new ServerboundSignUpdatePacket(pos, List.of(pendingText), slot));
 		pending = null;
 		return true;
 	}

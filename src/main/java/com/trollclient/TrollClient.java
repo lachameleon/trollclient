@@ -56,6 +56,9 @@ public class TrollClient implements ClientModInitializer {
 			}
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+			if (mc.player != null && Rotations.isSwapped()) {
+				Rotations.end(mc.player);
+			}
 			ConfigManager.tick();
 			MacroManager.saveTick();
 			TitleScreenGuard.tick(mc);

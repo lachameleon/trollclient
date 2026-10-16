@@ -319,7 +319,7 @@ public final class Updater {
 		return false;
 	}
 
-	/** The site's own idea of which Minecraft versions a release is for: "26.2" covers 26.2 and 26.2.x. */
+	/** The site's own idea of which Minecraft versions a release is for: "26.3" covers 26.3 and 26.3.x. */
 	private static boolean builtFor(JsonElement versions, String minecraft) {
 		if (versions == null || !versions.isJsonArray()) {
 			return false;

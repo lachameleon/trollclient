@@ -1,5 +1,9 @@
 # What changed in each version, newest first. The title screen's [ update notes ] button shows this file.
 # "= version" starts a version; every other line is one note, with an optional yyyy-mm-dd in front.
+= 1.1.0
+2026-10-15  now for minecraft 26.3. the 26.2 build stays on the website but gets no new work
+2026-10-15  your keybinds and macro keys carry over to 26.3's new key codes by themselves
+2026-10-15  26.3 has no plain arm swing packet: Twerk, Morse, Mimic, Fidget, Greeter and the Swing macro step punch the air with your main hand instead, and off-hand swings only show on your screen
 = 1.0.0
 2026-10-13  troll centre on the title screen: discord, the chatroom, the forum and these notes
 2026-10-13  fixed: a cycled setting no longer leaves its old and new value smeared over each other

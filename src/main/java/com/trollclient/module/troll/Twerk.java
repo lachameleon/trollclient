@@ -7,6 +7,7 @@ import com.trollclient.setting.ModeSetting;
 import com.trollclient.setting.NumberSetting;
 import com.trollclient.util.MovementControl;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 
@@ -90,7 +91,7 @@ public class Twerk extends Module {
 			MovementControl.sneak(MovementControl.PRIORITY_TWERK, (ticks / interval) % 2 == 0);
 		}
 		if (swing.get() && ticks % 2 == 0) {
-			mc.player.swing(ticks % 4 == 0 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+			Swing.visible(ticks % 4 == 0 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
 		}
 		if (sway.get() && !MovementControl.isMoveRequested()) {
 			float rad = mc.player.getYRot() * Mth.DEG_TO_RAD;

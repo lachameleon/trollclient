@@ -1,5 +1,6 @@
 package com.trollclient.gui.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Motion;
@@ -89,12 +90,12 @@ public class SliderRow extends Row {
 
 	@Override
 	public boolean mouseClicked(float mx, float my, int button) {
-		if (button == 0 && isHovered(mx, my)) {
+		if (button == InputConstants.MOUSE_BUTTON_LEFT && isHovered(mx, my)) {
 			dragging = true;
 			setFromMouse(mx);
 			return true;
 		}
-		if (button == 1 && isHovered(mx, my)) {
+		if (button == InputConstants.MOUSE_BUTTON_RIGHT && isHovered(mx, my)) {
 			setting.reset();
 			Sounds.click();
 			return true;

@@ -8,6 +8,7 @@ import com.trollclient.setting.NumberSetting;
 import com.trollclient.util.Delay;
 import com.trollclient.util.InventoryUtil;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -135,7 +136,7 @@ public class WindAnnoy extends Module {
 		mc.gameMode.useItem(mc.player, hand);
 		mc.player.setYRot(realYaw);
 		mc.player.setXRot(realPitch);
-		mc.player.swing(hand);
+		Swing.local(hand);
 		if (swapBack.get() && hand == InteractionHand.MAIN_HAND) {
 			InventoryUtil.select(previous);
 		}

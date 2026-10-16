@@ -1,12 +1,12 @@
 package com.trollclient.gui.clickgui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Theme;
 import com.trollclient.util.ColorUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -90,7 +90,7 @@ public class TextField {
 			return true;
 		}
 		switch (key) {
-			case GLFW.GLFW_KEY_BACKSPACE -> {
+			case InputConstants.KEY_BACKSPACE -> {
 				if (cursor > 0) {
 					if (event.hasControlDown()) {
 						int start = previousWord();
@@ -103,28 +103,28 @@ public class TextField {
 					onChange.accept(text);
 				}
 			}
-			case GLFW.GLFW_KEY_DELETE -> {
+			case InputConstants.KEY_DELETE -> {
 				if (cursor < text.length()) {
 					text = text.substring(0, cursor) + text.substring(cursor + 1);
 					onChange.accept(text);
 				}
 			}
-			case GLFW.GLFW_KEY_LEFT -> cursor = Math.max(0, cursor - 1);
-			case GLFW.GLFW_KEY_RIGHT -> cursor = Math.min(text.length(), cursor + 1);
-			case GLFW.GLFW_KEY_HOME -> cursor = 0;
-			case GLFW.GLFW_KEY_END -> cursor = text.length();
-			case GLFW.GLFW_KEY_TAB -> {
+			case InputConstants.KEY_LEFT -> cursor = Math.max(0, cursor - 1);
+			case InputConstants.KEY_RIGHT -> cursor = Math.min(text.length(), cursor + 1);
+			case InputConstants.KEY_HOME -> cursor = 0;
+			case InputConstants.KEY_END -> cursor = text.length();
+			case InputConstants.KEY_TAB -> {
 				String c = completion();
 				if (c != null) {
 					setText(c);
 					onChange.accept(text);
 				}
 			}
-			case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER -> {
+			case InputConstants.KEY_RETURN, InputConstants.KEY_NUMPADENTER -> {
 				onSubmit.run();
 				setFocused(false);
 			}
-			case GLFW.GLFW_KEY_ESCAPE -> setFocused(false);
+			case InputConstants.KEY_ESCAPE -> setFocused(false);
 			default -> {
 				return false;
 			}

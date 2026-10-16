@@ -1,6 +1,7 @@
 package com.trollclient.dev;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.TrollClient;
 import com.trollclient.gui.clickgui.ClickGuiScreen;
 import com.trollclient.gui.clickgui.GuiState;
@@ -32,8 +33,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.Vec3;
-import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -167,7 +168,7 @@ public final class Showcase {
 			int w = mc.getWindow().getGuiScaledWidth();
 			int h = mc.getWindow().getGuiScaledHeight();
 			if (at(k, 2.4f)) {
-				Captions.show("v1.0", "TROLL CLIENT", "a black & white client for minecraft 26.2", 5f);
+				Captions.show("v1.1", "TROLL CLIENT", "a black & white client for minecraft 26.3", 5f);
 			}
 			if (at(k, 3.6f)) {
 				glideTo(title.itemCenter(0), 0.5f);
@@ -182,7 +183,7 @@ public final class Showcase {
 				glideTo(new double[]{w * 0.18, h * 0.62}, 0.5f);
 			}
 			if (at(k, 7.0f) || at(k, 8.2f)) {
-				click(title, 0);
+				click(title, InputConstants.MOUSE_BUTTON_LEFT);
 			}
 			if (at(k, 7.5f)) {
 				glideTo(new double[]{w * 0.8, h * 0.45}, 0.5f);
@@ -255,7 +256,7 @@ public final class Showcase {
 		}, k -> {
 			ClickGuiScreen menu = mc.gui.screen() instanceof ClickGuiScreen s ? s : null;
 			if (at(k, 0.6f)) {
-				pressKey(GLFW.GLFW_KEY_RIGHT_SHIFT);
+				pressKey(InputConstants.KEY_RSHIFT);
 			}
 			if (at(k, 1.2f)) {
 				Captions.warp(mc.getWindow().getGuiScaledWidth() * 0.7, mc.getWindow().getGuiScaledHeight() * 0.75);
@@ -274,16 +275,16 @@ public final class Showcase {
 				glideTo(menu.tabCenter(Category.TROLL.ordinal()), 0.3f);
 			}
 			if (at(k, 3.2f)) {
-				click(menu, 0);
+				click(menu, InputConstants.MOUSE_BUTTON_LEFT);
 			}
 			if (at(k, 3.9f)) {
 				glideTo(menu.moduleRowCenter(0), 0.5f);
 			}
 			if (at(k, 5.0f)) {
-				click(menu, 0);
+				click(menu, InputConstants.MOUSE_BUTTON_LEFT);
 			}
 			if (at(k, 5.8f)) {
-				click(menu, 1);
+				click(menu, InputConstants.MOUSE_BUTTON_RIGHT);
 			}
 			if (at(k, 6.8f)) {
 				glideTo(menu.settingsRow("Speed", 0.3f), 0.5f);
@@ -301,7 +302,7 @@ public final class Showcase {
 				glideTo(menu.settingsRow("Mode", 0.95f), 0.4f);
 			}
 			if (at(k, 9.7f) || at(k, 10.2f)) {
-				click(menu, 0);
+				click(menu, InputConstants.MOUSE_BUTTON_LEFT);
 			}
 			if (at(k, 10.8f)) {
 				glideTo(menu.paletteCenter(), 0.5f);
@@ -310,7 +311,7 @@ public final class Showcase {
 			String[] presets = {"Paper", "Ink", "Graphite", "Fog", "Noir"};
 			for (int i = 0; i < presets.length; i++) {
 				if (at(k, 11.5f + i * 0.9f)) {
-					click(menu, 0);
+					click(menu, InputConstants.MOUSE_BUTTON_LEFT);
 					theme.preset.set(presets[i]);
 				}
 			}
@@ -325,13 +326,13 @@ public final class Showcase {
 				}
 			}
 			if (at(k, 17.9f)) {
-				menu.keyPressed(new KeyEvent(GLFW.GLFW_KEY_ENTER, 0, 0));
+				menu.keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
 			}
 			if (at(k, 19.0f)) {
-				menu.keyPressed(new KeyEvent(GLFW.GLFW_KEY_ESCAPE, 0, 0));
+				menu.keyPressed(new KeyEvent(InputConstants.KEY_ESCAPE, 0, 0));
 			}
 			if (at(k, 19.5f) || at(k, 19.8f)) {
-				menu.keyPressed(new KeyEvent(GLFW.GLFW_KEY_DOWN, 0, 0));
+				menu.keyPressed(new KeyEvent(InputConstants.KEY_DOWN, 0, 0));
 			}
 			if (at(k, 20.4f)) {
 				// Esc only unfocuses the search box at this point, so close the menu directly
@@ -813,7 +814,7 @@ public final class Showcase {
 		float yaw = -90 + (s > 3.4f && s < 4.6f ? (float) Math.sin((s - 3.4f) * 6) * 45 : 0);
 		walk(d, base.add(step, hop, 0), yaw);
 		if ((s > 2.8f && s < 3.4f) && k % 4 == 0) {
-			d.swing(InteractionHand.MAIN_HAND);
+			d.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 		}
 	}
 
@@ -846,7 +847,7 @@ public final class Showcase {
 		try {
 			Method press = net.minecraft.client.KeyboardHandler.class.getDeclaredMethod("keyPress", long.class, int.class, KeyEvent.class);
 			press.setAccessible(true);
-			press.invoke(mc.keyboardHandler, mc.getWindow().handle(), GLFW.GLFW_PRESS, new KeyEvent(key, 0, 0));
+			press.invoke(mc.keyboardHandler, mc.getWindow().handle(), InputConstants.PRESS, new KeyEvent(key, 0, 0));
 		} catch (ReflectiveOperationException e) {
 			throw new IllegalStateException(e);
 		}

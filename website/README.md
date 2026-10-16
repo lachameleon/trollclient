@@ -81,7 +81,7 @@ After a deploy that changes pages, nothing needs submitting again: Search Consol
   a one-off id (a hash of the room's challenge and its own nonce) with Mojang's session server, and the Worker asks
   `hasJoined`. No token comes here. Accounts Mojang doesn't vouch for can still talk, marked unverified. 200
   characters, one message per 1.5 s and eight a minute, the last 500 kept. `GET /api/chat/history` is the scrollback.
-- **Updates**: `GET /api/update?version=1.0.0&minecraft=26.2` answers from `src/releases.json` with the newest release
+- **Updates**: `GET /api/update?version=1.1.0&minecraft=26.3` answers from `src/releases.json` with the newest release
   built for that Minecraft version, or `update: false`. The jar itself comes from `GET /api/update/<file>.jar`, which
   serves the same file as `/downloads/` but bumps an `updates` counter instead of the download count.
 - **Poll**: `GET/POST /api/poll`, one vote per visitor per day.
@@ -116,7 +116,9 @@ npm --prefix website run deploy
 
 Every client on that Minecraft version picks it up on its next launch. Older entries stay in the list for as long
 as their jar is still in `public/downloads/`, so after moving to a new Minecraft version, clients on the old one
-keep getting the last build made for them and are never offered the new one. The client checks again on its side
+keep getting the last build made for them and are never offered the new one. The download page lists those older
+builds too (an "older minecraft versions" box, one per Minecraft version, written by `gen_site.py` from the same list),
+so deleting an old jar from `public/downloads/` is what retires it everywhere. The client checks again on its side
 before installing: checksum, size, the jar's own `fabric.mod.json` (mod id, version, and every `depends` entry
 against what's actually running).
 

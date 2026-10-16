@@ -1,5 +1,6 @@
 package com.trollclient.gui.menus;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Backdrop;
@@ -18,7 +19,6 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -433,7 +433,7 @@ public abstract class TrollListScreen<T> extends Screen {
 		double mx = event.x(), my = event.y();
 		float[] s = searchBox();
 		if (in(mx, my, s)) {
-			if (event.button() == 1) {
+			if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
 				search.setText("");
 			}
 			search.setFocused(true);
@@ -486,9 +486,9 @@ public abstract class TrollListScreen<T> extends Screen {
 		}
 		int key = event.key();
 		List<T> list = filtered();
-		if (key == GLFW.GLFW_KEY_UP || key == GLFW.GLFW_KEY_DOWN) {
+		if (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) {
 			if (!list.isEmpty()) {
-				selected = selected < 0 ? 0 : Math.floorMod(selected + (key == GLFW.GLFW_KEY_DOWN ? 1 : -1), list.size());
+				selected = selected < 0 ? 0 : Math.floorMod(selected + (key == InputConstants.KEY_DOWN ? 1 : -1), list.size());
 				float rowTop = selected * ROW_H;
 				if (rowTop < scrollTarget) {
 					scrollTarget = rowTop;
@@ -499,7 +499,7 @@ public abstract class TrollListScreen<T> extends Screen {
 			}
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
+		if (key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER) {
 			T entry = selectedEntry();
 			if (entry != null) {
 				activate(entry);
@@ -507,7 +507,7 @@ public abstract class TrollListScreen<T> extends Screen {
 			return true;
 		}
 		if (search.isFocused()) {
-			if (key == GLFW.GLFW_KEY_ESCAPE) {
+			if (key == InputConstants.KEY_ESCAPE) {
 				if (search.getText().isEmpty()) {
 					search.setFocused(false);
 				} else {
@@ -518,15 +518,15 @@ public abstract class TrollListScreen<T> extends Screen {
 			search.keyPressed(event);
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_ESCAPE) {
+		if (key == InputConstants.KEY_ESCAPE) {
 			onClose();
 			return true;
 		}
-		if ((key == GLFW.GLFW_KEY_DELETE || key == GLFW.GLFW_KEY_BACKSPACE) && selectedEntry() != null) {
+		if ((key == InputConstants.KEY_DELETE || key == InputConstants.KEY_BACKSPACE) && selectedEntry() != null) {
 			deleteRequested(selectedEntry());
 			return true;
 		}
-		if (event.hasControlDown() && key == GLFW.GLFW_KEY_F) {
+		if (event.hasControlDown() && key == InputConstants.KEY_F) {
 			search.setFocused(true);
 			return true;
 		}

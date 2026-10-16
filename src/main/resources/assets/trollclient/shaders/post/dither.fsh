@@ -1,17 +1,18 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
 // 1-bit ordered dithering, like a 1984 Macintosh: chunky 2px cells, 4x4 Bayer matrix, two colours.
 
 uniform sampler2D InSampler;
 
-in vec2 texCoord;
+layout(location = 0) in vec2 texCoord;
 
 layout(std140) uniform SamplerInfo {
     vec2 OutSize;
     vec2 InSize;
 };
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 const float BAYER[16] = float[](
     0.0, 8.0, 2.0, 10.0,

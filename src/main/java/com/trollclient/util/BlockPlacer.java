@@ -139,7 +139,7 @@ public final class BlockPlacer {
 		InventoryUtil.select(slot);
 		InteractionResult result = mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hit);
 		if (result.consumesAction()) {
-			player.swing(InteractionHand.MAIN_HAND);
+			Swing.local(InteractionHand.MAIN_HAND);
 		}
 		if (swapBack) {
 			InventoryUtil.select(previous);

@@ -1,5 +1,6 @@
 package com.trollclient.gui.clickgui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.trollclient.config.ConfigManager;
 import com.trollclient.gui.Anim;
@@ -18,6 +19,7 @@ import com.trollclient.module.ModuleManager;
 import com.trollclient.module.client.ClickGuiModule;
 import com.trollclient.module.client.ThemeModule;
 import com.trollclient.util.ColorUtil;
+import com.trollclient.util.Keys;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -25,7 +27,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -499,7 +500,7 @@ public class ClickGuiScreen extends Screen {
 		Draw.panel(g, lx - 3 + (glitching ? 1 : 0), ly - 3, aw, 13, Theme.accent(0.05f));
 		Draw.text(g, a, lx, ly, Theme.onAccent(), false);
 		Draw.text(g, b, lx + aw + 3, ly, Theme.text);
-		Draw.text(g, "v1.0", lx + aw + 7 + Theme.width("CLIENT"), ly, Theme.textDim);
+		Draw.text(g, "v1.1", lx + aw + 7 + Theme.width("CLIENT"), ly, Theme.textDim);
 		if (glitching) {
 			Draw.invert(g, lx - 3, ly + 2 + Motion.hash((int) (Motion.time() * 30)) * 6, aw + Theme.width("CLIENT") + 6, 2);
 		}
@@ -1224,7 +1225,7 @@ public class ClickGuiScreen extends Screen {
 
 		float[] sb = searchBox();
 		if (inRect(mx, my, sb[0], sb[1], sb[2], sb[3])) {
-			if (button == 1) {
+			if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
 				search.setText("");
 			}
 			search.setFocused(true);
@@ -1241,7 +1242,7 @@ public class ClickGuiScreen extends Screen {
 		float[] pb = paletteBox();
 		if (inRect(mx, my, pb[0], pb[1], pb[2], pb[3])) {
 			ThemeModule t = Theme.settings();
-			t.preset.cycle(button == 1 ? -1 : 1);
+			t.preset.cycle(button == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1);
 			themeFlashTime = Motion.time();
 			Sounds.toggle(true);
 			TerminalLog.push("theme --preset " + t.preset.get().toLowerCase(Locale.ROOT));
@@ -1263,14 +1264,14 @@ public class ClickGuiScreen extends Screen {
 		Module m = moduleAt(mx, my);
 		if (m != null) {
 			cursor = visibleModules().indexOf(m);
-			if (button == 2 && m.isToggleable()) {
+			if (button == InputConstants.MOUSE_BUTTON_MIDDLE && m.isToggleable()) {
 				if (wasBinding != m) {
 					binding = m;
 					bindingSince = Motion.time();
 					TerminalLog.push("bind " + m.getName().toLowerCase(Locale.ROOT) + " ... (esc to clear)");
 				}
 				Sounds.click();
-			} else if (button == 0 && m.isToggleable()) {
+			} else if (button == InputConstants.MOUSE_BUTTON_LEFT && m.isToggleable()) {
 				m.toggle();
 				RowState st = state(m);
 				st.rippleTime = Motion.time();
@@ -1280,7 +1281,7 @@ public class ClickGuiScreen extends Screen {
 				}
 				Sounds.toggle(m.isEnabled());
 				TerminalLog.push(m.getName().toLowerCase(Locale.ROOT) + (m.isEnabled() ? " --enable" : " --disable"));
-			} else if (button == 1 || !m.isToggleable()) {
+			} else if (button == InputConstants.MOUSE_BUTTON_RIGHT || !m.isToggleable()) {
 				selectModule(m);
 			}
 			return true;
@@ -1290,7 +1291,7 @@ public class ClickGuiScreen extends Screen {
 			return true;
 		}
 
-		if (button == 0 && inRect(mx, my, 0, 0, W, HEADER)) {
+		if (button == InputConstants.MOUSE_BUTTON_LEFT && inRect(mx, my, 0, 0, W, HEADER)) {
 			float now = Motion.time();
 			if (now - lastHeaderClick < 0.3f) {
 				GuiState.centerX = 0.5f;
@@ -1363,8 +1364,8 @@ public class ClickGuiScreen extends Screen {
 		if (binding != null) {
 			Module m = binding;
 			binding = null;
-			if (key == GLFW.GLFW_KEY_ESCAPE || key == GLFW.GLFW_KEY_BACKSPACE || key == GLFW.GLFW_KEY_DELETE) {
-				m.setKey(GLFW.GLFW_KEY_UNKNOWN);
+			if (key == InputConstants.KEY_ESCAPE || key == InputConstants.KEY_BACKSPACE || key == InputConstants.KEY_DELETE) {
+				m.setKey(Keys.NONE);
 				TerminalLog.push("unbind " + m.getName().toLowerCase(Locale.ROOT));
 			} else {
 				m.setKey(key);
@@ -1377,17 +1378,17 @@ public class ClickGuiScreen extends Screen {
 			if (panel.keyPressed(event)) {
 				return true;
 			}
-			if (key == GLFW.GLFW_KEY_ESCAPE) {
+			if (key == InputConstants.KEY_ESCAPE) {
 				panel.unfocusAll();
 			}
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_UP || key == GLFW.GLFW_KEY_DOWN) {
-			moveCursor(key == GLFW.GLFW_KEY_DOWN ? 1 : -1);
+		if (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) {
+			moveCursor(key == InputConstants.KEY_DOWN ? 1 : -1);
 			return true;
 		}
 		if (search.isFocused()) {
-			if (key == GLFW.GLFW_KEY_ESCAPE) {
+			if (key == InputConstants.KEY_ESCAPE) {
 				if (search.getText().isEmpty()) {
 					search.setFocused(false);
 				} else {
@@ -1395,7 +1396,7 @@ public class ClickGuiScreen extends Screen {
 				}
 				return true;
 			}
-			if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
+			if (key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER) {
 				List<Module> hits = visibleModules();
 				if (!hits.isEmpty()) {
 					selectModule(hits.get(cursor >= 0 && cursor < hits.size() ? cursor : 0));
@@ -1406,24 +1407,24 @@ public class ClickGuiScreen extends Screen {
 			return true;
 		}
 		boolean bindKey = key == ModuleManager.get(ClickGuiModule.class).getKey();
-		if (key == GLFW.GLFW_KEY_ESCAPE || (bindKey && bindArmed)) {
+		if (key == InputConstants.KEY_ESCAPE || (bindKey && bindArmed)) {
 			onClose();
 			return true;
 		}
-		if (event.hasControlDown() && key == GLFW.GLFW_KEY_F) {
+		if (event.hasControlDown() && key == InputConstants.KEY_F) {
 			search.setFocused(true);
 			return true;
 		}
 		Category[] cats = Category.values();
-		if (key == GLFW.GLFW_KEY_LEFT || key == GLFW.GLFW_KEY_RIGHT || key == GLFW.GLFW_KEY_TAB) {
-			int dir = key == GLFW.GLFW_KEY_LEFT || (key == GLFW.GLFW_KEY_TAB && event.hasShiftDown()) ? -1 : 1;
+		if (key == InputConstants.KEY_LEFT || key == InputConstants.KEY_RIGHT || key == InputConstants.KEY_TAB) {
+			int dir = key == InputConstants.KEY_LEFT || (key == InputConstants.KEY_TAB && event.hasShiftDown()) ? -1 : 1;
 			keyboardNav = true;
 			selectCategory(cats[Math.floorMod(category.ordinal() + dir, cats.length)]);
 			return true;
 		}
 		List<Module> mods = visibleModules();
 		Module focused = cursor >= 0 && cursor < mods.size() ? mods.get(cursor) : null;
-		if (key == GLFW.GLFW_KEY_SPACE && focused != null && focused.isToggleable()) {
+		if (key == InputConstants.KEY_SPACE && focused != null && focused.isToggleable()) {
 			focused.toggle();
 			RowState st = state(focused);
 			st.rippleTime = Motion.time();
@@ -1435,7 +1436,7 @@ public class ClickGuiScreen extends Screen {
 			Sounds.toggle(focused.isEnabled());
 			return true;
 		}
-		if ((key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) && focused != null) {
+		if ((key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER) && focused != null) {
 			selectModule(focused);
 			return true;
 		}

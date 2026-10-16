@@ -18,11 +18,11 @@ import com.trollclient.setting.Setting;
 import com.trollclient.telemetry.Telemetry;
 import com.trollclient.update.Updater;
 import com.trollclient.util.Friends;
+import com.trollclient.util.Keys;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -189,7 +189,7 @@ public final class Commands {
 		}
 		String keyName = args[2].toLowerCase(Locale.ROOT);
 		if (keyName.equals("none") || keyName.equals("unbind")) {
-			m.setKey(GLFW.GLFW_KEY_UNKNOWN);
+			m.setKey(Keys.NONE);
 			info("Unbound " + m.getName());
 			return;
 		}
@@ -205,16 +205,16 @@ public final class Commands {
 	private static int parseKey(String name) {
 		switch (name) {
 			case "rshift" -> {
-				return GLFW.GLFW_KEY_RIGHT_SHIFT;
+				return InputConstants.KEY_RSHIFT;
 			}
 			case "lshift" -> {
-				return GLFW.GLFW_KEY_LEFT_SHIFT;
+				return InputConstants.KEY_LSHIFT;
 			}
 			case "rctrl" -> {
-				return GLFW.GLFW_KEY_RIGHT_CONTROL;
+				return InputConstants.KEY_RCONTROL;
 			}
 			case "ralt" -> {
-				return GLFW.GLFW_KEY_RIGHT_ALT;
+				return InputConstants.KEY_RALT;
 			}
 			default -> {
 			}

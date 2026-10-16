@@ -45,7 +45,7 @@ public final class InteractSteps {
 		public Result tick(MacroRun run) {
 			if (run.stepTicks() == 0) {
 				if (mc.gameMode.useItem(mc.player, of(hand)).consumesAction()) {
-					mc.player.swing(of(hand));
+					com.trollclient.util.Swing.local(of(hand));
 				}
 				if (hold.getInt() == 0) {
 					return Result.NEXT;
@@ -90,7 +90,7 @@ public final class InteractSteps {
 		public Result tick(MacroRun run) {
 			if (mc.hitResult instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK
 					&& mc.gameMode.useItemOn(mc.player, of(hand), hit).consumesAction()) {
-				mc.player.swing(of(hand));
+				com.trollclient.util.Swing.local(of(hand));
 			}
 			return Result.NEXT;
 		}
@@ -107,7 +107,7 @@ public final class InteractSteps {
 			if (mc.hitResult instanceof EntityHitResult hit) {
 				mc.gameMode.attack(mc.player, hit.getEntity());
 			}
-			mc.player.swing(InteractionHand.MAIN_HAND);
+			com.trollclient.util.Swing.visible(InteractionHand.MAIN_HAND);
 			return Result.NEXT;
 		}
 
@@ -122,7 +122,7 @@ public final class InteractSteps {
 
 		@Override
 		public Result tick(MacroRun run) {
-			mc.player.swing(of(hand));
+			com.trollclient.util.Swing.visible(of(hand));
 			return Result.NEXT;
 		}
 

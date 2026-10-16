@@ -1,19 +1,20 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
-#moj_import <minecraft:globals.glsl>
+#include <minecraft:globals.glsl>
 
 // Monochrome CRT: barrel distortion, beam bloom, scanlines, a rolling refresh band and dark rounded corners.
 
 uniform sampler2D InSampler;
 
-in vec2 texCoord;
+layout(location = 0) in vec2 texCoord;
 
 layout(std140) uniform SamplerInfo {
     vec2 OutSize;
     vec2 InSize;
 };
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 float luma(vec3 c) {
     return dot(c, vec3(0.299, 0.587, 0.114));

@@ -1,5 +1,6 @@
 package com.trollclient.gui.tools;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.trollclient.config.ConfigManager;
 import com.trollclient.gui.Anim;
@@ -34,7 +35,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.world.inventory.Slot;
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -541,7 +541,7 @@ public final class GuiToolsPanel {
 		// hits are laid out top-down without overlaps; the header's fold button comes before the drag area
 		for (Hit h : hits) {
 			if (h.contains(mx, my)) {
-				Runnable action = button == 1 ? h.right() : button == 0 ? h.left() : null;
+				Runnable action = button == InputConstants.MOUSE_BUTTON_RIGHT ? h.right() : button == InputConstants.MOUSE_BUTTON_LEFT ? h.left() : null;
 				if (action != null) {
 					Sounds.click();
 					action.run();
@@ -556,7 +556,7 @@ public final class GuiToolsPanel {
 			return true;
 		}
 		chat.setFocused(false);
-		if (button == 0 && my < py + HEADER) {
+		if (button == InputConstants.MOUSE_BUTTON_LEFT && my < py + HEADER) {
 			dragging = true;
 			dragDX = (float) mx - px;
 			dragDY = (float) my - py;
@@ -599,7 +599,7 @@ public final class GuiToolsPanel {
 		if (!shown || !chat.isFocused()) {
 			return false;
 		}
-		if (event.key() == GLFW.GLFW_KEY_ESCAPE) {
+		if (event.key() == InputConstants.KEY_ESCAPE) {
 			chat.setFocused(false);
 			return true;
 		}

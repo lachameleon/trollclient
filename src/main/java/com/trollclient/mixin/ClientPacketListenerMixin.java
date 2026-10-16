@@ -47,11 +47,11 @@ public abstract class ClientPacketListenerMixin {
 
 	/** The server opens the sign editor after every placement; Graffiti writes its own signs without showing it. */
 	@Inject(method = "handleOpenSignEditor", at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/player/LocalPlayer;openTextEdit(Lnet/minecraft/world/level/block/entity/SignBlockEntity;Z)V"),
+			target = "Lnet/minecraft/client/player/LocalPlayer;openTextEdit(Lnet/minecraft/world/level/block/entity/SignBlockEntity;Lnet/minecraft/world/level/block/entity/SignTextSlot;)V"),
 			cancellable = true)
 	private void troll$onOpenSignEditor(ClientboundOpenSignEditorPacket packet, CallbackInfo ci) {
 		Graffiti graffiti = ModuleManager.get(Graffiti.class);
-		if (graffiti != null && graffiti.claimEditor(packet.getPos(), packet.isFrontText())) {
+		if (graffiti != null && graffiti.claimEditor(packet.pos(), packet.slot())) {
 			ci.cancel();
 		}
 	}

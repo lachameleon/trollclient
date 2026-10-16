@@ -10,6 +10,7 @@ import com.trollclient.util.BlockPlacer;
 import com.trollclient.util.Delay;
 import com.trollclient.util.InventoryUtil;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -110,7 +111,7 @@ public class Confetti extends Module {
 			InventoryUtil.select(slot);
 		}
 		if (mc.gameMode.useItemOn(mc.player, hand, hit).consumesAction()) {
-			mc.player.swing(hand);
+			Swing.local(hand);
 			launched++;
 			if (pending > 0) {
 				pending--;

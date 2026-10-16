@@ -253,7 +253,7 @@ public final class Captions {
 				}
 			}
 		}
-		String[] lines = {"black & white & read all over", "27 modules  /  5 shaders  /  fabric  /  minecraft 26.2", "free download"};
+		String[] lines = {"black & white & read all over", "27 modules  /  5 shaders  /  fabric  /  minecraft 26.3", "free download"};
 		float y = ly + 7 * ps + 20;
 		for (int i = 0; i < lines.length; i++) {
 			float lt = t - 1.0f - i * 0.35f;

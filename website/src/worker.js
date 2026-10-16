@@ -249,7 +249,7 @@ const telemetry = (env) => env.TELEMETRY.get(env.TELEMETRY.idFromName("global"))
 const chat = (env) => env.CHAT.get(env.CHAT.idFromName("global"));
 
 // ------------------------------------------------------------ updates, for the client's updater
-/** True if a release built for `built` ("26.2") runs on `minecraft` ("26.2" or a patch of it, "26.2.1"). */
+/** True if a release built for `built` ("26.3") runs on `minecraft` ("26.3" or a patch of it, "26.3.1"). */
 const runsOn = (built, minecraft) => minecraft === built || minecraft.startsWith(built + ".");
 
 /**

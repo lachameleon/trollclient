@@ -1,8 +1,8 @@
 package com.trollclient.module.client;
 
-import com.trollclient.mixin.GameRendererAccessor;
 import com.trollclient.module.Category;
 import com.trollclient.module.Module;
+import com.trollclient.module.ModuleManager;
 import com.trollclient.setting.ModeSetting;
 import net.minecraft.resources.Identifier;
 
@@ -22,24 +22,13 @@ public class ShadersModule extends Module {
 		return Identifier.fromNamespaceAndPath("trollclient", shader.get().toLowerCase(Locale.ROOT));
 	}
 
-	private static boolean ours(Identifier id) {
-		return id != null && id.getNamespace().equals("trollclient");
-	}
-
-	@Override
-	public void onTick() {
-		// re-applied every tick: vanilla clears post effects whenever the camera entity changes
-		Identifier want = wanted();
-		if (!want.equals(mc.gameRenderer.currentPostEffect())) {
-			((GameRendererAccessor) mc.gameRenderer).troll$setPostEffect(want);
-		}
-	}
-
-	@Override
-	protected void onDisable() {
-		if (mc.gameRenderer != null && ours(mc.gameRenderer.currentPostEffect())) {
-			mc.gameRenderer.clearPostEffect();
-		}
+	/**
+	 * The effect to add to this frame's list, or null. Vanilla rebuilds that list every frame (spectated mob,
+	 * player effects...), so {@code GameRendererMixin} appends ours after it does.
+	 */
+	public static Identifier postEffect() {
+		ShadersModule m = ModuleManager.get(ShadersModule.class);
+		return m != null && m.isEnabled() ? m.wanted() : null;
 	}
 
 	@Override

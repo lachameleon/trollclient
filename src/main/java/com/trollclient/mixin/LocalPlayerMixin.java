@@ -8,8 +8,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Swaps in silent rotations for the whole player tick: input, physics and the
- * movement packet all see the same yaw, exactly like a player who turned.
+ * Swaps in silent rotations from the start of the player tick until the movement packet has gone out: input,
+ * physics and the packet all see the same yaw, exactly like a player who turned. Since 26.3 the packet isn't
+ * sent from {@code tick} but from {@code sendChanges}, which Minecraft calls after every entity has ticked.
  */
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin {
@@ -18,8 +19,8 @@ public abstract class LocalPlayerMixin {
 		Rotations.begin((LocalPlayer) (Object) this);
 	}
 
-	@Inject(method = "tick", at = @At("RETURN"))
-	private void troll$postTick(CallbackInfo ci) {
+	@Inject(method = "sendChanges", at = @At("RETURN"))
+	private void troll$afterSend(CallbackInfo ci) {
 		Rotations.end((LocalPlayer) (Object) this);
 	}
 }

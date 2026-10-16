@@ -118,7 +118,7 @@ public final class Rotations {
 		return shape.clip(eyes, eyes.add(dir.scale(reach)), pos);
 	}
 
-	/** Mixin hook: start of LocalPlayer#tick, before input, physics and the movement packet. */
+	/** Mixin hook: start of LocalPlayer#tick, before input, physics and (in sendChanges) the movement packet. */
 	public static void begin(LocalPlayer p) {
 		LocalPlayerAccessor acc = (LocalPlayerAccessor) p;
 		if (!requested || p.isPassenger()) {
@@ -147,7 +147,10 @@ public final class Rotations {
 		p.setXRot(Mth.clamp(snap(lastPitch, pitch), -90f, 90f));
 	}
 
-	/** Mixin hook: end of LocalPlayer#tick, after the movement packet went out. */
+	/**
+	 * Mixin hook: end of LocalPlayer#sendChanges, after the movement packet went out. Also called at the end of
+	 * every client tick, in case sendChanges was skipped (player removed mid-tick): then it puts the camera back.
+	 */
 	public static void end(LocalPlayer p) {
 		if (swapped) {
 			p.setYRot(realYaw);

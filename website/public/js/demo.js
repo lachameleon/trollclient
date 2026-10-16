@@ -56,7 +56,7 @@
 	root.innerHTML = "";
 	root.classList.add("gui");
 	var header = el("div", "gui-header");
-	header.appendChild(el("div", "gui-logo", '<span class="tag">TROLL</span> CLIENT <span class="dim">v1.0</span>'));
+	header.appendChild(el("div", "gui-logo", '<span class="tag">TROLL</span> CLIENT <span class="dim">v1.1</span>'));
 	var search = el("input", "gui-search");
 	search.type = "text";
 	search.placeholder = "type to search";

@@ -4,11 +4,11 @@ import com.trollclient.config.ConfigManager;
 import com.trollclient.gui.hud.Notifications;
 import com.trollclient.setting.Setting;
 import com.trollclient.telemetry.Telemetry;
+import com.trollclient.util.Keys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ public abstract class Module {
 	private final List<Setting<?>> settings = new ArrayList<>();
 	private final List<Action> actions = new ArrayList<>();
 	private boolean enabled;
-	private int key = GLFW.GLFW_KEY_UNKNOWN;
+	private int key = Keys.NONE;
 	private boolean hidden;
 
 	protected Module(String name, String description, Category category) {

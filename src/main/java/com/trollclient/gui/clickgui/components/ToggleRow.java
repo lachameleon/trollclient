@@ -1,5 +1,6 @@
 package com.trollclient.gui.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Motion;
@@ -70,7 +71,7 @@ public class ToggleRow extends Row {
 
 	@Override
 	public boolean mouseClicked(float mx, float my, int button) {
-		if (button == 0 && isHovered(mx, my)) {
+		if (button == InputConstants.MOUSE_BUTTON_LEFT && isHovered(mx, my)) {
 			toggler.run();
 			pressTime = Motion.time();
 			Sounds.toggle(getter.getAsBoolean());

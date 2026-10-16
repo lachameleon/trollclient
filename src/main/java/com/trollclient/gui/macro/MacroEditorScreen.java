@@ -1,6 +1,7 @@
 package com.trollclient.gui.macro;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Backdrop;
@@ -33,7 +34,6 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -852,7 +852,7 @@ public class MacroEditorScreen extends Screen {
 		}
 		for (Hit h : hits) {
 			if (h.contains(mx, my)) {
-				Runnable action = button == 1 ? h.right() : button == 0 ? h.left() : null;
+				Runnable action = button == InputConstants.MOUSE_BUTTON_RIGHT ? h.right() : button == InputConstants.MOUSE_BUTTON_LEFT ? h.left() : null;
 				if (action != null) {
 					Sounds.click();
 					action.run();
@@ -863,9 +863,9 @@ public class MacroEditorScreen extends Screen {
 		int at = stepAt(mx, my);
 		if (at >= 0) {
 			MacroStep s = macro.steps.get(at);
-			if (button == 1) {
+			if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
 				toggleStep(s);
-			} else if (button == 0) {
+			} else if (button == InputConstants.MOUSE_BUTTON_LEFT) {
 				selectStep(s);
 				pressIndex = at;
 				pressY = (float) my;
@@ -874,7 +874,7 @@ public class MacroEditorScreen extends Screen {
 			}
 			return true;
 		}
-		if (button == 0 && in(mx, my, midX, listTop(), midW, listBottom() - listTop())) {
+		if (button == InputConstants.MOUSE_BUTTON_LEFT && in(mx, my, midX, listTop(), midW, listBottom() - listTop())) {
 			// empty space under the steps: back to the macro's own settings
 			selectStep(null);
 		}
@@ -947,12 +947,12 @@ public class MacroEditorScreen extends Screen {
 		boolean ctrl = event.hasControlDown();
 		int at = stepIndex();
 		switch (key) {
-			case GLFW.GLFW_KEY_ESCAPE -> onClose();
-			case GLFW.GLFW_KEY_UP, GLFW.GLFW_KEY_DOWN -> {
+			case InputConstants.KEY_ESCAPE -> onClose();
+			case InputConstants.KEY_UP, InputConstants.KEY_DOWN -> {
 				if (macro == null || macro.steps.isEmpty()) {
 					return true;
 				}
-				int dir = key == GLFW.GLFW_KEY_UP ? -1 : 1;
+				int dir = key == InputConstants.KEY_UP ? -1 : 1;
 				if (event.hasAltDown() && at >= 0) {
 					moveStep(at, at + dir);
 				} else {
@@ -962,28 +962,28 @@ public class MacroEditorScreen extends Screen {
 					Sounds.tick();
 				}
 			}
-			case GLFW.GLFW_KEY_DELETE, GLFW.GLFW_KEY_BACKSPACE -> deleteStep();
-			case GLFW.GLFW_KEY_SPACE -> {
+			case InputConstants.KEY_DELETE, InputConstants.KEY_BACKSPACE -> deleteStep();
+			case InputConstants.KEY_SPACE -> {
 				if (step != null) {
 					toggleStep(step);
 				}
 			}
-			case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER -> {
+			case InputConstants.KEY_RETURN, InputConstants.KEY_NUMPADENTER -> {
 				if (ctrl) {
 					run();
 				}
 			}
-			case GLFW.GLFW_KEY_D -> {
+			case InputConstants.KEY_D -> {
 				if (ctrl) {
 					duplicateStep();
 				}
 			}
-			case GLFW.GLFW_KEY_Z -> {
+			case InputConstants.KEY_Z -> {
 				if (ctrl) {
 					undo();
 				}
 			}
-			case GLFW.GLFW_KEY_N -> {
+			case InputConstants.KEY_N -> {
 				if (ctrl) {
 					newMacro();
 				}

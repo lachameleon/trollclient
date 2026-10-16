@@ -90,8 +90,8 @@ SEO = {
     },
     "download.html": {
         "title": "Download Troll Client {version} for Minecraft {mc} (Fabric)",
-        "desc": "Download Troll Client {version}, a free Fabric mod for Minecraft {mc}. The jar with its size and "
-                "SHA-256, install steps, menu controls, chat commands and an FAQ.",
+        "desc": "Download Troll Client {version}, a free Fabric mod for Minecraft {mc} (older versions too): the jar "
+                "and its SHA-256, install steps, controls, commands and an FAQ.",
         "shot": "title.jpg",
         "extras": ("software", "faq"),
     },
@@ -595,7 +595,7 @@ def gradle_properties():
     return props
 
 
-def write_releases(downloads, name, version, minecraft, data):
+def write_releases(downloads, name, version, props, data):
     """The release list the Worker answers the client's updater from (website/src/releases.json).
 
     Older entries stay for as long as their jar is still in public/downloads, so a client on an
@@ -609,7 +609,9 @@ def write_releases(downloads, name, version, minecraft, data):
     sha = hashlib.sha256(data).hexdigest()
     old = next((r for r in releases if r.get("version") == version), None)
     date = old["date"] if old and old.get("sha256") == sha else datetime.date.today().isoformat()
-    entry = {"version": version, "minecraft": [minecraft], "file": name, "size": len(data), "sha256": sha, "date": date}
+    # what it runs with, for the download page's list of builds for older Minecraft versions
+    entry = {"version": version, "minecraft": [props["minecraft_version"]], "file": name, "size": len(data), "sha256": sha,
+             "date": date, "loader": props["loader_version"], "fabric_api": props["fabric_api_version"]}
     releases = [r for r in releases if r.get("version") != version and os.path.exists(os.path.join(downloads, r.get("file", "")))]
     releases.insert(0, entry)
     with open(path, "w", encoding="utf-8") as f:
@@ -635,11 +637,38 @@ def jar_info():
     dest = os.path.join(SITE, "downloads")
     os.makedirs(dest, exist_ok=True)
     shutil.copyfile(jar, os.path.join(dest, name))
-    write_releases(dest, name, props["version"], props["minecraft_version"], data)
+    write_releases(dest, name, props["version"], props, data)
+    older_releases(props)
     seconds = len(data) * 8 / 28800
     fill("download.html", "jar:size", "%d KB" % round(len(data) / 1024))
     fill("download.html", "jar:sha", hashlib.sha256(data).hexdigest())
     fill("download.html", "jar:time", "%d min %02d s" % (seconds // 60, seconds % 60))
+
+
+def older_releases(props):
+    """The download page's box of builds for older Minecraft versions: the newest release for each version the
+    current one isn't for. They stay downloadable (and the updater keeps serving them) as long as their jar is
+    in public/downloads, but they don't get new work."""
+    path = os.path.join(REPO, "website", "src", "releases.json")
+    current = props["minecraft_version"]
+    seen, rows = {current}, []
+    for r in json.load(open(path, encoding="utf-8")).get("releases", []):
+        mc = r["minecraft"][0]
+        if mc in seen:
+            continue
+        seen.add(mc)
+        needs = ("Fabric Loader %s+, Fabric API %s" % (r["loader"], r["fabric_api"])) if r.get("fabric_api") else "Fabric API"
+        rows.append(
+            '\t\t\t\t\t<li><a href="/downloads/{file}" download>{file}</a> &middot; Minecraft <b>{mc}</b> &middot; {kb} KB'
+            ' &middot; {needs}<br><span class="dim small" style="word-break:break-all">sha-256: {sha}</span></li>'.format(
+                file=esc(r["file"]), mc=esc(mc), kb=round(r["size"] / 1024), needs=esc(needs), sha=r["sha256"]))
+    html = ""
+    if rows:
+        html = ('\t\t\t<div class="group" data-reveal>\n\t\t\t\t<span class="legend">older minecraft versions</span>\n'
+                '\t\t\t\t<p class="dim" style="margin-top:0">Still on an older Minecraft? These builds work, but new features '
+                'and fixes only go into the Minecraft %s version.</p>\n\t\t\t\t<ul>\n%s\n\t\t\t\t</ul>\n\t\t\t</div>'
+                % (esc(current), "\n".join(rows)))
+    fill("download.html", "jar:older", html)
 
 
 def gallery():
@@ -922,7 +951,7 @@ def main():
         "troll": ("TROLL", "CLIENT", False, "split"),
         "fabric": ("FABRIC", "POWERED", True, "stack"),
         "notepad": ("MADE WITH", "NOTEPAD", False, "stack"),
-        "mc": ("MC", "26.2", False, "split"),
+        "mc": ("MC", gradle_properties()["minecraft_version"], False, "split"),
         "bw": ("BLACK &", "WHITE", True, "stack"),
         "800": ("BEST AT", "800x600", False, "stack"),
         "java": ("JAVA", "25", True, "split"),

@@ -5,10 +5,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.platform.VideoMode;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.DeviceInfo;
-import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.device.DeviceInfo;
+import com.mojang.renderpearl.api.device.GpuDevice;
 import com.trollclient.TrollClient;
 import com.trollclient.config.ConfigManager;
 import com.trollclient.dev.DevShots;
@@ -467,8 +468,13 @@ public final class Telemetry {
 		Window window = mc.getWindow();
 		if (window != null) {
 			env.addProperty("window", window.getScreenWidth() + "x" + window.getScreenHeight());
-			env.addProperty("fullscreen", window.isFullscreen());
-			env.addProperty("refreshRate", window.getRefreshRate());
+			if (mc.options != null) {
+				env.addProperty("fullscreen", mc.options.fullscreen().get());
+			}
+			VideoMode mode = window.getActiveVideoMode();
+			if (mode != null) {
+				env.addProperty("refreshRate", Math.round(mode.getRefreshRate()));
+			}
 			env.addProperty("guiScale", window.getGuiScale());
 		}
 		if (mc.options != null) {

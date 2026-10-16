@@ -10,7 +10,6 @@
 		"ChatScreenMixin",
 		"ClientPacketListenerMixin",
 		"ConnectionMixin",
-		"GameRendererAccessor",
 		"GameRendererMixin",
 		"GuiMixin",
 		"KeyboardHandlerMixin",

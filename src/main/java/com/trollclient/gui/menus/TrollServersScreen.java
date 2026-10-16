@@ -1,5 +1,6 @@
 package com.trollclient.gui.menus;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.TrollClient;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Theme;
@@ -20,7 +21,6 @@ import net.minecraft.client.server.LanServer;
 import net.minecraft.client.server.LanServerDetection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.network.EventLoopGroupHolder;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -307,7 +307,7 @@ public class TrollServersScreen extends TrollListScreen<ServerData> {
 
 	@Override
 	protected boolean extraKey(KeyEvent event) {
-		if (event.key() == GLFW.GLFW_KEY_F5) {
+		if (event.key() == InputConstants.KEY_F5) {
 			refresh();
 		}
 		return true;

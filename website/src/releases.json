@@ -1,6 +1,18 @@
 {
  "releases": [
   {
+   "version": "1.1.0",
+   "minecraft": [
+    "26.3"
+   ],
+   "file": "troll-client-1.1.0.jar",
+   "size": 939298,
+   "sha256": "bea9423a69f96268647e7ee04d32ffe47d524492c65b1e27b9d3d8136cf4e578",
+   "date": "2026-10-15",
+   "loader": "0.19.5",
+   "fabric_api": "0.163.0+26.3"
+  },
+  {
    "version": "1.0.0",
    "minecraft": [
     "26.2"
@@ -8,7 +20,9 @@
    "file": "troll-client-1.0.0.jar",
    "size": 935346,
    "sha256": "aebbe21a15e9830528af58eceb38e774054b67d3a7645ad61706b099df19fe99",
-   "date": "2026-10-13"
+   "date": "2026-10-13",
+   "loader": "0.19.5",
+   "fabric_api": "0.161.0+26.2"
   }
  ]
 }

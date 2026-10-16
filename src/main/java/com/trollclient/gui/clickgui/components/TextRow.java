@@ -1,5 +1,6 @@
 package com.trollclient.gui.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Sounds;
@@ -55,7 +56,7 @@ public class TextRow extends Row {
 	@Override
 	public boolean mouseClicked(float mx, float my, int button) {
 		boolean inside = isHovered(mx, my);
-		if (inside && button == 1) {
+		if (inside && button == InputConstants.MOUSE_BUTTON_RIGHT) {
 			field.setText("");
 			setting.set("");
 			Sounds.click();

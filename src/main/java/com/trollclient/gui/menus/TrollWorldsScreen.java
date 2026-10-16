@@ -1,5 +1,6 @@
 package com.trollclient.gui.menus;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.trollclient.TrollClient;
 import com.trollclient.gui.Draw;
@@ -18,7 +19,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -257,7 +257,7 @@ public class TrollWorldsScreen extends TrollListScreen<LevelSummary> {
 	@Override
 	protected boolean extraKey(KeyEvent event) {
 		switch (event.key()) {
-			case GLFW.GLFW_KEY_F5 -> reload();
+			case InputConstants.KEY_F5 -> reload();
 			default -> {
 			}
 		}

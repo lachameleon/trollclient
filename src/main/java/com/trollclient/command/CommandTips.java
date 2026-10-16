@@ -1,11 +1,11 @@
 package com.trollclient.command;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Theme;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public final class CommandTips {
 			return false;
 		}
 		int key = event.key();
-		if (key == GLFW.GLFW_KEY_TAB) {
+		if (key == InputConstants.KEY_TAB) {
 			Tip tip = tips.get(Math.min(selected, tips.size() - 1));
 			String text = input.getValue();
 			int cursor = Math.min(input.getCursorPosition(), text.length());
@@ -137,8 +137,8 @@ public final class CommandTips {
 			input.moveCursorTo(wordStart + insert.length(), false);
 			return true;
 		}
-		if (tips.size() > 1 && (key == GLFW.GLFW_KEY_UP || key == GLFW.GLFW_KEY_DOWN)) {
-			selected = Math.floorMod(selected + (key == GLFW.GLFW_KEY_UP ? -1 : 1), tips.size());
+		if (tips.size() > 1 && (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN)) {
+			selected = Math.floorMod(selected + (key == InputConstants.KEY_UP ? -1 : 1), tips.size());
 			return true;
 		}
 		return false;

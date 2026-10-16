@@ -7,8 +7,8 @@ import com.trollclient.macro.steps.FlowSteps;
 import com.trollclient.setting.NumberSetting;
 import com.trollclient.setting.Setting;
 import com.trollclient.setting.TextSetting;
-import org.lwjgl.glfw.GLFW;
 
+import com.trollclient.util.Keys;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public final class Macro {
 	public final NumberSetting loops = new NumberSetting("Loops", "Times it runs from top to bottom (0 = until stopped)", 1, 0, 100, 1)
 			.unit("x");
 	public final List<MacroStep> steps = new ArrayList<>();
-	private int key = GLFW.GLFW_KEY_UNKNOWN;
+	private int key = Keys.NONE;
 
 	public Macro(String name) {
 		this.name.set(name);

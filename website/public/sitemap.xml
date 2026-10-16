@@ -3,7 +3,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 	<url>
 		<loc>https://trollclient.cyou/</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 		<image:image><image:loc>https://trollclient.cyou/img/shots/shader_noir.jpg</image:loc></image:image>
 		<image:image><image:loc>https://trollclient.cyou/img/shots/shader_crt.jpg</image:loc></image:image>
 		<image:image><image:loc>https://trollclient.cyou/img/shots/shader_dither.jpg</image:loc></image:image>
@@ -12,7 +12,7 @@
 		<video:video>
 			<video:thumbnail_loc>https://trollclient.cyou/video/poster.jpg</video:thumbnail_loc>
 			<video:title>Troll Client showcase</video:title>
-			<video:description>Troll Client recorded straight out of Minecraft 26.2: the title screen, the menu and its themes, the skins, and the modules in action under each of the shaders.</video:description>
+			<video:description>Troll Client recorded straight out of Minecraft 26.3: the title screen, the menu and its themes, the skins, and the modules in action under each of the shaders.</video:description>
 			<video:content_loc>https://trollclient.cyou/video/showcase.mp4</video:content_loc>
 			<video:duration>124</video:duration>
 			<video:publication_date>2026-10-07T21:37:03+11:00</video:publication_date>
@@ -20,15 +20,15 @@
 	</url>
 	<url>
 		<loc>https://trollclient.cyou/skin-animation</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 	</url>
 	<url>
 		<loc>https://trollclient.cyou/modules</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 	</url>
 	<url>
 		<loc>https://trollclient.cyou/gallery</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 		<image:image><image:loc>https://trollclient.cyou/img/shots/title.jpg</image:loc></image:image>
 		<image:image><image:loc>https://trollclient.cyou/img/shots/menu.jpg</image:loc></image:image>
 		<image:image><image:loc>https://trollclient.cyou/img/shots/settings.jpg</image:loc></image:image>
@@ -46,18 +46,18 @@
 	</url>
 	<url>
 		<loc>https://trollclient.cyou/download</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 	</url>
 	<url>
 		<loc>https://trollclient.cyou/forum</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 	</url>
 	<url>
 		<loc>https://trollclient.cyou/analytics</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 	</url>
 	<url>
 		<loc>https://trollclient.cyou/privacy</loc>
-		<lastmod>2026-10-13</lastmod>
+		<lastmod>2026-10-15</lastmod>
 	</url>
 </urlset>

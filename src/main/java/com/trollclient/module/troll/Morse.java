@@ -7,6 +7,7 @@ import com.trollclient.setting.ModeSetting;
 import com.trollclient.setting.NumberSetting;
 import com.trollclient.setting.TextSetting;
 import com.trollclient.util.MovementControl;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.world.InteractionHand;
 
@@ -112,7 +113,7 @@ public class Morse extends Module {
 				ticksLeft += (int) (gap.get() * 20);
 			}
 			if (p.on() && !signal.is("Crouch")) {
-				mc.player.swing(InteractionHand.MAIN_HAND);
+				Swing.visible(InteractionHand.MAIN_HAND);
 			}
 		}
 		ticksLeft--;
@@ -121,7 +122,7 @@ public class Morse extends Module {
 			MovementControl.sneak(MovementControl.PRIORITY_SIGNAL, current.on());
 		} else if (current.on() && ticksLeft % 4 == 0) {
 			// keep the arm moving for the length of a dash
-			mc.player.swing(InteractionHand.MAIN_HAND);
+			Swing.visible(InteractionHand.MAIN_HAND);
 		}
 	}
 

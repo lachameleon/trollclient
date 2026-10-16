@@ -9,9 +9,9 @@ import com.trollclient.gui.Sounds;
 import com.trollclient.gui.Theme;
 import com.trollclient.module.Module;
 import com.trollclient.util.ColorUtil;
+import com.trollclient.util.Keys;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Locale;
 import java.util.function.IntConsumer;
@@ -40,13 +40,13 @@ public class BindRow extends Row {
 			return "none";
 		}
 		return switch (key) {
-			case GLFW.GLFW_KEY_RIGHT_SHIFT -> "rshift";
-			case GLFW.GLFW_KEY_LEFT_SHIFT -> "lshift";
-			case GLFW.GLFW_KEY_RIGHT_CONTROL -> "rctrl";
-			case GLFW.GLFW_KEY_LEFT_CONTROL -> "lctrl";
-			case GLFW.GLFW_KEY_RIGHT_ALT -> "ralt";
-			case GLFW.GLFW_KEY_LEFT_ALT -> "lalt";
-			default -> InputConstants.Type.KEYSYM.getOrCreate(key).getDisplayName().getString().toLowerCase(Locale.ROOT);
+			case InputConstants.KEY_RSHIFT -> "rshift";
+			case InputConstants.KEY_LSHIFT -> "lshift";
+			case InputConstants.KEY_RCONTROL -> "rctrl";
+			case InputConstants.KEY_LCONTROL -> "lctrl";
+			case InputConstants.KEY_RALT -> "ralt";
+			case InputConstants.KEY_LALT -> "lalt";
+			default -> InputConstants.Type.KEYBOARD.getOrCreate(key).getDisplayName().getString().toLowerCase(Locale.ROOT);
 		};
 	}
 
@@ -87,8 +87,8 @@ public class BindRow extends Row {
 			}
 			return false;
 		}
-		if (button == 1) {
-			setKey.accept(GLFW.GLFW_KEY_UNKNOWN);
+		if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
+			setKey.accept(Keys.NONE);
 			listening = false;
 		} else {
 			listening = !listening;
@@ -104,8 +104,8 @@ public class BindRow extends Row {
 			return false;
 		}
 		int pressed = event.key();
-		if (pressed == GLFW.GLFW_KEY_ESCAPE || pressed == GLFW.GLFW_KEY_BACKSPACE || pressed == GLFW.GLFW_KEY_DELETE) {
-			setKey.accept(GLFW.GLFW_KEY_UNKNOWN);
+		if (pressed == InputConstants.KEY_ESCAPE || pressed == InputConstants.KEY_BACKSPACE || pressed == InputConstants.KEY_DELETE) {
+			setKey.accept(Keys.NONE);
 		} else {
 			setKey.accept(pressed);
 		}

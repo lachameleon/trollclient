@@ -10,7 +10,6 @@ import com.trollclient.util.InventoryUtil;
 import com.trollclient.util.Rotations;
 import com.trollclient.util.Targets;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -82,8 +81,9 @@ public class Gifter extends Module {
 		InventoryUtil.select(slot);
 		InventoryUtil.syncSelected();
 
-		if (mc.player.drop(false)) {
-			mc.player.swing(InteractionHand.MAIN_HAND);
+		if (!mc.player.getMainHandItem().isEmpty()) {
+			// drops it and swings the arm, the same as pressing Q
+			mc.gameMode.dropItem(mc.player, false);
 			gifts++;
 		}
 		if (swapBack.get()) {

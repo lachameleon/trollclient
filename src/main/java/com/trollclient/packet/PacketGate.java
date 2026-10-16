@@ -201,9 +201,9 @@ public final class PacketGate {
 			case ServerboundSetCreativeModeSlotPacket c -> "slot " + c.slotNum();
 			case ServerboundRenameItemPacket r -> "\"" + r.getName() + "\"";
 			case ServerboundSelectTradePacket t -> "#" + t.getItem();
-			case ServerboundSignUpdatePacket s -> String.join("/", s.getLines()).replaceAll("/+$", "");
+			case ServerboundSignUpdatePacket s -> String.join("/", s.lines()).replaceAll("/+$", "");
 			case ServerboundPlayerActionPacket a -> lower(a.getAction().name());
-			case ServerboundUseItemPacket u -> lower(u.getHand().name());
+			case ServerboundUseItemPacket u -> lower(u.hand().name());
 			case ServerboundChatPacket c -> c.message();
 			case ServerboundChatCommandPacket c -> "/" + c.command();
 			case ServerboundChatCommandSignedPacket c -> "/" + c.command();

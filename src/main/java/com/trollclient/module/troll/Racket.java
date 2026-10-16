@@ -6,6 +6,7 @@ import com.trollclient.setting.BoolSetting;
 import com.trollclient.setting.NumberSetting;
 import com.trollclient.util.BlockPlacer;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -207,7 +208,7 @@ public class Racket extends Module {
 			return Click.READY;
 		}
 		if (mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND, hit).consumesAction()) {
-			mc.player.swing(InteractionHand.MAIN_HAND);
+			Swing.local(InteractionHand.MAIN_HAND);
 		}
 		return Click.DONE;
 	}

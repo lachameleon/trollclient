@@ -1,5 +1,6 @@
 package com.trollclient.gui.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Motion;
@@ -100,7 +101,7 @@ public class ColorRow extends Row {
 			return false;
 		}
 		if (my < y + COLLAPSED) {
-			if (button == 1) {
+			if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
 				setting.reset();
 			} else {
 				expanded = !expanded;
@@ -108,7 +109,7 @@ public class ColorRow extends Row {
 			Sounds.click();
 			return true;
 		}
-		if (expanded && button == 0) {
+		if (expanded && button == InputConstants.MOUSE_BUTTON_LEFT) {
 			float rel = my - (y + COLLAPSED + 2);
 			int bar = (int) (rel / 13);
 			if (bar >= 0 && bar <= 2) {

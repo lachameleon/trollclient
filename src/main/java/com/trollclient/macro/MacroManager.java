@@ -10,6 +10,7 @@ import com.trollclient.TrollClient;
 import com.trollclient.gui.clickgui.TerminalLog;
 import com.trollclient.macro.steps.FlowSteps;
 import com.trollclient.telemetry.Telemetry;
+import com.trollclient.util.Keys;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -239,6 +240,7 @@ public final class MacroManager {
 			list.add(m.toJson());
 		}
 		JsonObject root = new JsonObject();
+		Keys.markFormat(root);
 		root.add("macros", list);
 		Path path = file();
 		Path tmp = path.resolveSibling(path.getFileName() + ".tmp");
@@ -258,17 +260,27 @@ public final class MacroManager {
 			MACROS.add(example());
 			return;
 		}
+		boolean legacyKeys = false;
 		try {
 			JsonObject root = JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject();
+			legacyKeys = Keys.isLegacy(root);
 			if (root.has("macros")) {
 				for (JsonElement e : root.getAsJsonArray("macros")) {
-					MACROS.add(Macro.fromJson(e.getAsJsonObject()));
+					Macro m = Macro.fromJson(e.getAsJsonObject());
+					if (legacyKeys && m.getKey() > 0) {
+						m.setKey(Keys.fromGlfw(m.getKey()));
+					}
+					MACROS.add(m);
 				}
 			}
 		} catch (IOException | RuntimeException e) {
 			TrollClient.LOGGER.error("Failed to load macros", e);
 		}
 		dirtySince = -1;
+		if (legacyKeys) {
+			// a 26.2 save: write it back with SDL codes now, so no key is ever converted twice
+			markDirty();
+		}
 	}
 
 	/** First run: one harmless macro so the editor isn't empty. Hops five times. */

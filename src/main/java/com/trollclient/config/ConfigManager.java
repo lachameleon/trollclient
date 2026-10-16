@@ -12,6 +12,7 @@ import com.trollclient.module.Module;
 import com.trollclient.module.ModuleManager;
 import com.trollclient.setting.Setting;
 import com.trollclient.util.Friends;
+import com.trollclient.util.Keys;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -56,6 +57,7 @@ public final class ConfigManager {
 	public static void save() {
 		dirtySince = -1;
 		JsonObject root = new JsonObject();
+		Keys.markFormat(root);
 		JsonObject modules = new JsonObject();
 		for (Module m : ModuleManager.all()) {
 			JsonObject obj = new JsonObject();
@@ -93,8 +95,10 @@ public final class ConfigManager {
 			return;
 		}
 		loading = true;
+		boolean legacyKeys = false;
 		try {
 			JsonObject root = JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject();
+			legacyKeys = Keys.isLegacy(root);
 			if (root.has("modules")) {
 				JsonObject modules = root.getAsJsonObject("modules");
 				for (Module m : ModuleManager.all()) {
@@ -116,7 +120,8 @@ public final class ConfigManager {
 						}
 					}
 					if (obj.has("key")) {
-						m.setKey(obj.get("key").getAsInt());
+						int key = obj.get("key").getAsInt();
+						m.setKey(legacyKeys && key > 0 ? Keys.fromGlfw(key) : key);
 					}
 					if (obj.has("hidden")) {
 						m.setHidden(obj.get("hidden").getAsBoolean());
@@ -139,6 +144,10 @@ public final class ConfigManager {
 		} finally {
 			loading = false;
 			dirtySince = -1;
+		}
+		if (legacyKeys) {
+			// a 26.2 save: write it back with SDL codes now, so no key is ever converted twice
+			markDirty();
 		}
 	}
 }

@@ -10,7 +10,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 
@@ -91,9 +90,7 @@ public final class InventorySteps {
 		@Override
 		public Result tick(MacroRun run) {
 			InventoryUtil.syncSelected();
-			if (mc.player.drop(amount.is("Stack"))) {
-				mc.player.swing(InteractionHand.MAIN_HAND);
-			}
+			mc.gameMode.dropItem(mc.player, amount.is("Stack"));
 			return Result.NEXT;
 		}
 

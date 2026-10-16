@@ -7,6 +7,7 @@ import com.trollclient.setting.NumberSetting;
 import com.trollclient.util.InventoryUtil;
 import com.trollclient.util.MovementControl;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -148,7 +149,7 @@ public class Fidget extends Module {
 				// tell the server now, so other players actually see the item change
 				InventoryUtil.syncSelected();
 			}
-			case SWING -> mc.player.swing(InteractionHand.MAIN_HAND);
+			case SWING -> Swing.visible(InteractionHand.MAIN_HAND);
 			case HOP -> MovementControl.jump();
 			default -> {
 			}

@@ -9,10 +9,11 @@ import com.trollclient.setting.NumberSetting;
 import com.trollclient.setting.TextSetting;
 import com.trollclient.util.MovementControl;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -57,7 +58,7 @@ public class Mimic extends Module {
 		if (p != current) {
 			current = p;
 			lastPos = p == null ? null : p.position();
-			lastSwinging = p != null && p.swinging;
+			lastSwinging = p != null && p.isSwinging();
 		}
 		if (p == null) {
 			return;
@@ -78,10 +79,11 @@ public class Mimic extends Module {
 			wasOnGround = Math.abs(delta.y) < 0.01;
 		}
 		if (swing.get()) {
-			if (p.swinging && !lastSwinging) {
-				mc.player.swing(p.swingingArm == null ? InteractionHand.MAIN_HAND : p.swingingArm);
+			LivingEntity.SwingDescription seen = p.getCurrentSwing();
+			if (seen != null && !lastSwinging) {
+				Swing.visible(seen.hand());
 			}
-			lastSwinging = p.swinging;
+			lastSwinging = seen != null;
 		}
 
 		Vec3 normal = mirrorNormal(p);

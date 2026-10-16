@@ -1,5 +1,6 @@
 package com.trollclient.dev;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.TrollClient;
 import com.trollclient.chat.Chatroom;
 import com.trollclient.gui.centre.TrollCentreScreen;
@@ -82,7 +83,7 @@ public final class DevShots {
 			shot("01c_centre_buttons");
 			hoverAt(((TrollTitleScreen) mc.gui.screen()).centreButtonCenter(3));
 		});
-		step("", () -> true, 3, () -> clickAt(0));
+		step("", () -> true, 3, () -> clickAt(InputConstants.MOUSE_BUTTON_LEFT));
 		step("", () -> true, 25, () -> {
 			TrollClient.LOGGER.info("[devshots] centre: after clicking update notes, screen = {}", screenName());
 			shot("01d_centre_notes");
@@ -102,7 +103,7 @@ public final class DevShots {
 		// a long mode list is a "< value >" cycler: one mid-slide, then settled with only the new value left
 		step("cycler", () -> true, 1, () -> openGui(Category.CLIENT, "TitleScreen"));
 		step("", () -> true, 45, () -> hoverAt(((ClickGuiScreen) mc.gui.screen()).settingsRow("Background", 0.9f)));
-		step("", () -> true, 3, () -> clickAt(0));
+		step("", () -> true, 3, () -> clickAt(InputConstants.MOUSE_BUTTON_LEFT));
 		step("", () -> true, 1, () -> shot("01f_cycler_sliding"));
 		step("", () -> true, 20, () -> {
 			TrollClient.LOGGER.info("[devshots] cycler: background = {}", ModuleManager.get(TitleScreenModule.class).background.get());
@@ -136,7 +137,7 @@ public final class DevShots {
 			// a real click on "[ vanilla menu ]": cursor there, then press + release through MouseHandler
 			hoverAt(new double[]{20, 11});
 		});
-		step("", () -> true, 3, () -> clickAt(0));
+		step("", () -> true, 3, () -> clickAt(InputConstants.MOUSE_BUTTON_LEFT));
 		step("", () -> true, 20, () -> {
 			TrollClient.LOGGER.info("[devshots] vanilla button: after a real click, screen = {}", screenName());
 			shot("01a_vanilla_clicked");
@@ -149,7 +150,7 @@ public final class DevShots {
 			TrollClient.LOGGER.info("[devshots] vanilla button: after another mod swaps its menu in, screen = {}, back button = {}",
 					screenName(), back);
 			// the cursor is still over the corner, right where the back button sits
-			clickAt(0);
+			clickAt(InputConstants.MOUSE_BUTTON_LEFT);
 		});
 		step("", () -> true, 5, () -> TrollClient.LOGGER.info("[devshots] vanilla button: after the back button, screen = {}", screenName()));
 		step("title guard", () -> true, 1, () -> {
@@ -193,7 +194,7 @@ public final class DevShots {
 		step("", () -> true, 5, () -> {
 			TrollClient.LOGGER.info("[devshots] guard: vanilla menu re-opened while wanted, screen = {}", screenName());
 			hoverAt(new double[]{20, 11});
-			clickAt(0);
+			clickAt(InputConstants.MOUSE_BUTTON_LEFT);
 		});
 		step("", () -> true, 5, () -> {
 			TrollClient.LOGGER.info("[devshots] guard: after the back button, screen = {}", screenName());
@@ -207,7 +208,7 @@ public final class DevShots {
 		step("keyboard cursor", () -> true, 1, () -> {
 			ClickGuiScreen s = (ClickGuiScreen) mc.gui.screen();
 			for (int i = 0; i < 3; i++) {
-				s.keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN, 0, 0));
+				s.keyPressed(new net.minecraft.client.input.KeyEvent(InputConstants.KEY_DOWN, 0, 0));
 			}
 		});
 		step("", () -> true, 20, () -> shot("03b_keyboard_cursor"));
@@ -215,11 +216,11 @@ public final class DevShots {
 			ClickGuiScreen s = (ClickGuiScreen) mc.gui.screen();
 			double[] p = s.moduleRowCenter(5);
 			s.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(p[0], p[1],
-					new net.minecraft.client.input.MouseButtonInfo(2, 0)), false);
+					new net.minecraft.client.input.MouseButtonInfo(InputConstants.MOUSE_BUTTON_MIDDLE, 0)), false);
 		});
 		step("", () -> true, 20, () -> {
 			shot("03c_bind_prompt");
-			((ClickGuiScreen) mc.gui.screen()).keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE, 0, 0));
+			((ClickGuiScreen) mc.gui.screen()).keyPressed(new net.minecraft.client.input.KeyEvent(InputConstants.KEY_ESCAPE, 0, 0));
 		});
 		step("search", () -> true, 5, () -> {
 			ClickGuiScreen s = (ClickGuiScreen) mc.gui.screen();
@@ -327,12 +328,24 @@ public final class DevShots {
 			mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
 			mc.gui.hud.getChat().clearMessages(false);
 		});
+		// every post effect: a shader that no longer compiles shows up here as a plain, unshaded world
+		for (String look : new String[] {"Noir", "CRT", "Dither", "Halftone", "Ink"}) {
+			step(look.equals("Noir") ? "shaders" : "", () -> true, 5, () -> {
+				module("Shaders").getSetting("Shader").parse(look);
+				module("Shaders").setEnabled(true);
+			});
+			step("", () -> true, 10, () -> shot("08s_shader_" + look.toLowerCase(java.util.Locale.ROOT)));
+		}
+		step("", () -> true, 1, () -> {
+			TrollClient.LOGGER.info("[devshots] shaders: applied post effects {}", mc.gameRenderer.getAppliedPostEffects());
+			module("Shaders").setEnabled(false);
+		});
 		// chat tips: typing a client command lists what can come next, and Tab fills it in
 		step("chat tips", () -> true, 5, () -> mc.gui.setScreen(new net.minecraft.client.gui.screens.ChatScreen(".t", false)));
 		step("", () -> mc.gui.screen() instanceof net.minecraft.client.gui.screens.ChatScreen, 15, () -> shot("08b_chat_tips_commands"));
 		step("", () -> true, 1, () -> {
 			net.minecraft.client.gui.screens.ChatScreen chat = (net.minecraft.client.gui.screens.ChatScreen) mc.gui.screen();
-			net.minecraft.client.input.KeyEvent tab = new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_TAB, 0, 0);
+			net.minecraft.client.input.KeyEvent tab = new net.minecraft.client.input.KeyEvent(InputConstants.KEY_TAB, 0, 0);
 			boolean ours = chat.keyPressed(tab);
 			TrollClient.LOGGER.info("[devshots] chat tips: Tab on \".t\" handled = {}, box = \"{}\"", ours, chatBox(chat));
 			chat.insertText(".set clickgui op", true);
@@ -340,10 +353,10 @@ public final class DevShots {
 		step("", () -> true, 10, () -> {
 			shot("08c_chat_tips_setting");
 			net.minecraft.client.gui.screens.ChatScreen chat = (net.minecraft.client.gui.screens.ChatScreen) mc.gui.screen();
-			chat.keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_TAB, 0, 0));
+			chat.keyPressed(new net.minecraft.client.input.KeyEvent(InputConstants.KEY_TAB, 0, 0));
 			TrollClient.LOGGER.info("[devshots] chat tips: Tab on \".set clickgui op\" gives \"{}\"", chatBox(chat));
-			chat.keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN, 0, 0));
-			chat.keyPressed(new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_TAB, 0, 0));
+			chat.keyPressed(new net.minecraft.client.input.KeyEvent(InputConstants.KEY_DOWN, 0, 0));
+			chat.keyPressed(new net.minecraft.client.input.KeyEvent(InputConstants.KEY_TAB, 0, 0));
 			TrollClient.LOGGER.info("[devshots] chat tips: Down, Tab on the modes gives \"{}\"", chatBox(chat));
 		});
 		step("", () -> true, 10, () -> {
@@ -593,7 +606,7 @@ public final class DevShots {
 					signPos = p.immutable();
 					StringBuilder sb = new StringBuilder();
 					for (int i = 0; i < 4; i++) {
-						sb.append('[').append(sign.getFrontText().getMessage(i, false).getString()).append(']');
+						sb.append('[').append(sign.getText(net.minecraft.world.level.block.entity.SignTextSlot.FRONT).getMessages(false).get(i).getString()).append(']');
 					}
 					text = sb.toString();
 				}
@@ -711,7 +724,7 @@ public final class DevShots {
 					com.trollclient.macro.MacroManager.isRunning(com.trollclient.macro.MacroManager.byName("devshots chest")));
 			// a real click on the panel's delay button, through Fabric's screen events
 			hoverAt(com.trollclient.gui.tools.GuiToolsPanel.buttonCenter("delay"));
-			clickAt(0);
+			clickAt(InputConstants.MOUSE_BUTTON_LEFT);
 		});
 		step("", () -> true, 3, () -> {
 			TrollClient.LOGGER.info("[devshots] gui tools: after clicking delay, delaying={}, screen={}",
@@ -759,7 +772,7 @@ public final class DevShots {
 		step("macro editor", () -> true, 20, () -> {
 			com.trollclient.gui.macro.MacroEditorScreen editor = (com.trollclient.gui.macro.MacroEditorScreen) mc.gui.screen();
 			hoverAt(editor.stepRowCenter(3));
-			clickAt(0);
+			clickAt(InputConstants.MOUSE_BUTTON_LEFT);
 		});
 		step("", () -> true, 25, () -> shot("20_macro_editor"));
 		step("", () -> true, 1, () -> ((com.trollclient.gui.macro.MacroEditorScreen) mc.gui.screen()).showPalette("packets"));
@@ -775,8 +788,8 @@ public final class DevShots {
 		step("", () -> true, 80, () -> {
 			TrollClient.LOGGER.info("[devshots] bunny macro: ground changes={} (5 hops = 10), still running={}", endWatch(),
 					com.trollclient.macro.MacroManager.isRunning(com.trollclient.macro.MacroManager.byName("bunny")));
-			com.trollclient.macro.MacroManager.byName("bunny").setKey(org.lwjgl.glfw.GLFW.GLFW_KEY_K);
-			pressKey(org.lwjgl.glfw.GLFW.GLFW_KEY_K);
+			com.trollclient.macro.MacroManager.byName("bunny").setKey(InputConstants.KEY_K);
+			pressKey(InputConstants.KEY_K);
 		});
 		step("", () -> true, 3, () -> {
 			TrollClient.LOGGER.info("[devshots] macro key: bunny running after K={}",
@@ -815,8 +828,8 @@ public final class DevShots {
 				java.lang.reflect.Method press = net.minecraft.client.KeyboardHandler.class.getDeclaredMethod("keyPress",
 						long.class, int.class, net.minecraft.client.input.KeyEvent.class);
 				press.setAccessible(true);
-				press.invoke(mc.keyboardHandler, mc.getWindow().handle(), org.lwjgl.glfw.GLFW.GLFW_PRESS,
-						new net.minecraft.client.input.KeyEvent(org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_SHIFT, 0, 0));
+				press.invoke(mc.keyboardHandler, mc.getWindow().handle(), InputConstants.PRESS,
+						new net.minecraft.client.input.KeyEvent(InputConstants.KEY_RSHIFT, 0, 0));
 			} catch (ReflectiveOperationException e) {
 				throw new IllegalStateException(e);
 			}
@@ -985,7 +998,7 @@ public final class DevShots {
 		for (Entity e : mc.level.entitiesForRendering()) {
 			if (e instanceof net.minecraft.world.entity.animal.chicken.Chicken chicken && chicken.isAlive() && chicken.distanceTo(mc.player) < 3.5) {
 				mc.gameMode.attack(mc.player, chicken);
-				mc.player.swing(net.minecraft.world.InteractionHand.MAIN_HAND);
+				com.trollclient.util.Swing.visible(net.minecraft.world.InteractionHand.MAIN_HAND);
 				return;
 			}
 		}
@@ -1030,14 +1043,14 @@ public final class DevShots {
 		return sp != null && sp.containerMenu != sp.inventoryMenu;
 	}
 
-	/** A key press the way GLFW delivers it: KeyboardHandler.keyPress, then our mixin and the screen. */
+	/** A key press the way SDL delivers it: KeyboardHandler.keyPress, then our mixin and the screen. */
 	private static void pressKey(int key) {
 		Minecraft mc = Minecraft.getInstance();
 		try {
 			java.lang.reflect.Method press = net.minecraft.client.KeyboardHandler.class.getDeclaredMethod("keyPress",
 					long.class, int.class, net.minecraft.client.input.KeyEvent.class);
 			press.setAccessible(true);
-			press.invoke(mc.keyboardHandler, mc.getWindow().handle(), org.lwjgl.glfw.GLFW.GLFW_PRESS,
+			press.invoke(mc.keyboardHandler, mc.getWindow().handle(), InputConstants.PRESS,
 					new net.minecraft.client.input.KeyEvent(key, 0, 0));
 		} catch (ReflectiveOperationException e) {
 			throw new IllegalStateException(e);
@@ -1126,19 +1139,12 @@ public final class DevShots {
 	private static void hoverAt(double[] gui) {
 		com.mojang.blaze3d.platform.Window w = Minecraft.getInstance().getWindow();
 		double k = (double) w.getScreenWidth() / w.getGuiScaledWidth();
-		org.lwjgl.glfw.GLFW.glfwSetCursorPos(w.handle(), gui[0] * k, gui[1] * k);
-		try {
-			// macOS doesn't fire the cursor callback for programmatic moves, so feed the handler directly
-			java.lang.reflect.Method move = net.minecraft.client.MouseHandler.class.getDeclaredMethod("onMove",
-					long.class, double.class, double.class);
-			move.setAccessible(true);
-			move.invoke(Minecraft.getInstance().mouseHandler, w.handle(), gui[0] * k, gui[1] * k);
-		} catch (ReflectiveOperationException e) {
-			throw new IllegalStateException(e);
-		}
+		org.lwjgl.sdl.SDLMouse.SDL_WarpMouseInWindow(w.handle(), (float) (gui[0] * k), (float) (gui[1] * k));
+		// macOS doesn't report programmatic moves, so feed the handler directly
+		Minecraft.getInstance().mouseHandler.onMove(w.handle(), gui[0] * k, gui[1] * k, 0, 0);
 	}
 
-	/** Presses and releases a mouse button where the cursor is, the way GLFW would report it. */
+	/** Presses and releases a mouse button where the cursor is, the way SDL would report it. */
 	private static void clickAt(int button) {
 		Minecraft mc = Minecraft.getInstance();
 		try {
@@ -1146,8 +1152,8 @@ public final class DevShots {
 					long.class, net.minecraft.client.input.MouseButtonInfo.class, int.class);
 			onButton.setAccessible(true);
 			net.minecraft.client.input.MouseButtonInfo info = new net.minecraft.client.input.MouseButtonInfo(button, 0);
-			onButton.invoke(mc.mouseHandler, mc.getWindow().handle(), info, org.lwjgl.glfw.GLFW.GLFW_PRESS);
-			onButton.invoke(mc.mouseHandler, mc.getWindow().handle(), info, org.lwjgl.glfw.GLFW.GLFW_RELEASE);
+			onButton.invoke(mc.mouseHandler, mc.getWindow().handle(), info, InputConstants.PRESS);
+			onButton.invoke(mc.mouseHandler, mc.getWindow().handle(), info, InputConstants.RELEASE);
 		} catch (ReflectiveOperationException e) {
 			throw new IllegalStateException(e);
 		}

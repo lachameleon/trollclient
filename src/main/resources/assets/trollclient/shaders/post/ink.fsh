@@ -1,17 +1,18 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
 // Pen and ink: Sobel edges become black lines on paper, dark areas get cross-hatched.
 
 uniform sampler2D InSampler;
 
-in vec2 texCoord;
+layout(location = 0) in vec2 texCoord;
 
 layout(std140) uniform SamplerInfo {
     vec2 OutSize;
     vec2 InSize;
 };
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 float lum(vec2 uv) {
     return dot(texture(InSampler, uv).rgb, vec3(0.299, 0.587, 0.114));

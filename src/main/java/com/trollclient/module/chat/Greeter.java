@@ -9,6 +9,7 @@ import com.trollclient.setting.NumberSetting;
 import com.trollclient.setting.TextSetting;
 import com.trollclient.util.ChatUtil;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -88,7 +89,7 @@ public class Greeter extends Module {
 				Rotations.request(look[0], look[1], 4, true);
 			}
 			if (waveTicks % 5 == 0) {
-				mc.player.swing(InteractionHand.MAIN_HAND);
+				Swing.visible(InteractionHand.MAIN_HAND);
 			}
 		}
 		long now = System.currentTimeMillis();

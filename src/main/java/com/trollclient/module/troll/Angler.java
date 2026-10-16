@@ -7,6 +7,7 @@ import com.trollclient.setting.NumberSetting;
 import com.trollclient.util.Delay;
 import com.trollclient.util.InventoryUtil;
 import com.trollclient.util.Rotations;
+import com.trollclient.util.Swing;
 import com.trollclient.util.Targets;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -158,7 +159,7 @@ public class Angler extends Module {
 		}
 		hand = found;
 		use();
-		mc.player.swing(hand);
+		Swing.local(hand);
 		casts++;
 		state = State.CAST;
 		lineTicks = 0;

@@ -1,5 +1,6 @@
 package com.trollclient.gui.title;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.mojang.realmsclient.RealmsMainScreen;
 import com.trollclient.TrollClient;
@@ -18,6 +19,7 @@ import com.trollclient.module.ModuleManager;
 import com.trollclient.module.client.ThemeModule;
 import com.trollclient.module.client.TitleScreenModule;
 import com.trollclient.util.ColorUtil;
+import com.trollclient.util.Site;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -31,7 +33,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -59,7 +60,7 @@ public class TrollTitleScreen extends Screen {
 	private static final String[] SPLASHES = {
 			"now with 100% more twerking!", "crystals? cancelled.", "no way home!", "nom nom nom (never finishes)",
 			"wind charge to the face!", "follow me!", "arrows? nope.", "certified annoying", "black & white & read all over",
-			"right shift for fun", "your path is blocked", "it's not a bug, it's a troll", "26.2 compatible!",
+			"right shift for fun", "your path is blocked", "it's not a bug, it's a troll", "26.3 compatible!",
 			"skeet? never heard of it", "fabric, not cotton"
 	};
 	private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm");
@@ -128,7 +129,7 @@ public class TrollTitleScreen extends Screen {
 			// we replace the menu that Mod Menu's button lives on, so offer it here instead
 			items.add(new Item("mods", "everything else you've installed", this::openModMenu, () -> true));
 		}
-		items.add(new Item("options", "the vanilla kind", () -> minecraft.gui.setScreen(new OptionsScreen(this, minecraft.options, false)), () -> true));
+		items.add(new Item("options", "the vanilla kind", () -> minecraft.gui.setScreen(new OptionsScreen(this, minecraft.options)), () -> true));
 		items.add(new Item("troll client", "modules, themes, the good stuff", () -> minecraft.gui.setScreen(new ClickGuiScreen(this)), () -> true));
 		items.add(new Item("quit", "rage quit", () -> minecraft.stop(), () -> true));
 		itemHover = new Anim[items.size()];
@@ -787,7 +788,8 @@ public class TrollTitleScreen extends Screen {
 	private void drawChrome(GuiGraphicsExtractor g, int mouseX, int mouseY) {
 		float time = Motion.time();
 		String version = SharedConstants.getCurrentVersion().name();
-		Draw.text(g, "troll client 1.0 / minecraft " + version + " / fabric", 6, height - 12, ColorUtil.fade(Theme.textDim, 0.85f));
+		Draw.text(g, "troll client " + Site.version(TrollClient.MOD_ID) + " / minecraft " + version + " / fabric", 6, height - 12,
+				ColorUtil.fade(Theme.textDim, 0.85f));
 		Draw.textRight(g, "Copyright Mojang AB. Do not distribute!", width - 6, height - 12, ColorUtil.fade(Theme.textDim, 0.85f));
 
 		String clock = LocalTime.now().format(CLOCK);
@@ -896,11 +898,11 @@ public class TrollTitleScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (inBox(event.x(), event.y(), themeBox()) && (event.button() == 0 || event.button() == 1)) {
-			cycleTheme(event.button() == 1 ? -1 : 1);
+		if (inBox(event.x(), event.y(), themeBox()) && (event.button() == InputConstants.MOUSE_BUTTON_LEFT || event.button() == InputConstants.MOUSE_BUTTON_RIGHT)) {
+			cycleTheme(event.button() == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1);
 			return true;
 		}
-		if (event.button() != 0) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return true;
 		}
 		if (inBox(event.x(), event.y(), vanillaBox())) {
@@ -937,28 +939,28 @@ public class TrollTitleScreen extends Screen {
 	@Override
 	public boolean keyPressed(KeyEvent event) {
 		int key = event.key();
-		if (key == GLFW.GLFW_KEY_DOWN || key == GLFW.GLFW_KEY_TAB) {
+		if (key == InputConstants.KEY_DOWN || key == InputConstants.KEY_TAB) {
 			keyboardMode = true;
 			selected = selected < 0 ? 0 : (selected + 1) % items.size();
 			Sounds.tick();
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_UP) {
+		if (key == InputConstants.KEY_UP) {
 			keyboardMode = true;
 			selected = selected < 0 ? items.size() - 1 : Math.floorMod(selected - 1, items.size());
 			Sounds.tick();
 			return true;
 		}
-		if ((key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER || key == GLFW.GLFW_KEY_SPACE) && selected >= 0) {
+		if ((key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER || key == InputConstants.KEY_SPACE) && selected >= 0) {
 			activate(selected);
 			return true;
 		}
-		if (key == GLFW.GLFW_KEY_T && settings().themeButton.get()) {
+		if (key == InputConstants.KEY_T && settings().themeButton.get()) {
 			cycleTheme(event.hasShiftDown() ? -1 : 1);
 			return true;
 		}
-		if (key >= GLFW.GLFW_KEY_1 && key < GLFW.GLFW_KEY_1 + items.size()) {
-			selected = key - GLFW.GLFW_KEY_1;
+		if (key >= InputConstants.KEY_1 && key < InputConstants.KEY_1 + items.size()) {
+			selected = key - InputConstants.KEY_1;
 			activate(selected);
 			return true;
 		}

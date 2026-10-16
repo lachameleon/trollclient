@@ -1,5 +1,6 @@
 package com.trollclient.gui.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.trollclient.gui.Anim;
 import com.trollclient.gui.Draw;
 import com.trollclient.gui.Icon;
@@ -169,10 +170,10 @@ public class ModeRow extends Row {
 				cx += segW;
 			}
 			// clicking the label cycles too
-			cycle(button == 1 ? -1 : 1);
+			cycle(button == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1);
 			return true;
 		}
-		cycle(button == 1 ? -1 : 1);
+		cycle(button == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1);
 		return true;
 	}
 
